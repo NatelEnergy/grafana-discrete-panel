@@ -34,7 +34,7 @@ module.exports = (grunt) => {
           archive: 'archive.zip'
         },
         files: [
-          {src: ['dist/**'], cwd: 'dist', dest: '/' }
+          { src: 'dist/**' }
         ]
       }
     },
