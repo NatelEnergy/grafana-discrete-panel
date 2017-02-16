@@ -10,8 +10,8 @@
     },
     "keywords": [ "discrete", "events", "strings" ],
     "logos": {
-      "small": "src/img/discrete.svg",
-      "large": "src/img/discrete.svg"
+      "small": "src/img/discrete_logo.svg",
+      "large": "src/img/discrete_logo.svg"
     },
     "links": [
       {"name": "Project site", "url": "https://github.com/NatelEnergy/grafana-influx-admin"},
