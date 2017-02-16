@@ -18,7 +18,10 @@
       {"name": "MIT License",  "url": "https://github.com/NatelEnergy/grafana-influx-admin/blob/master/LICENSE"}
     ],
     "screenshots": [
-      { "name": "Single State",     "path": "src/img/screenshot-single.png"    },
+      { "name": "Single State",     "path": "src/img/screenshot-single-1.png"  },
+      { "name": "Tooltips",         "path": "src/img/screenshot-single-2.png"  },
+      { "name": "Summary Tooltips", "path": "src/img/screenshot-single-3.png"  },
+      { "name": "Show all values",  "path": "src/img/screenshot-single-4.png"  },
       { "name": "Multiple Results", "path": "src/img/screenshot-multiple.png"  },
       { "name": "Options",          "path": "src/img/screenshot-options.png"   }
     ],
