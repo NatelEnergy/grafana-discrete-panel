@@ -28,6 +28,17 @@ module.exports = (grunt) => {
       }
     },
 
+    compress: {
+      main: {
+        options: {
+          archive: 'archive.zip'
+        },
+        files: [
+          {src: ['dist/**'], cwd: 'dist', dest: '/' }
+        ]
+      }
+    },
+
     watch: {
       rebuild_all: {
         files: ['src/**/*', 'plugin.json'],
@@ -55,5 +66,5 @@ module.exports = (grunt) => {
 
   });
 
-  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'babel']);
+  grunt.registerTask('default', ['clean', 'copy:src_to_dist', 'copy:pluginDef', 'copy:img_to_dist', 'compress', 'babel']);
 };
