@@ -15,7 +15,8 @@
     },
     "links": [
       {"name": "Project site", "url": "https://github.com/NatelEnergy/grafana-influx-admin"},
-      {"name": "MIT License",  "url": "https://github.com/NatelEnergy/grafana-influx-admin/blob/master/LICENSE"}
+      {"name": "MIT License",  "url": "https://github.com/NatelEnergy/grafana-influx-admin/blob/master/LICENSE"},
+      {"name": "Natel Energy", "url": "http://www.natelenergy.com/"}
     ],
     "screenshots": [
       { "name": "Single State",     "path": "src/img/screenshot-single-1.png"  },
