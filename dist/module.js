@@ -162,10 +162,13 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               // The no-data line
               ctx.fillStyle = '#333333';
               ctx.fillRect(0, top, width, rowHeight);
-              ctx.fillStyle = "#111111";
-              ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
-              ctx.textAlign = 'left';
-              ctx.fillText("No Data", 10, centerV);
+
+              if (!_this2.panel.writeMetricNames) {
+                ctx.fillStyle = "#111111";
+                ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText("No Data", 10, centerV);
+              }
 
               var lastBS = 0;
               var point = metric.changes[0];
