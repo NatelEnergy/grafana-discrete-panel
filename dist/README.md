@@ -15,6 +15,11 @@ choice to display string or boolean data
 
 #### Changelog
 
+##### v0.0.2
+
+- Use the panel time shift.
+
+
 ##### v0.0.1
 
 - First working version

@@ -69,10 +69,10 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
       _export('PanelCtrl', DiscretePanelCtrl = function (_CanvasPanelCtrl) {
         _inherits(DiscretePanelCtrl, _CanvasPanelCtrl);
 
-        function DiscretePanelCtrl($scope, $injector, $q, timeSrv) {
+        function DiscretePanelCtrl($scope, $injector, $q) {
           _classCallCheck(this, DiscretePanelCtrl);
 
-          var _this = _possibleConstructorReturn(this, (DiscretePanelCtrl.__proto__ || Object.getPrototypeOf(DiscretePanelCtrl)).call(this, $scope, $injector, $q, timeSrv));
+          var _this = _possibleConstructorReturn(this, (DiscretePanelCtrl.__proto__ || Object.getPrototypeOf(DiscretePanelCtrl)).call(this, $scope, $injector, $q));
 
           _this.data = null;
 
@@ -153,8 +153,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
             var top = 0;
 
-            var range = this.timeSrv.timeRange();
-            var elapsed = range.to - range.from;
+            var elapsed = this.range.to - this.range.from;
 
             _.forEach(this.data, function (metric) {
               var centerV = top + rowHeight / 2;
@@ -174,8 +173,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               var point = metric.changes[0];
               for (var i = 0; i < metric.changes.length; i++) {
                 point = metric.changes[i];
-                if (point.start <= range.to) {
-                  var xt = Math.max(point.start - range.from, 0);
+                if (point.start <= _this2.range.to) {
+                  var xt = Math.max(point.start - _this2.range.from, 0);
                   point.x = xt / elapsed * width;
                   ctx.fillStyle = _this2.getColor(point.val);
                   ctx.fillRect(point.x, top, width, rowHeight);
@@ -436,8 +435,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
             $(this.canvas).css('cursor', 'pointer');
 
-            var range = this.timeSrv.timeRange();
-            var elapsed = range.to - range.from;
+            var elapsed = this.range.to - this.range.from;
             var data = [];
             _.forEach(dataList, function (metric) {
               var valToInfo = {};
@@ -469,7 +467,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               });
 
               if (last != null) {
-                _this3._processLast(last, range.to, res, valToInfo);
+                _this3._processLast(last, _this3.range.to, res, valToInfo);
               };
 
               // Remove null from the legend if it is the first value and small (common for influx queries)

@@ -67,12 +67,11 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
       _export('CanvasPanelCtrl', CanvasPanelCtrl = function (_MetricsPanelCtrl) {
         _inherits(CanvasPanelCtrl, _MetricsPanelCtrl);
 
-        function CanvasPanelCtrl($scope, $injector, $q, timeSrv) {
+        function CanvasPanelCtrl($scope, $injector, $q) {
           _classCallCheck(this, CanvasPanelCtrl);
 
           var _this = _possibleConstructorReturn(this, (CanvasPanelCtrl.__proto__ || Object.getPrototypeOf(CanvasPanelCtrl)).call(this, $scope, $injector));
 
-          _this.timeSrv = timeSrv;
           _this.q = $q;
           _this.data = null;
           _this.mouse = {
@@ -178,9 +177,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
           value: function getMousePosition(evt) {
             var rect = this.canvas.getBoundingClientRect();
             var x = evt.clientX - rect.left;
-            var range = this.timeSrv.timeRange();
-            var elapsed = range.to - range.from;
-            var ts = range.from + elapsed * (x / rect.width);
+            var elapsed = this.range.to - this.range.from;
+            var ts = this.range.from + elapsed * (x / rect.width);
 
             return {
               x: x,
