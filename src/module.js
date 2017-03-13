@@ -8,8 +8,8 @@ import angular from 'angular';
 
 class DiscretePanelCtrl extends CanvasPanelCtrl {
 
-  constructor($scope, $injector, $q, timeSrv) {
-    super($scope, $injector, $q, timeSrv);
+  constructor($scope, $injector, $q) {
+    super($scope, $injector, $q);
 
     this.data = null;
 
@@ -92,8 +92,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     var top = 0;
 
-    var range = this.timeSrv.timeRange();
-    var elapsed = range.to - range.from;
+    var elapsed = this.range.to - this.range.from;
 
     _.forEach(this.data, (metric) => {
       var centerV = top + (rowHeight/2);
@@ -113,8 +112,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       var point = metric.changes[0];
       for(var i=0; i<metric.changes.length; i++) {
         point = metric.changes[i];
-        if(point.start <= range.to) {
-          var xt = Math.max( point.start - range.from, 0 );
+        if(point.start <= this.range.to) {
+          var xt = Math.max( point.start - this.range.from, 0 );
           point.x = (xt / elapsed) * width;
           ctx.fillStyle = this.getColor( point.val );
           ctx.fillRect(point.x, top, width, rowHeight);
@@ -382,8 +381,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onDataReceived(dataList) {
     $(this.canvas).css( 'cursor', 'pointer' );
 
-    var range = this.timeSrv.timeRange();
-    var elapsed = range.to - range.from;
+    var elapsed = this.range.to - this.range.from;
     var data = [];
     _.forEach(dataList, (metric) => {
       var valToInfo = {};
@@ -415,7 +413,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       });
 
       if(last!=null) {
-        this._processLast( last, range.to, res, valToInfo);
+        this._processLast( last, this.range.to, res, valToInfo);
       };
 
       // Remove null from the legend if it is the first value and small (common for influx queries)

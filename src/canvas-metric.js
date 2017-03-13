@@ -9,10 +9,9 @@ import angular from 'angular';
 // <div class="canvas-spot"></div>
 export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
-  constructor($scope, $injector, $q, timeSrv) {
+  constructor($scope, $injector, $q) {
     super($scope, $injector);
 
-    this.timeSrv = timeSrv;
     this.q = $q;
     this.data = null;
     this.mouse = {
@@ -116,9 +115,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   getMousePosition(evt) {
     var rect = this.canvas.getBoundingClientRect();
     var x = evt.clientX - rect.left;
-    var range = this.timeSrv.timeRange();
-    var elapsed = range.to - range.from;
-    var ts = range.from + (elapsed*(x/rect.width));
+    var elapsed = this.range.to - this.range.from;
+    var ts = this.range.from + (elapsed*(x/rect.width));
 
     return {
       x: x,
