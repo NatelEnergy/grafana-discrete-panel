@@ -10,24 +10,24 @@
     },
     "keywords": [ "discrete", "events", "strings" ],
     "logos": {
-      "small": "src/img/discrete_logo.svg",
-      "large": "src/img/discrete_logo.svg"
+      "small": "img/discrete_logo.svg",
+      "large": "img/discrete_logo.svg"
     },
     "links": [
-      {"name": "Project site", "url": "https://github.com/NatelEnergy/grafana-influx-admin"},
-      {"name": "MIT License",  "url": "https://github.com/NatelEnergy/grafana-influx-admin/blob/master/LICENSE"},
+      {"name": "Project site", "url": "https://github.com/NatelEnergy/grafana-discrete-panel"},
+      {"name": "MIT License",  "url": "https://github.com/NatelEnergy/grafana-discrete-panel/blob/master/LICENSE"},
       {"name": "Natel Energy", "url": "http://www.natelenergy.com/"}
     ],
     "screenshots": [
-      { "name": "Single State",     "path": "src/img/screenshot-single-1.png"  },
-      { "name": "Tooltips",         "path": "src/img/screenshot-single-2.png"  },
-      { "name": "Summary Tooltips", "path": "src/img/screenshot-single-3.png"  },
-      { "name": "Show all values",  "path": "src/img/screenshot-single-4.png"  },
-      { "name": "Multiple Results", "path": "src/img/screenshot-multiple.png"  },
-      { "name": "Options",          "path": "src/img/screenshot-options.png"   }
+      { "name": "Single State",     "path": "img/screenshot-single-1.png"  },
+      { "name": "Tooltips",         "path": "img/screenshot-single-2.png"  },
+      { "name": "Summary Tooltips", "path": "img/screenshot-single-3.png"  },
+      { "name": "Show all values",  "path": "img/screenshot-single-4.png"  },
+      { "name": "Multiple Results", "path": "img/screenshot-multiple.png"  },
+      { "name": "Options",          "path": "img/screenshot-options.png"   }
     ],
-    "version": "0.0.1",
-    "updated": "2016-02-01"
+    "version": "0.0.2",
+    "updated": "2017-03-14"
   },
 
   "dependencies": {
