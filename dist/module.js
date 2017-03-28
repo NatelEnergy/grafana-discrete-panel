@@ -658,17 +658,19 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             if (this.data) {
               var range = this.timeSrv.timeRange();
               var hover = null;
-              for (var j = 0; j < this.data.length; j++) {
-                if (true) {
-                  // TODO, pick the right one!
-                  hover = this.data[j].changes[0];
-                  for (var i = 0; i < this.data[j].changes.length; i++) {
-                    if (this.data[j].changes[i].start > this.mouse.position.ts) {
-                      break;
-                    }
-                    hover = this.data[j].changes[i];
-                  }
+              var j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
+              if (j < 0) {
+                j = 0;
+              }
+              if (j >= this.data.length) {
+                j = this.data.length - 1;
+              }
+              hover = this.data[j].changes[0];
+              for (var i = 0; i < this.data[j].changes.length; i++) {
+                if (this.data[j].changes[i].start > this.mouse.position.ts) {
+                  break;
                 }
+                hover = this.data[j].changes[i];
               }
               this.hoverPoint = hover;
               this.showTooltip(evt, hover);
