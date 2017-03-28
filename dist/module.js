@@ -109,6 +109,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
             colorMaps: [{ text: 'N/A', color: '#CCC' }],
             metricNameColor: '#000000',
+            valueTextColor: '#000000',
             backgroundColor: 'rgba(128, 128, 128, 0.1)',
             lineColor: 'rgba(128, 128, 128, 1.0)',
             writeLastValue: true,
@@ -214,7 +215,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                   ctx.fillRect(point.x, top, width * (point.ms / elapsed), rowHeight);
 
                   if (_this2.panel.writeAllValues) {
-                    ctx.fillStyle = "#000000";
+                    ctx.fillStyle = _this2.panel.valueTextColor;
                     ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                     ctx.textAlign = 'left';
 
