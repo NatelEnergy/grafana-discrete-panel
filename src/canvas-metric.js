@@ -120,7 +120,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     return {
       x: x,
-      y: evt.clientY - rect.right,
+      y: evt.clientY - rect.top,
       ts: ts,
       evt: evt
     };
