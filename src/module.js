@@ -395,7 +395,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
                 start: start.format('x'),
                 ms: end.diff(start)
             };
-            console.log(pt);
             var res = {
                 name: point.desc,
                 changes: [pt],

@@ -450,7 +450,6 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                     start: start.format('x'),
                     ms: end.diff(start)
                   };
-                  console.log(pt);
                   var res = {
                     name: point.desc,
                     changes: [pt],
