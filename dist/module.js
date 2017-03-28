@@ -177,7 +177,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                   var xt = Math.max(point.start - _this2.range.from, 0);
                   point.x = xt / elapsed * width;
                   ctx.fillStyle = _this2.getColor(point.val);
-                  ctx.fillRect(point.x, top, width, rowHeight);
+                  ctx.fillRect(point.x, top, width * (point.ms / elapsed), rowHeight);
 
                   if (_this2.panel.writeAllValues) {
                     ctx.fillStyle = "#000000";
