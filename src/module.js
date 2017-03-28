@@ -29,6 +29,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       colorMaps: [
         { text: 'N/A', color: '#CCC' }
       ],
+      metricNameColor: '#000000',
       writeLastValue: true,
       writeAllValues: false,
       writeMetricNames: false,
@@ -145,6 +146,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
       if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
+        ctx.fillStyle = this.panel.metricNameColor;
         ctx.textAlign = 'left';
         ctx.fillText( metric.name, 10, centerV);
       }
