@@ -36,7 +36,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       showLegend: true,
       showLegendPercent: true,
       highlightOnMouseover: true,
-      queryAllData: false
+      queryAllData: false,
+      eventBeginField: 'begin',
+      eventEndField: 'end',
+      eventNameField: 'desc'
     };
     _.defaults(this.panel, panelDefaults);
 
@@ -415,12 +418,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if (metric.type === 'docs') { // handle discrete events
         _.forEach(metric.datapoints, (point) => {
-          var start = moment(point.begin);
+          var start = moment(point[this.panel.eventBeginField]);
           var startMs = start.format('x');
-          if (!point.end || point.end === '') {
-            point.end = this.range.to;
+          var end = this.range.to;
+          if ([this.panel.eventEndField] && point[this.panel.eventEndField] !== '') {
+            end = moment(point[this.panel.eventEndField]);
           }
-          var end = moment(point.end);
           var endMs = end.format('x');
           if (!(startMs > this.range.to || endMs < this.range.from)) {
             var pt = {
@@ -429,7 +432,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
               ms: end.diff(start)
             };
             var res = {
-              name: point.desc,
+              name: point[this.panel.eventNameField],
               changes: [pt],
               tooManyValues: false,
               legendInfo: []
