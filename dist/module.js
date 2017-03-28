@@ -83,6 +83,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             mappingTypes: [{ name: 'value to text', value: 1 }, { name: 'range to text', value: 2 }],
             rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
             colorMaps: [{ text: 'N/A', color: '#CCC' }],
+            metricNameColor: '#000000',
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
@@ -203,6 +204,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
               if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
+                ctx.fillStyle = _this2.panel.metricNameColor;
                 ctx.textAlign = 'left';
                 ctx.fillText(metric.name, 10, centerV);
               }
