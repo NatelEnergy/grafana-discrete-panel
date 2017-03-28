@@ -439,59 +439,80 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             var data = [];
             _.forEach(dataList, function (metric) {
               var valToInfo = {};
-              var res = {
-                name: metric.target,
-                changes: [],
-                tooManyValues: false,
-                legendInfo: [] };
-              data.push(res);
 
-              var last = null;
-              _.forEach(metric.datapoints, function (point) {
-
-                var norm = _this3.formatValue(point[0]);
-                if (last == null || norm != last.val) {
+              if (metric.type === 'docs') {
+                // handle discrete events
+                _.forEach(metric.datapoints, function (point) {
+                  var start = moment(point.begin);
+                  var end = moment(point.end);
                   var pt = {
-                    val: norm,
-                    start: point[1],
-                    ms: 0 // time in this state
+                    val: 1,
+                    start: start.format('x'),
+                    ms: end.diff(start)
                   };
-
-                  if (last != null) {
-                    _this3._processLast(last, pt.start, res, valToInfo);
+                  console.log(pt);
+                  var res = {
+                    name: point.desc,
+                    changes: [pt],
+                    tooManyValues: false,
+                    legendInfo: []
                   };
+                  data.push(res);
+                });
+              } else {
+                var res = {
+                  name: metric.target,
+                  changes: [],
+                  tooManyValues: false,
+                  legendInfo: [] };
+                data.push(res);
+                var last = null;
+                _.forEach(metric.datapoints, function (point) {
 
-                  res.changes.push(pt);
-                  last = pt;
-                }
-              });
+                  var norm = _this3.formatValue(point[0]);
+                  if (last == null || norm != last.val) {
+                    var pt = {
+                      val: norm,
+                      start: point[1],
+                      ms: 0 // time in this state
+                    };
 
-              if (last != null) {
-                _this3._processLast(last, _this3.range.to, res, valToInfo);
-              };
+                    if (last != null) {
+                      _this3._processLast(last, pt.start, res, valToInfo);
+                    };
 
-              // Remove null from the legend if it is the first value and small (common for influx queries)
-              var nullText = _this3.formatValue(null);
-              if (res.changes.length > 1 && _.has(valToInfo, nullText)) {
-                var info = valToInfo[nullText];
-                if (info.count == 1) {
-                  var per = info.ms / elapsed;
-                  if (per < .02) {
-                    if (res.changes[0].val == nullText) {
-                      console.log('Removing null', info);
-                      delete valToInfo[nullText];
+                    res.changes.push(pt);
+                    last = pt;
+                  }
+                });
 
-                      res.changes[1].start = res.changes[0].start;
-                      res.changes[1].ms += res.changes[0].ms;
-                      res.changes.splice(0, 1);
+                if (last != null) {
+                  _this3._processLast(last, _this3.range.to, res, valToInfo);
+                };
+
+                // Remove null from the legend if it is the first value and small (common for influx queries)
+                var nullText = _this3.formatValue(null);
+                if (res.changes.length > 1 && _.has(valToInfo, nullText)) {
+                  var info = valToInfo[nullText];
+                  if (info.count == 1) {
+                    var per = info.ms / elapsed;
+                    if (per < .02) {
+                      if (res.changes[0].val == nullText) {
+                        console.log('Removing null', info);
+                        delete valToInfo[nullText];
+
+                        res.changes[1].start = res.changes[0].start;
+                        res.changes[1].ms += res.changes[0].ms;
+                        res.changes.splice(0, 1);
+                      }
                     }
                   }
                 }
+                _.forEach(valToInfo, function (value) {
+                  value.per = Math.round(value.ms / elapsed * 100);
+                  res.legendInfo.push(value);
+                });
               }
-              _.forEach(valToInfo, function (value) {
-                value.per = Math.round(value.ms / elapsed * 100);
-                res.legendInfo.push(value);
-              });
             });
             this.data = data;
 

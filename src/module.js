@@ -385,59 +385,79 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var data = [];
     _.forEach(dataList, (metric) => {
       var valToInfo = {};
-      var res = { 
-        name: metric.target, 
-        changes: [],
-        tooManyValues: false,
-        legendInfo: [] };
-      data.push( res );
 
-      var last = null;
-      _.forEach(metric.datapoints, (point) => {
+      if (metric.type === 'docs') { // handle discrete events
+        _.forEach(metric.datapoints, (point) => {
+            var start = moment(point.begin);
+            var end = moment(point.end);
+            var pt = {
+                val: 1,
+                start: start.format('x'),
+                ms: end.diff(start)
+            };
+            console.log(pt);
+            var res = {
+                name: point.desc,
+                changes: [pt],
+                tooManyValues: false,
+                legendInfo: []
+            };
+            data.push(res);
+        });
+      } else {
+        var res = { 
+            name: metric.target, 
+            changes: [],
+            tooManyValues: false,
+            legendInfo: [] };
+        data.push( res );
+        var last = null;
+        _.forEach(metric.datapoints, (point) => {
 
-        var norm = this.formatValue(point[0]);
-        if(last==null || norm != last.val) {
-          var pt = {
-            val: norm,
-            start: point[1],
-            ms: 0 // time in this state
-          }
+            var norm = this.formatValue(point[0]);
+            if(last==null || norm != last.val) {
+                var pt = {
+                    val: norm,
+                    start: point[1],
+                    ms: 0 // time in this state
+                }
 
-          if(last!=null) {
-            this._processLast( last, pt.start, res, valToInfo);
-          };
+                if(last!=null) {
+                    this._processLast( last, pt.start, res, valToInfo);
+                };
 
-          res.changes.push(pt);
-          last = pt;
-        }
-      });
-
-      if(last!=null) {
-        this._processLast( last, this.range.to, res, valToInfo);
-      };
-
-      // Remove null from the legend if it is the first value and small (common for influx queries)
-      var nullText = this.formatValue(null);
-      if( res.changes.length > 1 && _.has(valToInfo, nullText ) ) {
-        var info = valToInfo[nullText];
-        if(info.count == 1 ) { 
-          var per = (info.ms/elapsed);
-          if( per < .02 ) {
-            if(res.changes[0].val == nullText) {
-              console.log( 'Removing null', info );
-              delete valToInfo[nullText];
-
-              res.changes[1].start = res.changes[0].start;
-              res.changes[1].ms += res.changes[0].ms;
-              res.changes.splice(0, 1);
+                res.changes.push(pt);
+                last = pt;
             }
-          }
+        });
+
+        if(last!=null) {
+            this._processLast( last, this.range.to, res, valToInfo);
+        };
+
+        // Remove null from the legend if it is the first value and small (common for influx queries)
+        var nullText = this.formatValue(null);
+        if( res.changes.length > 1 && _.has(valToInfo, nullText ) ) {
+            var info = valToInfo[nullText];
+            if(info.count == 1 ) { 
+                var per = (info.ms/elapsed);
+                if( per < .02 ) {
+                    if(res.changes[0].val == nullText) {
+                        console.log( 'Removing null', info );
+                        delete valToInfo[nullText];
+
+                        res.changes[1].start = res.changes[0].start;
+                        res.changes[1].ms += res.changes[0].ms;
+                        res.changes.splice(0, 1);
+                    }
+                }
+            }
         }
+        _.forEach(valToInfo, (value) => {
+            value.per = Math.round( (value.ms/elapsed)*100 );
+            res.legendInfo.push( value );
+        });
       }
-      _.forEach(valToInfo, (value) => {
-        value.per = Math.round( (value.ms/elapsed)*100 );
-        res.legendInfo.push( value );
-      });
     });
     this.data = data;
     
