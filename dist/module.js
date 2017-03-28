@@ -87,7 +87,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             writeAllValues: false,
             writeMetricNames: false,
             showLegend: true,
-            showLegendPercent: true
+            showLegendPercent: true,
+            highlightOnMouseover: true
           };
           _.defaults(_this.panel, panelDefaults);
 
@@ -201,7 +202,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               ctx.fillStyle = "#000000";
               ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
-              if (_this2.panel.writeMetricNames && (_this2.mouse.position == null || _this2.mouse.position.x > 200)) {
+              if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
                 ctx.textAlign = 'left';
                 ctx.fillText(metric.name, 10, centerV);
               }
@@ -209,7 +210,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               ctx.textAlign = 'right';
 
               if (_this2.mouse.down == null) {
-                if (_this2.mouse.position != null) {
+                if (_this2.panel.highlightOnMouseover && _this2.mouse.position != null) {
                   point = metric.changes[0];
                   var next = null;
                   for (var i = 0; i < metric.changes.length; i++) {

@@ -33,7 +33,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       writeAllValues: false,
       writeMetricNames: false,
       showLegend: true,
-      showLegendPercent: true
+      showLegendPercent: true,
+      highlightOnMouseover: true,
     };
     _.defaults(this.panel, panelDefaults);
 
@@ -142,7 +143,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       ctx.fillStyle = "#000000";
       ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
-      if(this.panel.writeMetricNames && (this.mouse.position==null || this.mouse.position.x > 200 ) ) {
+      if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
         ctx.textAlign = 'left';
         ctx.fillText( metric.name, 10, centerV);
       }
@@ -150,7 +151,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       ctx.textAlign = 'right';
 
       if( this.mouse.down == null ) {
-        if( this.mouse.position != null ) {
+        if( this.panel.highlightOnMouseover && this.mouse.position != null ) {
           point = metric.changes[0];
           var next = null;
           for(var i=0; i<metric.changes.length; i++) {
