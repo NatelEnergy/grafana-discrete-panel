@@ -91,6 +91,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             writeAllValues: false,
             writeMetricNames: false,
             showLegend: true,
+            showLegendNames: true,
             showLegendPercent: true,
             highlightOnMouseover: true
           };

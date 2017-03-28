@@ -37,6 +37,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       writeAllValues: false,
       writeMetricNames: false,
       showLegend: true,
+      showLegendNames: true,
       showLegendPercent: true,
       highlightOnMouseover: true,
     };
