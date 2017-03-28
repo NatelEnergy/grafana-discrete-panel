@@ -109,6 +109,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
             colorMaps: [{ text: 'N/A', color: '#CCC' }],
             metricNameColor: '#000000',
+            backgroundColor: 'rgba(128, 128, 128, 0.1)',
+            lineColor: 'rgba(128, 128, 128, 1.0)',
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
@@ -191,15 +193,15 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               var centerV = top + rowHeight / 2;
 
               // The no-data line
-              ctx.fillStyle = '#333333';
+              ctx.fillStyle = _this2.panel.backgroundColor;
               ctx.fillRect(0, top, width, rowHeight);
 
-              if (!_this2.panel.writeMetricNames) {
+              /*if(!this.panel.writeMetricNames) {
                 ctx.fillStyle = "#111111";
                 ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText("No Data", 10, centerV);
-              }
+              }*/
 
               var lastBS = 0;
               var point = metric.changes[0];
@@ -223,7 +225,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               }
 
               if (top > 0) {
-                ctx.fillStyle = "#DDDDDD";
+                ctx.strokeStyle = _this2.panel.lineColor;
                 ctx.beginPath();
                 ctx.moveTo(0, top);
                 ctx.lineTo(width, top);

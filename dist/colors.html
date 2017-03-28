@@ -11,6 +11,26 @@
                 <spectrum-picker ng-model="ctrl.panel.metricNameColor" ng-change="ctrl.updateColorInfo()" ></spectrum-picker>
             </span>
         </div>
+
+        <div class="gf-form">
+            <span class="gf-form-label">
+                Background
+            </span>
+            <input type="text" placeholder="text" ng-model="ctrl.panel.backgroundColor" class="gf-form-input max-width-8" ng-blur="ctrl.updateColorInfo()">
+            <span class="gf-form-label">
+                <spectrum-picker ng-model="ctrl.panel.backgroundColor" ng-change="ctrl.updateColorInfo()" ></spectrum-picker>
+            </span>
+        </div>
+
+        <div class="gf-form">
+            <span class="gf-form-label">
+                Lines
+            </span>
+            <input type="text" placeholder="text" ng-model="ctrl.panel.lineColor" class="gf-form-input max-width-8" ng-blur="ctrl.updateColorInfo()">
+            <span class="gf-form-label">
+                <spectrum-picker ng-model="ctrl.panel.lineColor" ng-change="ctrl.updateColorInfo()" ></spectrum-picker>
+            </span>
+        </div>
     </div>
 </div>
 
