@@ -39,6 +39,14 @@
 
     <div class="gf-form">
       <gf-form-switch class="gf-form" 
+        label="Show Metric Names in Legend" 
+        label-class="query-keyword width-12" 
+        checked="ctrl.panel.showLegendNames" 
+        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+    </div>
+
+    <div class="gf-form">
+      <gf-form-switch class="gf-form" 
         label="Show Legend Percent" 
         label-class="query-keyword width-12" 
         checked="ctrl.panel.showLegendPercent" 

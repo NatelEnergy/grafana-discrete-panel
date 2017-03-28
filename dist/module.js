@@ -113,6 +113,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             writeAllValues: false,
             writeMetricNames: false,
             showLegend: true,
+            showLegendNames: true,
             showLegendPercent: true,
             highlightOnMouseover: true,
             queryAllData: false,
@@ -500,23 +501,23 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 // handle discrete events
                 _.forEach(metric.datapoints, function (point) {
                   var start = moment(point[_this3.panel.eventBeginField]);
-                  var startMs = start.format('x');
+                  var startMs = start.valueOf();
                   var end = _this3.range.to;
                   if ([_this3.panel.eventEndField] && point[_this3.panel.eventEndField] !== '') {
                     end = moment(point[_this3.panel.eventEndField]);
                   }
-                  var endMs = end.format('x');
+                  var endMs = end.valueOf();
                   if (!(startMs > _this3.range.to || endMs < _this3.range.from)) {
                     var pt = {
-                      val: 1,
+                      val: point[_this3.panel.eventNameField],
                       start: startMs,
                       ms: end.diff(start)
                     };
                     var res = {
-                      name: point[_this3.panel.eventNameField],
+                      name: pt.val,
                       changes: [pt],
                       tooManyValues: false,
-                      legendInfo: []
+                      legendInfo: [{ 'val': pt.val, 'ms': pt.ms, 'count': 1 }]
                     };
                     data.push(res);
                   }
