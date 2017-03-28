@@ -30,6 +30,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         { text: 'N/A', color: '#CCC' }
       ],
       metricNameColor: '#000000',
+      valueTextColor: '#000000',
+      backgroundColor: 'rgba(128, 128, 128, 0.1)',
+      lineColor: 'rgba(128, 128, 128, 1.0)',
       writeLastValue: true,
       writeAllValues: false,
       writeMetricNames: false,
@@ -121,7 +124,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           ctx.fillRect(point.x, top, width, rowHeight);
 
           if(this.panel.writeAllValues) {
-            ctx.fillStyle = "#000000";
+            ctx.fillStyle = this.panel.valueTextColor;
             ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
             ctx.textAlign = 'left';
 
