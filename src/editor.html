@@ -46,3 +46,20 @@
     </div>
 
 </div>
+
+<div class="editor-row">
+    <div class"section gf-form-group">
+        <h5 class="section-heading">Events</h5>
+        <div class="gf-form">
+            <gf-form-switch class="gf-form" 
+                            label="Query all data" 
+                            label-class="query-keyword width-12" 
+                            checked="ctrl.panel.queryAllData" 
+                            on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        <p>Warning! This will expand the data selection interval to &quot;all time&quot;,
+            regardless of the time picker settings. This should only be used with discrete
+            event data, e.g. from Elasticsearch. Only events that cover the time range
+            from the time picker or override will be shown, however.</p>
+        </div>
+    </div>
+</div>

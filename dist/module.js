@@ -3,7 +3,7 @@
 System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angular'], function (_export, _context) {
   "use strict";
 
-  var config, CanvasPanelCtrl, _, moment, angular, _createClass, DiscretePanelCtrl;
+  var config, CanvasPanelCtrl, _, moment, angular, _createClass, _get, DiscretePanelCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -66,6 +66,31 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
         };
       }();
 
+      _get = function get(object, property, receiver) {
+        if (object === null) object = Function.prototype;
+        var desc = Object.getOwnPropertyDescriptor(object, property);
+
+        if (desc === undefined) {
+          var parent = Object.getPrototypeOf(object);
+
+          if (parent === null) {
+            return undefined;
+          } else {
+            return get(parent, property, receiver);
+          }
+        } else if ("value" in desc) {
+          return desc.value;
+        } else {
+          var getter = desc.get;
+
+          if (getter === undefined) {
+            return undefined;
+          }
+
+          return getter.call(receiver);
+        }
+      };
+
       _export('PanelCtrl', DiscretePanelCtrl = function (_CanvasPanelCtrl) {
         _inherits(DiscretePanelCtrl, _CanvasPanelCtrl);
 
@@ -87,7 +112,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             writeAllValues: false,
             writeMetricNames: false,
             showLegend: true,
-            showLegendPercent: true
+            showLegendPercent: true,
+            queryAllData: false
           };
           _.defaults(_this.panel, panelDefaults);
 
@@ -414,6 +440,30 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             return hash;
           }
         }, {
+          key: 'issueQueries',
+          value: function issueQueries(datasource) {
+            if (this.panel.queryAllData) {
+              var range = this.timeSrv.timeRange();
+              range.from = 0;
+              range.to = this.range.to;
+              var metricsQuery = {
+                panelId: this.panel.id,
+                range: range,
+                rangeRaw: range,
+                interval: 31557600,
+                intervalMs: 31557600000,
+                targets: this.panel.targets,
+                format: this.panel.renderer === 'png' ? 'png' : 'json',
+                maxDataPoints: this.resolution,
+                scopedVars: {},
+                cacheTimeout: this.panel.cacheTimeout
+              };
+
+              return datasource.query(metricsQuery);
+            }
+            return _get(DiscretePanelCtrl.prototype.__proto__ || Object.getPrototypeOf(DiscretePanelCtrl.prototype), 'issueQueries', this).call(this, datasource);
+          }
+        }, {
           key: '_processLast',
           value: function _processLast(pt, end, res, valToInfo) {
             pt.ms = end - pt.start;
@@ -444,19 +494,26 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 // handle discrete events
                 _.forEach(metric.datapoints, function (point) {
                   var start = moment(point.begin);
+                  var startMs = start.format('x');
+                  if (!point.end || point.end === '') {
+                    point.end = _this3.range.to;
+                  }
                   var end = moment(point.end);
-                  var pt = {
-                    val: 1,
-                    start: start.format('x'),
-                    ms: end.diff(start)
-                  };
-                  var res = {
-                    name: point.desc,
-                    changes: [pt],
-                    tooManyValues: false,
-                    legendInfo: []
-                  };
-                  data.push(res);
+                  var endMs = end.format('x');
+                  if (!(startMs > _this3.range.to || endMs < _this3.range.from)) {
+                    var pt = {
+                      val: 1,
+                      start: startMs,
+                      ms: end.diff(start)
+                    };
+                    var res = {
+                      name: point.desc,
+                      changes: [pt],
+                      tooManyValues: false,
+                      legendInfo: []
+                    };
+                    data.push(res);
+                  }
                 });
               } else {
                 var res = {

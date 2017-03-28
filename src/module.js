@@ -33,7 +33,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       writeAllValues: false,
       writeMetricNames: false,
       showLegend: true,
-      showLegendPercent: true
+      showLegendPercent: true,
+      queryAllData: false
     };
     _.defaults(this.panel, panelDefaults);
 
@@ -363,6 +364,29 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   //-----------
 
+  issueQueries(datasource) {
+    if (this.panel.queryAllData) {
+      var range = this.timeSrv.timeRange();
+      range.from = 0;
+      range.to = this.range.to;
+      var metricsQuery = {
+        panelId: this.panel.id,
+        range: range,
+        rangeRaw: range,
+        interval: 31557600,
+        intervalMs: 31557600000,
+        targets: this.panel.targets,
+        format: this.panel.renderer === 'png' ? 'png' : 'json',
+        maxDataPoints: this.resolution,
+        scopedVars: {},
+        cacheTimeout: this.panel.cacheTimeout
+      };
+
+      return datasource.query(metricsQuery);
+    }
+    return super.issueQueries(datasource);
+  }
+
   _processLast(pt, end, res, valToInfo) {
     pt.ms = (end - pt.start);
     if(!res.tooManyValues) {
@@ -388,20 +412,27 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if (metric.type === 'docs') { // handle discrete events
         _.forEach(metric.datapoints, (point) => {
-            var start = moment(point.begin);
-            var end = moment(point.end);
+          var start = moment(point.begin);
+          var startMs = start.format('x');
+          if (!point.end || point.end === '') {
+            point.end = this.range.to;
+          }
+          var end = moment(point.end);
+          var endMs = end.format('x');
+          if (!(startMs > this.range.to || endMs < this.range.from)) {
             var pt = {
-                val: 1,
-                start: start.format('x'),
-                ms: end.diff(start)
+              val: 1,
+              start: startMs,
+              ms: end.diff(start)
             };
             var res = {
-                name: point.desc,
-                changes: [pt],
-                tooManyValues: false,
-                legendInfo: []
+              name: point.desc,
+              changes: [pt],
+              tooManyValues: false,
+              legendInfo: []
             };
             data.push(res);
+          }
         });
       } else {
         var res = { 
