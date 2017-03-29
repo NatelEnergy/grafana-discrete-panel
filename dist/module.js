@@ -223,8 +223,12 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 if (point.start <= _this2.range.to) {
                   var xt = Math.max(point.start - _this2.range.from, 0);
                   point.x = xt / elapsed * width;
+                  var w = width * (point.ms / elapsed);
+                  if (point.x + w > width) {
+                    w = width - point.x;
+                  }
                   ctx.fillStyle = _this2.getColor(point.val);
-                  ctx.fillRect(point.x, top, width * (point.ms / elapsed), rowHeight);
+                  ctx.fillRect(point.x, top, w, rowHeight);
 
                   if (_this2.panel.writeAllValues) {
                     ctx.fillStyle = _this2.panel.valueTextColor;

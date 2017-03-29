@@ -137,8 +137,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if(point.start <= this.range.to) {
           var xt = Math.max( point.start - this.range.from, 0 );
           point.x = (xt / elapsed) * width;
+          var w = width*(point.ms/elapsed);
+          if (point.x + w > width) {
+            w = width-point.x;
+          }
           ctx.fillStyle = this.getColor( point.val );
-          ctx.fillRect(point.x, top, width*(point.ms/elapsed), rowHeight);
+          ctx.fillRect(point.x, top, w, rowHeight);
 
           if(this.panel.writeAllValues) {
             ctx.fillStyle = this.panel.valueTextColor;
