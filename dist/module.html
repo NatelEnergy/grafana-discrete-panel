@@ -3,8 +3,11 @@
 
 
 <div ng-show="ctrl.panel.showLegend">
-  <div ng-repeat="info in ctrl.data[0].legendInfo | orderBy:'-ms'" style="cursor: default; display:inline-block; margin-right:15px;" ng-mousemove="ctrl.showLegandTooltip($event, info);" ng-mouseleave="ctrl.clearTT()">
-    <div ng-style="{ 'background-color': ctrl.getColor(info.val) }" style="width:10px; height:10px; display:inline-block;"></div> {{ info.val }} 
-    <span ng-show="ctrl.panel.showLegendPercent">({{info.per}}%)</span>
-  </div
+    <div ng-repeat="metric in ctrl.data">
+        <span ng-show="ctrl.panel.showLegendNames">{{ metric.name }}: </span>
+        <div ng-repeat="info in metric.legendInfo | orderBy:'-ms'" style="cursor: default; display:inline-block; margin-right:15px;" ng-mousemove="ctrl.showLegandTooltip($event, info);" ng-mouseleave="ctrl.clearTT()">
+            <div ng-style="{ 'background-color': ctrl.getColor(info.val) }" style="width:10px; height:10px; display:inline-block;"></div> {{ info.val }} 
+            <span ng-show="ctrl.panel.showLegendPercent">({{info.per}}%)</span>
+        </div>
+    </div>
 </div>

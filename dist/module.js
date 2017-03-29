@@ -83,11 +83,17 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             mappingTypes: [{ name: 'value to text', value: 1 }, { name: 'range to text', value: 2 }],
             rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
             colorMaps: [{ text: 'N/A', color: '#CCC' }],
+            metricNameColor: '#000000',
+            valueTextColor: '#000000',
+            backgroundColor: 'rgba(128, 128, 128, 0.1)',
+            lineColor: 'rgba(128, 128, 128, 1.0)',
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
             showLegend: true,
-            showLegendPercent: true
+            showLegendNames: true,
+            showLegendPercent: true,
+            highlightOnMouseover: true
           };
           _.defaults(_this.panel, panelDefaults);
 
@@ -159,15 +165,15 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               var centerV = top + rowHeight / 2;
 
               // The no-data line
-              ctx.fillStyle = '#333333';
+              ctx.fillStyle = _this2.panel.backgroundColor;
               ctx.fillRect(0, top, width, rowHeight);
 
-              if (!_this2.panel.writeMetricNames) {
+              /*if(!this.panel.writeMetricNames) {
                 ctx.fillStyle = "#111111";
                 ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText("No Data", 10, centerV);
-              }
+              }*/
 
               var lastBS = 0;
               var point = metric.changes[0];
@@ -180,7 +186,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                   ctx.fillRect(point.x, top, width, rowHeight);
 
                   if (_this2.panel.writeAllValues) {
-                    ctx.fillStyle = "#000000";
+                    ctx.fillStyle = _this2.panel.valueTextColor;
                     ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                     ctx.textAlign = 'left';
 
@@ -191,7 +197,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               }
 
               if (top > 0) {
-                ctx.fillStyle = "#DDDDDD";
+                ctx.strokeStyle = _this2.panel.lineColor;
                 ctx.beginPath();
                 ctx.moveTo(0, top);
                 ctx.lineTo(width, top);
@@ -201,7 +207,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               ctx.fillStyle = "#000000";
               ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
-              if (_this2.panel.writeMetricNames && (_this2.mouse.position == null || _this2.mouse.position.x > 200)) {
+              if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
+                ctx.fillStyle = _this2.panel.metricNameColor;
                 ctx.textAlign = 'left';
                 ctx.fillText(metric.name, 10, centerV);
               }
@@ -209,7 +216,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               ctx.textAlign = 'right';
 
               if (_this2.mouse.down == null) {
-                if (_this2.mouse.position != null) {
+                if (_this2.panel.highlightOnMouseover && _this2.mouse.position != null) {
                   point = metric.changes[0];
                   var next = null;
                   for (var i = 0; i < metric.changes.length; i++) {
@@ -575,17 +582,19 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             if (this.data) {
               var range = this.timeSrv.timeRange();
               var hover = null;
-              for (var j = 0; j < this.data.length; j++) {
-                if (true) {
-                  // TODO, pick the right one!
-                  hover = this.data[j].changes[0];
-                  for (var i = 0; i < this.data[j].changes.length; i++) {
-                    if (this.data[j].changes[i].start > this.mouse.position.ts) {
-                      break;
-                    }
-                    hover = this.data[j].changes[i];
-                  }
+              var j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
+              if (j < 0) {
+                j = 0;
+              }
+              if (j >= this.data.length) {
+                j = this.data.length - 1;
+              }
+              hover = this.data[j].changes[0];
+              for (var i = 0; i < this.data[j].changes.length; i++) {
+                if (this.data[j].changes[i].start > this.mouse.position.ts) {
+                  break;
                 }
+                hover = this.data[j].changes[i];
               }
               this.hoverPoint = hover;
               this.showTooltip(evt, hover);
