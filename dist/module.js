@@ -246,7 +246,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
                 ctx.fillStyle = _this2.panel.metricNameColor;
                 ctx.textAlign = 'left';
-                ctx.fillText(metric.name, 10, centerV);
+                ctx.fillText(metric.name, left + 10, centerV);
               }
 
               ctx.textAlign = 'right';

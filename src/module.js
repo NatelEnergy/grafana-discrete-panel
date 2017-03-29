@@ -162,7 +162,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
         ctx.fillStyle = this.panel.metricNameColor;
         ctx.textAlign = 'left';
-        ctx.fillText( metric.name, 10, centerV);
+        ctx.fillText( metric.name, left+10, centerV);
       }
 
       ctx.textAlign = 'right';
