@@ -222,7 +222,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
                   if (_this2.panel.writeAllValues) {
                     ctx.fillStyle = _this2.panel.valueTextColor;
-                    ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+                    ctx.font = rowHeight - 2 + 'px "Open Sans", Helvetica, Arial, sans-serif';
                     ctx.textAlign = 'left';
 
                     ctx.fillText(point.val, point.x + 7, centerV);
@@ -240,7 +240,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               }
 
               ctx.fillStyle = "#000000";
-              ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+              ctx.font = rowHeight - 2 + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
               if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
                 ctx.fillStyle = _this2.panel.metricNameColor;
@@ -278,7 +278,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
                   // Now Draw the value
                   ctx.fillStyle = "#000000";
-                  ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+                  ctx.font = rowHeight - 2 + 'px "Open Sans", Helvetica, Arial, sans-serif';
                   ctx.textAlign = 'left';
                   ctx.fillText(point.val, point.x + 10, centerV);
 

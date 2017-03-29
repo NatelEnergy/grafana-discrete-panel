@@ -136,7 +136,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           if(this.panel.writeAllValues) {
             ctx.fillStyle = this.panel.valueTextColor;
-            ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+            ctx.font = (rowHeight-2) + 'px "Open Sans", Helvetica, Arial, sans-serif';
             ctx.textAlign = 'left';
 
             ctx.fillText(point.val, point.x+7, centerV);
@@ -156,7 +156,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
 
       ctx.fillStyle = "#000000";
-      ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+      ctx.font = (rowHeight-2) + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
       if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
         ctx.fillStyle = this.panel.metricNameColor;
@@ -194,7 +194,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           // Now Draw the value
           ctx.fillStyle = "#000000";
-          ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+          ctx.font = (rowHeight-2) + 'px "Open Sans", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
           ctx.fillText( point.val, point.x+10, centerV);
 
