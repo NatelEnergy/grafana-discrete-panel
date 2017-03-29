@@ -16,6 +16,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     // Set and populate defaults
     var panelDefaults = {
       rowHeight: 50,
+      padding: { 'left': 0, 'right': 0, 'top': 0, 'bottom': 0 },
       valueMaps: [
         { value: 'null', op: '=', text: 'N/A' }
       ],
@@ -81,13 +82,18 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
  //   console.log( 'render', this.data);
 
+    $(this.wrap).css( 'margin-top', this.panel.padding.top );
+    $(this.wrap).css( 'margin-right', this.panel.padding.right );
+    $(this.wrap).css( 'margin-bottom', this.panel.padding.bottom );
+    $(this.wrap).css( 'margin-left', this.panel.padding.left );
+
     var rect = this.wrap.getBoundingClientRect();
 
     var rows = this.data.length;
     var rowHeight = this.panel.rowHeight;
 
     var height = rowHeight * rows;
-    var width = rect.width;
+    var width = rect.width - this.panel.padding.left - this.panel.padding.right;
     this.canvas.width = width;
     this.canvas.height = height;
 
