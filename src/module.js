@@ -37,6 +37,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       writeLastValue: true,
       writeAllValues: false,
       writeMetricNames: false,
+      writeMetricNamesOnRight: false,
+      metricNamesOnRightWidth: 400,
       showLegend: true,
       showLegendNames: true,
       showLegendPercent: true,
@@ -96,6 +98,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var width = rect.width - this.panel.padding.left - this.panel.padding.right;
     this.canvas.width = width;
     this.canvas.height = height;
+
+    if (this.panel.writeMetricNamesOnRight) {
+      width -= this.panel.metricNamesOnRightWidth;
+    }
 
     var ctx = this.context;
     ctx.lineWidth = 1;
@@ -161,7 +167,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
         ctx.fillStyle = this.panel.metricNameColor;
         ctx.textAlign = 'left';
-        ctx.fillText( metric.name, 10, centerV);
+        var x = 10;
+        if (this.panel.writeMetricNamesOnRight) {
+          x = width+10;
+        }
+        ctx.fillText( metric.name, x, centerV);
       }
 
       ctx.textAlign = 'right';

@@ -116,6 +116,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
+            writeMetricNamesOnRight: false,
+            metricNamesOnRightWidth: 400,
             showLegend: true,
             showLegendNames: true,
             showLegendPercent: true,
@@ -183,6 +185,10 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             this.canvas.width = width;
             this.canvas.height = height;
 
+            if (this.panel.writeMetricNamesOnRight) {
+              width -= this.panel.metricNamesOnRightWidth;
+            }
+
             var ctx = this.context;
             ctx.lineWidth = 1;
             ctx.textBaseline = 'middle';
@@ -245,7 +251,11 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
                 ctx.fillStyle = _this2.panel.metricNameColor;
                 ctx.textAlign = 'left';
-                ctx.fillText(metric.name, 10, centerV);
+                var x = 10;
+                if (_this2.panel.writeMetricNamesOnRight) {
+                  x = width + 10;
+                }
+                ctx.fillText(metric.name, x, centerV);
               }
 
               ctx.textAlign = 'right';

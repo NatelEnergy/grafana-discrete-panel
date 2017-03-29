@@ -14,11 +14,18 @@
     </div>
 
     <div class="gf-form">
-      <gf-form-switch class="gf-form" 
-        label="Write Metric Names" 
-        label-class="query-keyword width-12" 
-        checked="ctrl.panel.writeMetricNames" 
-        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        <gf-form-switch class="gf-form" 
+                        label="Write Metric Names" 
+                        label-class="query-keyword width-12" 
+                        checked="ctrl.panel.writeMetricNames" 
+                        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        <gf-form-switch class="gf-form" ng-if="ctrl.panel.writeMetricNames"
+                        label="on right" 
+                        label-class="query-keyword width-8" 
+                        checked="ctrl.panel.writeMetricNamesOnRight" 
+                        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+      <span class="gf-form-label" ng-if="ctrl.panel.writeMetricNames && ctrl.panel.writeMetricNamesOnRight">width</span>
+      <input type="number" ng-model="ctrl.panel.metricNamesOnRightWidth" class="gf-form-input max-width-6" ng-blur="ctrl.render()" ng-if="ctrl.panel.writeMetricNames && ctrl.panel.writeMetricNamesOnRight">
     </div>
 
     <div class="gf-form">
@@ -31,26 +38,20 @@
 
     <div class="gf-form">
       <gf-form-switch class="gf-form" 
-        label="Show Legend" 
-        label-class="query-keyword width-12" 
-        checked="ctrl.panel.showLegend" 
-        on-change="ctrl.onConfigChanged()"></gf-form-switch>
-    </div>
-
-    <div class="gf-form">
-      <gf-form-switch class="gf-form" 
-        label="Show Metric Names in Legend" 
-        label-class="query-keyword width-12" 
-        checked="ctrl.panel.showLegendNames" 
-        on-change="ctrl.onConfigChanged()"></gf-form-switch>
-    </div>
-
-    <div class="gf-form">
-      <gf-form-switch class="gf-form" 
-        label="Show Legend Percent" 
-        label-class="query-keyword width-12" 
-        checked="ctrl.panel.showLegendPercent" 
-        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+                      label="Show Legend" 
+                      label-class="query-keyword width-12" 
+                      checked="ctrl.panel.showLegend" 
+                      on-change="ctrl.onConfigChanged()"></gf-form-switch>
+      <gf-form-switch class="gf-form"  ng-if="ctrl.panel.showLegend"
+                      label="Show Metric Names" 
+                      label-class="query-keyword width-12" 
+                      checked="ctrl.panel.showLegendNames" 
+                      on-change="ctrl.onConfigChanged()"></gf-form-switch>
+      <gf-form-switch class="gf-form"   ng-if="ctrl.panel.showLegend"
+                      label="Show Percent" 
+                      label-class="query-keyword width-12" 
+                      checked="ctrl.panel.showLegendPercent" 
+                      on-change="ctrl.onConfigChanged()"></gf-form-switch>
     </div>
 
     <div class="gf-form">
@@ -64,8 +65,8 @@
 </div>
 
 <div class="editor-row">
+    <h5 class="page-heading">Events</h5>
     <div class"section gf-form-group">
-        <h5 class="section-heading">Events</h5>
         <div class="gf-form">
             <gf-form-switch class="gf-form" 
                             label="Query all data" 
