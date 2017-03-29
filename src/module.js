@@ -16,12 +16,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     // Set and populate defaults
     var panelDefaults = {
       rowHeight: 50,
-      padding: {
-        'left': 0,
-        'right': 0,
-        'top': 0,
-        'bottom': 0
-      },
       valueMaps: [
         { value: 'null', op: '=', text: 'N/A' }
       ],
@@ -92,8 +86,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var rows = this.data.length;
     var rowHeight = this.panel.rowHeight;
 
-    var height = rowHeight * rows + this.panel.padding.top + this.panel.padding.bottom;
-    var width = rect.width - this.panel.padding.left - this.panel.padding.right;
+    var height = rowHeight * rows;
+    var width = rect.width;
     this.canvas.width = width;
     this.canvas.height = height;
 
@@ -106,8 +100,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     // ctx.shadowColor = "rgba(0,0,0,0.3)";
     // ctx.shadowBlur = 3;
 
-    var top = this.panel.padding.top;
-    var left = this.panel.padding.left;
+    var top = 0;
 
     var elapsed = this.range.to - this.range.from;
 
@@ -116,7 +109,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       // The no-data line
       ctx.fillStyle = this.panel.backgroundColor;
-      ctx.fillRect(left, top, width, rowHeight);
+      ctx.fillRect(0, top, width, rowHeight);
 
       /*if(!this.panel.writeMetricNames) {
         ctx.fillStyle = "#111111";
@@ -131,7 +124,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         point = metric.changes[i];
         if(point.start <= this.range.to) {
           var xt = Math.max( point.start - this.range.from, 0 );
-          point.x = (xt / elapsed) * width + left;
+          point.x = (xt / elapsed) * width;
           ctx.fillStyle = this.getColor( point.val );
           ctx.fillRect(point.x, top, width*(point.ms/elapsed), rowHeight);
 
@@ -151,7 +144,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       if(top>0) {
         ctx.strokeStyle = this.panel.lineColor;
         ctx.beginPath();
-        ctx.moveTo(left, top);
+        ctx.moveTo(0, top);
         ctx.lineTo(width, top);
         ctx.stroke();
       }
@@ -162,7 +155,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
         ctx.fillStyle = this.panel.metricNameColor;
         ctx.textAlign = 'left';
-        ctx.fillText( metric.name, left+10, centerV);
+        ctx.fillText( metric.name, 10, centerV);
       }
 
       ctx.textAlign = 'right';
