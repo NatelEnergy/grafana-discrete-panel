@@ -104,6 +104,12 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
           // Set and populate defaults
           var panelDefaults = {
             rowHeight: 50,
+            padding: {
+              'left': 0,
+              'right': 0,
+              'top': 0,
+              'bottom': 0
+            },
             valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
             mappingTypes: [{ name: 'value to text', value: 1 }, { name: 'range to text', value: 2 }],
             rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
@@ -172,8 +178,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             var rows = this.data.length;
             var rowHeight = this.panel.rowHeight;
 
-            var height = rowHeight * rows;
-            var width = rect.width;
+            var height = rowHeight * rows + this.panel.padding.top + this.panel.padding.bottom;
+            var width = rect.width - this.panel.padding.left - this.panel.padding.right;
             this.canvas.width = width;
             this.canvas.height = height;
 
@@ -186,7 +192,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             // ctx.shadowColor = "rgba(0,0,0,0.3)";
             // ctx.shadowBlur = 3;
 
-            var top = 0;
+            var top = this.panel.padding.top;
+            var left = this.panel.padding.left;
 
             var elapsed = this.range.to - this.range.from;
 
@@ -195,7 +202,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
               // The no-data line
               ctx.fillStyle = _this2.panel.backgroundColor;
-              ctx.fillRect(0, top, width, rowHeight);
+              ctx.fillRect(left, top, width, rowHeight);
 
               /*if(!this.panel.writeMetricNames) {
                 ctx.fillStyle = "#111111";
@@ -210,7 +217,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 point = metric.changes[i];
                 if (point.start <= _this2.range.to) {
                   var xt = Math.max(point.start - _this2.range.from, 0);
-                  point.x = xt / elapsed * width;
+                  point.x = xt / elapsed * width + left;
                   ctx.fillStyle = _this2.getColor(point.val);
                   ctx.fillRect(point.x, top, width * (point.ms / elapsed), rowHeight);
 
