@@ -3,7 +3,7 @@
 System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angular'], function (_export, _context) {
   "use strict";
 
-  var config, CanvasPanelCtrl, _, moment, angular, _createClass, DiscretePanelCtrl;
+  var config, CanvasPanelCtrl, _, moment, angular, _createClass, _get, DiscretePanelCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -66,6 +66,31 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
         };
       }();
 
+      _get = function get(object, property, receiver) {
+        if (object === null) object = Function.prototype;
+        var desc = Object.getOwnPropertyDescriptor(object, property);
+
+        if (desc === undefined) {
+          var parent = Object.getPrototypeOf(object);
+
+          if (parent === null) {
+            return undefined;
+          } else {
+            return get(parent, property, receiver);
+          }
+        } else if ("value" in desc) {
+          return desc.value;
+        } else {
+          var getter = desc.get;
+
+          if (getter === undefined) {
+            return undefined;
+          }
+
+          return getter.call(receiver);
+        }
+      };
+
       _export('PanelCtrl', DiscretePanelCtrl = function (_CanvasPanelCtrl) {
         _inherits(DiscretePanelCtrl, _CanvasPanelCtrl);
 
@@ -79,15 +104,28 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
           // Set and populate defaults
           var panelDefaults = {
             rowHeight: 50,
+            padding: { 'left': 0, 'right': 0, 'top': 0, 'bottom': 0 },
             valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
             mappingTypes: [{ name: 'value to text', value: 1 }, { name: 'range to text', value: 2 }],
             rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
             colorMaps: [{ text: 'N/A', color: '#CCC' }],
+            metricNameColor: '#000000',
+            valueTextColor: '#000000',
+            backgroundColor: 'rgba(128, 128, 128, 0.1)',
+            lineColor: 'rgba(128, 128, 128, 1.0)',
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
+            writeMetricNamesOnRight: false,
+            metricNamesOnRightWidth: 400,
             showLegend: true,
-            showLegendPercent: true
+            showLegendNames: true,
+            showLegendPercent: true,
+            highlightOnMouseover: true,
+            queryAllData: false,
+            eventBeginField: 'begin',
+            eventEndField: 'end',
+            eventNameField: 'desc'
           };
           _.defaults(_this.panel, panelDefaults);
 
@@ -132,15 +170,24 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
             //   console.log( 'render', this.data);
 
+            $(this.wrap).css('margin-top', this.panel.padding.top);
+            $(this.wrap).css('margin-right', this.panel.padding.right);
+            $(this.wrap).css('margin-bottom', this.panel.padding.bottom);
+            $(this.wrap).css('margin-left', this.panel.padding.left);
+
             var rect = this.wrap.getBoundingClientRect();
 
             var rows = this.data.length;
             var rowHeight = this.panel.rowHeight;
 
             var height = rowHeight * rows;
-            var width = rect.width;
+            var width = rect.width - this.panel.padding.left - this.panel.padding.right;
             this.canvas.width = width;
             this.canvas.height = height;
+
+            if (this.panel.writeMetricNamesOnRight) {
+              width -= this.panel.metricNamesOnRightWidth;
+            }
 
             var ctx = this.context;
             ctx.lineWidth = 1;
@@ -159,15 +206,15 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               var centerV = top + rowHeight / 2;
 
               // The no-data line
-              ctx.fillStyle = '#333333';
+              ctx.fillStyle = _this2.panel.backgroundColor;
               ctx.fillRect(0, top, width, rowHeight);
 
-              if (!_this2.panel.writeMetricNames) {
+              /*if(!this.panel.writeMetricNames) {
                 ctx.fillStyle = "#111111";
                 ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText("No Data", 10, centerV);
-              }
+              }*/
 
               var lastBS = 0;
               var point = metric.changes[0];
@@ -176,12 +223,16 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 if (point.start <= _this2.range.to) {
                   var xt = Math.max(point.start - _this2.range.from, 0);
                   point.x = xt / elapsed * width;
+                  var w = width * (point.ms / elapsed);
+                  if (point.x + w > width) {
+                    w = width - point.x;
+                  }
                   ctx.fillStyle = _this2.getColor(point.val);
-                  ctx.fillRect(point.x, top, width, rowHeight);
+                  ctx.fillRect(point.x, top, w, rowHeight);
 
                   if (_this2.panel.writeAllValues) {
-                    ctx.fillStyle = "#000000";
-                    ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+                    ctx.fillStyle = _this2.panel.valueTextColor;
+                    ctx.font = rowHeight - 2 + 'px "Open Sans", Helvetica, Arial, sans-serif';
                     ctx.textAlign = 'left';
 
                     ctx.fillText(point.val, point.x + 7, centerV);
@@ -191,7 +242,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               }
 
               if (top > 0) {
-                ctx.fillStyle = "#DDDDDD";
+                ctx.strokeStyle = _this2.panel.lineColor;
                 ctx.beginPath();
                 ctx.moveTo(0, top);
                 ctx.lineTo(width, top);
@@ -199,17 +250,22 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               }
 
               ctx.fillStyle = "#000000";
-              ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+              ctx.font = rowHeight - 2 + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
-              if (_this2.panel.writeMetricNames && (_this2.mouse.position == null || _this2.mouse.position.x > 200)) {
+              if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
+                ctx.fillStyle = _this2.panel.metricNameColor;
                 ctx.textAlign = 'left';
-                ctx.fillText(metric.name, 10, centerV);
+                var x = 10;
+                if (_this2.panel.writeMetricNamesOnRight) {
+                  x = width + 10;
+                }
+                ctx.fillText(metric.name, x, centerV);
               }
 
               ctx.textAlign = 'right';
 
               if (_this2.mouse.down == null) {
-                if (_this2.mouse.position != null) {
+                if (_this2.panel.highlightOnMouseover && _this2.mouse.position != null) {
                   point = metric.changes[0];
                   var next = null;
                   for (var i = 0; i < metric.changes.length; i++) {
@@ -236,7 +292,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
                   // Now Draw the value
                   ctx.fillStyle = "#000000";
-                  ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
+                  ctx.font = rowHeight - 2 + 'px "Open Sans", Helvetica, Arial, sans-serif';
                   ctx.textAlign = 'left';
                   ctx.fillText(point.val, point.x + 10, centerV);
 
@@ -414,6 +470,30 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             return hash;
           }
         }, {
+          key: 'issueQueries',
+          value: function issueQueries(datasource) {
+            if (this.panel.queryAllData) {
+              var range = this.timeSrv.timeRange();
+              range.from = 0;
+              range.to = this.range.to;
+              var metricsQuery = {
+                panelId: this.panel.id,
+                range: range,
+                rangeRaw: range,
+                interval: 31557600,
+                intervalMs: 31557600000,
+                targets: this.panel.targets,
+                format: this.panel.renderer === 'png' ? 'png' : 'json',
+                maxDataPoints: this.resolution,
+                scopedVars: {},
+                cacheTimeout: this.panel.cacheTimeout
+              };
+
+              return datasource.query(metricsQuery);
+            }
+            return _get(DiscretePanelCtrl.prototype.__proto__ || Object.getPrototypeOf(DiscretePanelCtrl.prototype), 'issueQueries', this).call(this, datasource);
+          }
+        }, {
           key: '_processLast',
           value: function _processLast(pt, end, res, valToInfo) {
             pt.ms = end - pt.start;
@@ -439,59 +519,86 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             var data = [];
             _.forEach(dataList, function (metric) {
               var valToInfo = {};
-              var res = {
-                name: metric.target,
-                changes: [],
-                tooManyValues: false,
-                legendInfo: [] };
-              data.push(res);
 
-              var last = null;
-              _.forEach(metric.datapoints, function (point) {
+              if (metric.type === 'docs') {
+                // handle discrete events
+                _.forEach(metric.datapoints, function (point) {
+                  var start = moment.utc(point[_this3.panel.eventBeginField]);
+                  var startMs = start.valueOf();
+                  var end = _this3.range.to;
+                  if ([_this3.panel.eventEndField] && point[_this3.panel.eventEndField] !== '') {
+                    end = moment.utc(point[_this3.panel.eventEndField]);
+                  }
+                  var endMs = end.valueOf();
+                  if (!(startMs > _this3.range.to || endMs < _this3.range.from)) {
+                    var pt = {
+                      val: point[_this3.panel.eventNameField],
+                      start: startMs,
+                      ms: end.diff(start)
+                    };
+                    var res = {
+                      name: pt.val,
+                      changes: [pt],
+                      tooManyValues: false,
+                      legendInfo: [{ 'val': pt.val, 'ms': pt.ms, 'count': 1 }]
+                    };
+                    data.push(res);
+                  }
+                });
+              } else {
+                var res = {
+                  name: metric.target,
+                  changes: [],
+                  tooManyValues: false,
+                  legendInfo: [] };
+                data.push(res);
+                var last = null;
+                _.forEach(metric.datapoints, function (point) {
 
-                var norm = _this3.formatValue(point[0]);
-                if (last == null || norm != last.val) {
-                  var pt = {
-                    val: norm,
-                    start: point[1],
-                    ms: 0 // time in this state
-                  };
+                  var norm = _this3.formatValue(point[0]);
+                  if (last == null || norm != last.val) {
+                    var pt = {
+                      val: norm,
+                      start: point[1],
+                      ms: 0 // time in this state
+                    };
 
-                  if (last != null) {
-                    _this3._processLast(last, pt.start, res, valToInfo);
-                  };
+                    if (last != null) {
+                      _this3._processLast(last, pt.start, res, valToInfo);
+                    };
 
-                  res.changes.push(pt);
-                  last = pt;
-                }
-              });
+                    res.changes.push(pt);
+                    last = pt;
+                  }
+                });
 
-              if (last != null) {
-                _this3._processLast(last, _this3.range.to, res, valToInfo);
-              };
+                if (last != null) {
+                  _this3._processLast(last, _this3.range.to, res, valToInfo);
+                };
 
-              // Remove null from the legend if it is the first value and small (common for influx queries)
-              var nullText = _this3.formatValue(null);
-              if (res.changes.length > 1 && _.has(valToInfo, nullText)) {
-                var info = valToInfo[nullText];
-                if (info.count == 1) {
-                  var per = info.ms / elapsed;
-                  if (per < .02) {
-                    if (res.changes[0].val == nullText) {
-                      console.log('Removing null', info);
-                      delete valToInfo[nullText];
+                // Remove null from the legend if it is the first value and small (common for influx queries)
+                var nullText = _this3.formatValue(null);
+                if (res.changes.length > 1 && _.has(valToInfo, nullText)) {
+                  var info = valToInfo[nullText];
+                  if (info.count == 1) {
+                    var per = info.ms / elapsed;
+                    if (per < .02) {
+                      if (res.changes[0].val == nullText) {
+                        console.log('Removing null', info);
+                        delete valToInfo[nullText];
 
-                      res.changes[1].start = res.changes[0].start;
-                      res.changes[1].ms += res.changes[0].ms;
-                      res.changes.splice(0, 1);
+                        res.changes[1].start = res.changes[0].start;
+                        res.changes[1].ms += res.changes[0].ms;
+                        res.changes.splice(0, 1);
+                      }
                     }
                   }
                 }
+                _.forEach(valToInfo, function (value) {
+                  value.per = Math.round(value.ms / elapsed * 100);
+                  res.legendInfo.push(value);
+                });
               }
-              _.forEach(valToInfo, function (value) {
-                value.per = Math.round(value.ms / elapsed * 100);
-                res.legendInfo.push(value);
-              });
             });
             this.data = data;
 
@@ -575,17 +682,19 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             if (this.data) {
               var range = this.timeSrv.timeRange();
               var hover = null;
-              for (var j = 0; j < this.data.length; j++) {
-                if (true) {
-                  // TODO, pick the right one!
-                  hover = this.data[j].changes[0];
-                  for (var i = 0; i < this.data[j].changes.length; i++) {
-                    if (this.data[j].changes[i].start > this.mouse.position.ts) {
-                      break;
-                    }
-                    hover = this.data[j].changes[i];
-                  }
+              var j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
+              if (j < 0) {
+                j = 0;
+              }
+              if (j >= this.data.length) {
+                j = this.data.length - 1;
+              }
+              hover = this.data[j].changes[0];
+              for (var i = 0; i < this.data[j].changes.length; i++) {
+                if (this.data[j].changes[i].start > this.mouse.position.ts) {
+                  break;
                 }
+                hover = this.data[j].changes[i];
               }
               this.hoverPoint = hover;
               this.showTooltip(evt, hover);

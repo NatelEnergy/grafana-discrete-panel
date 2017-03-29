@@ -182,7 +182,7 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
 
             return {
               x: x,
-              y: evt.clientY - rect.right,
+              y: evt.clientY - rect.top,
               ts: ts,
               evt: evt
             };

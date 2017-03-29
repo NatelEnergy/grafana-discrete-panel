@@ -14,11 +14,18 @@
     </div>
 
     <div class="gf-form">
-      <gf-form-switch class="gf-form" 
-        label="Write Metric Names" 
-        label-class="query-keyword width-12" 
-        checked="ctrl.panel.writeMetricNames" 
-        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        <gf-form-switch class="gf-form" 
+                        label="Write Metric Names" 
+                        label-class="query-keyword width-12" 
+                        checked="ctrl.panel.writeMetricNames" 
+                        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        <gf-form-switch class="gf-form" ng-if="ctrl.panel.writeMetricNames"
+                        label="on right" 
+                        label-class="query-keyword width-8" 
+                        checked="ctrl.panel.writeMetricNamesOnRight" 
+                        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+      <span class="gf-form-label" ng-if="ctrl.panel.writeMetricNames && ctrl.panel.writeMetricNamesOnRight">width</span>
+      <input type="number" ng-model="ctrl.panel.metricNamesOnRightWidth" class="gf-form-input max-width-6" ng-blur="ctrl.render()" ng-if="ctrl.panel.writeMetricNames && ctrl.panel.writeMetricNamesOnRight">
     </div>
 
     <div class="gf-form">
@@ -31,18 +38,60 @@
 
     <div class="gf-form">
       <gf-form-switch class="gf-form" 
-        label="Show Legend" 
-        label-class="query-keyword width-12" 
-        checked="ctrl.panel.showLegend" 
-        on-change="ctrl.onConfigChanged()"></gf-form-switch>
+                      label="Show Legend" 
+                      label-class="query-keyword width-12" 
+                      checked="ctrl.panel.showLegend" 
+                      on-change="ctrl.onConfigChanged()"></gf-form-switch>
+      <gf-form-switch class="gf-form"  ng-if="ctrl.panel.showLegend"
+                      label="Show Metric Names" 
+                      label-class="query-keyword width-12" 
+                      checked="ctrl.panel.showLegendNames" 
+                      on-change="ctrl.onConfigChanged()"></gf-form-switch>
+      <gf-form-switch class="gf-form"   ng-if="ctrl.panel.showLegend"
+                      label="Show Percent" 
+                      label-class="query-keyword width-12" 
+                      checked="ctrl.panel.showLegendPercent" 
+                      on-change="ctrl.onConfigChanged()"></gf-form-switch>
     </div>
 
     <div class="gf-form">
       <gf-form-switch class="gf-form" 
-        label="Show Legend Percent" 
+        label="Highlight on Mouseover" 
         label-class="query-keyword width-12" 
-        checked="ctrl.panel.showLegendPercent" 
+        checked="ctrl.panel.highlightOnMouseover" 
         on-change="ctrl.onConfigChanged()"></gf-form-switch>
     </div>
 
+</div>
+
+<div class="editor-row">
+    <h5 class="page-heading">Events</h5>
+    <div class"section gf-form-group">
+        <div class="gf-form">
+            <gf-form-switch class="gf-form" 
+                            label="Query all data" 
+                            label-class="query-keyword width-12" 
+                            checked="ctrl.panel.queryAllData" 
+                            on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        <p>Warning! This will expand the data selection interval to &quot;all time&quot;,
+            regardless of the time picker settings. This should only be used with discrete
+            event data, e.g. from Elasticsearch. Only events that cover the time range
+            from the time picker or override will be shown, however.</p>
+        </div>
+    </div>
+
+    <div class="gf-form">
+      <span class="gf-form-label">Event Begin Time Field</span>
+      <input type="text" ng-model="ctrl.panel.eventBeginField" class="gf-form-input max-width-12" ng-blur="ctrl.render()">
+    </div>
+
+    <div class="gf-form">
+      <span class="gf-form-label">Event End Time Field</span>
+      <input type="text" ng-model="ctrl.panel.eventEndField" class="gf-form-input max-width-12" ng-blur="ctrl.render()">
+    </div>
+
+    <div class="gf-form">
+      <span class="gf-form-label">Event Name Field</span>
+      <input type="text" ng-model="ctrl.panel.eventNameField" class="gf-form-input max-width-12" ng-blur="ctrl.render()">
+    </div>
 </div>
