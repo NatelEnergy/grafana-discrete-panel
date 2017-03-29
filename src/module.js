@@ -151,7 +151,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       if(top>0) {
         ctx.strokeStyle = this.panel.lineColor;
         ctx.beginPath();
-        ctx.moveTo(0, top);
+        ctx.moveTo(left, top);
         ctx.lineTo(width, top);
         ctx.stroke();
       }

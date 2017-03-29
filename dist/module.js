@@ -235,7 +235,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               if (top > 0) {
                 ctx.strokeStyle = _this2.panel.lineColor;
                 ctx.beginPath();
-                ctx.moveTo(0, top);
+                ctx.moveTo(left, top);
                 ctx.lineTo(width, top);
                 ctx.stroke();
               }
