@@ -503,11 +503,11 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               if (metric.type === 'docs') {
                 // handle discrete events
                 _.forEach(metric.datapoints, function (point) {
-                  var start = moment(point[_this3.panel.eventBeginField]);
+                  var start = moment.utc(point[_this3.panel.eventBeginField]);
                   var startMs = start.valueOf();
                   var end = _this3.range.to;
                   if ([_this3.panel.eventEndField] && point[_this3.panel.eventEndField] !== '') {
-                    end = moment(point[_this3.panel.eventEndField]);
+                    end = moment.utc(point[_this3.panel.eventEndField]);
                   }
                   var endMs = end.valueOf();
                   if (!(startMs > _this3.range.to || endMs < _this3.range.from)) {

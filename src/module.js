@@ -422,11 +422,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if (metric.type === 'docs') { // handle discrete events
         _.forEach(metric.datapoints, (point) => {
-          var start = moment(point[this.panel.eventBeginField]);
+          var start = moment.utc(point[this.panel.eventBeginField]);
           var startMs = start.valueOf();
           var end = this.range.to;
           if ([this.panel.eventEndField] && point[this.panel.eventEndField] !== '') {
-            end = moment(point[this.panel.eventEndField]);
+            end = moment.utc(point[this.panel.eventEndField]);
           }
           var endMs = end.valueOf();
           if (!(startMs > this.range.to || endMs < this.range.from)) {
