@@ -1,8 +1,9 @@
 
 
 <div class="editor-row">
-    <h5 class="page-heading">Display</h5>
-    <div class="gf-form-group">
+
+    <div class="section gf-form-group">
+        <h5 class="section-heading">Display</h5>
         <div class="gf-form">
           <label class="gf-form-label width-14">Row Height</label>
           <input type="number" ng-model="ctrl.panel.rowHeight" class="gf-form-input max-width-5" ng-blur="ctrl.render()" />
@@ -31,21 +32,11 @@
             checked="ctrl.panel.writeAllValues" 
             on-change="ctrl.onConfigChanged()"></gf-form-switch>
         </div>
-
-        <div class="gf-form">
-          <gf-form-switch class="gf-form" 
-            label="Highlight on Mouseover" 
-            label-class="gf-form-label width-14" 
-            checked="ctrl.panel.highlightOnMouseover" 
-            on-change="ctrl.onConfigChanged()"></gf-form-switch>
-        </div>
     </div>
-</div>
 
 
-<div class="editor-row">
-    <h5 class="page-heading">Legend</h5>
-    <div class="gf-form-group">
+    <div class="section gf-form-group">
+        <h5 class="section-heading">Legend</h5>
         <div class="gf-form">
           <gf-form-switch class="gf-form" 
             label="Show Legend" 
@@ -71,4 +62,16 @@
             </div>
         </div>
     </div>
+
+    <div class="section gf-form-group">
+        <h5 class="section-heading">Tooltips</h5>
+        <div class="gf-form">
+          <gf-form-switch class="gf-form" 
+            label="Highlight on Mouseover" 
+            label-class="gf-form-label width-14" 
+            checked="ctrl.panel.highlightOnMouseover" 
+            on-change="ctrl.onConfigChanged()"></gf-form-switch>
+        </div>
+    </div>
+
 </div>

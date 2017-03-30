@@ -15,6 +15,12 @@ choice to display string or boolean data
 
 #### Changelog
 
+##### v0.0.3
+
+- Configure more colors (retzkek)
+- Fix tooltips (retzkek)
+
+
 ##### v0.0.2
 
 - Use the panel time shift.

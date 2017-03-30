@@ -1,6 +1,6 @@
 {
   "name": "natel-discrete-panel",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Discrete Events in Grafana",
   "main": "src/module.js",
   "scripts": {
