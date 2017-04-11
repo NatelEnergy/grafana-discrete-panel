@@ -291,7 +291,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     var isNull = _.isNil(val);
-    if(!isNull && _.isString(val)) {
+    if(!isNull && !_.isString(val)) {
       val = val.toString(); // convert everything to a string
     }
 
