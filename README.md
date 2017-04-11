@@ -19,6 +19,7 @@ choice to display string or boolean data
 
 - Configure more colors (retzkek)
 - Fix tooltips (retzkek)
+- Configure Text Size
 
 
 ##### v0.0.2

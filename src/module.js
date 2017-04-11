@@ -33,6 +33,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       valueTextColor: '#000000',
       backgroundColor: 'rgba(128, 128, 128, 0.1)',
       lineColor: 'rgba(128, 128, 128, 1.0)',
+      textSize: 24,
       writeLastValue: true,
       writeAllValues: false,
       writeMetricNames: false,
@@ -90,6 +91,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var ctx = this.context;
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
+    ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
     // ctx.shadowOffsetX = 1;
     // ctx.shadowOffsetY = 1;
@@ -109,7 +111,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       /*if(!this.panel.writeMetricNames) {
         ctx.fillStyle = "#111111";
-        ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText("No Data", 10, centerV);
       }*/
@@ -126,9 +127,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           if(this.panel.writeAllValues) {
             ctx.fillStyle = this.panel.valueTextColor;
-            ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
             ctx.textAlign = 'left';
-
             ctx.fillText(point.val, point.x+7, centerV);
           }
           lastBS = point.x;
@@ -146,7 +145,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
 
       ctx.fillStyle = "#000000";
-      ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
       if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
         ctx.fillStyle = this.panel.metricNameColor;
@@ -184,23 +182,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           // Now Draw the value
           ctx.fillStyle = "#000000";
-          ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText( point.val, point.x+10, centerV);
-
-
-          // ctx.fillText( point.val, this.mouse.position.x-10, centerV);
-
-          // if(point.ms > 2) {
-          //   ctx.textAlign = 'left';
-          //   ctx.font = '18px "Open Sans", Helvetica, Arial, sans-serif';
-
-          //   var msg = moment.duration( point.ms ).humanize(false);
-          //   ctx.fillText(msg, this.mouse.position.x+10, centerV);
-          // }
+          ctx.fillText( point.val, point.x+7, centerV);
         }
         else if( this.panel.writeLastValue ) {
-          ctx.fillText( point.val, width-10, centerV );
+          ctx.fillText( point.val, width-7, centerV );
         }
       }
 
@@ -257,7 +243,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     var body = '<div class="graph-tooltip-time">'+ val + '</div>';
-    
+
     body += "<center>"
     body += this.dashboard.formatDate( moment(from) ) + "<br/>";
     body += "to<br/>";
@@ -271,7 +257,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   showLegandTooltip(pos, info) {
     var body = '<div class="graph-tooltip-time">'+ info.val +'</div>';
-    
+
     body += "<center>";
     if(info.count > 1) {
       body += info.count + " times<br/>for<br/>";
@@ -286,7 +272,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   clearTT() {
-    this.$tooltip.detach(); 
+    this.$tooltip.detach();
   }
 
   formatValue(val, stats) {
@@ -392,8 +378,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var data = [];
     _.forEach(dataList, (metric) => {
       var valToInfo = {};
-      var res = { 
-        name: metric.target, 
+      var res = {
+        name: metric.target,
         changes: [],
         tooManyValues: false,
         legendInfo: [] };
@@ -427,7 +413,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       var nullText = this.formatValue(null);
       if( res.changes.length > 1 && _.has(valToInfo, nullText ) ) {
         var info = valToInfo[nullText];
-        if(info.count == 1 ) { 
+        if(info.count == 1 ) {
           var per = (info.ms/elapsed);
           if( per < .02 ) {
             if(res.changes[0].val == nullText) {
@@ -447,7 +433,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       });
     });
     this.data = data;
-    
+
     this.onRender();
 
     //console.log( 'data', dataList, this.data);
@@ -555,7 +541,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onMouseSelectedRange(range) {
     this.timeSrv.setTime(range);
-    $(this.canvas).css( 'cursor', 'wait' ); 
+    $(this.canvas).css( 'cursor', 'wait' );
   }
 
 }

@@ -87,6 +87,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             valueTextColor: '#000000',
             backgroundColor: 'rgba(128, 128, 128, 0.1)',
             lineColor: 'rgba(128, 128, 128, 1.0)',
+            textSize: 24,
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
@@ -151,6 +152,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             var ctx = this.context;
             ctx.lineWidth = 1;
             ctx.textBaseline = 'middle';
+            ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
             // ctx.shadowOffsetX = 1;
             // ctx.shadowOffsetY = 1;
@@ -170,7 +172,6 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
               /*if(!this.panel.writeMetricNames) {
                 ctx.fillStyle = "#111111";
-                ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText("No Data", 10, centerV);
               }*/
@@ -187,9 +188,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
                   if (_this2.panel.writeAllValues) {
                     ctx.fillStyle = _this2.panel.valueTextColor;
-                    ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                     ctx.textAlign = 'left';
-
                     ctx.fillText(point.val, point.x + 7, centerV);
                   }
                   lastBS = point.x;
@@ -205,7 +204,6 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               }
 
               ctx.fillStyle = "#000000";
-              ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
 
               if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
                 ctx.fillStyle = _this2.panel.metricNameColor;
@@ -243,21 +241,10 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
                   // Now Draw the value
                   ctx.fillStyle = "#000000";
-                  ctx.font = '24px "Open Sans", Helvetica, Arial, sans-serif';
                   ctx.textAlign = 'left';
-                  ctx.fillText(point.val, point.x + 10, centerV);
-
-                  // ctx.fillText( point.val, this.mouse.position.x-10, centerV);
-
-                  // if(point.ms > 2) {
-                  //   ctx.textAlign = 'left';
-                  //   ctx.font = '18px "Open Sans", Helvetica, Arial, sans-serif';
-
-                  //   var msg = moment.duration( point.ms ).humanize(false);
-                  //   ctx.fillText(msg, this.mouse.position.x+10, centerV);
-                  // }
+                  ctx.fillText(point.val, point.x + 7, centerV);
                 } else if (_this2.panel.writeLastValue) {
-                  ctx.fillText(point.val, width - 10, centerV);
+                  ctx.fillText(point.val, width - 7, centerV);
                 }
               }
 
