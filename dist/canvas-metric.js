@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_export, _context) {
+System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app_events'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, _, moment, angular, _createClass, CanvasPanelCtrl;
+  var MetricsPanelCtrl, _, moment, angular, appEvents, _createClass, CanvasPanelCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -44,6 +44,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
       moment = _moment.default;
     }, function (_angular) {
       angular = _angular.default;
+    }, function (_appCoreApp_events) {
+      appEvents = _appCoreApp_events.default;
     }],
     execute: function () {
       _createClass = function () {
@@ -179,10 +181,12 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
             var x = evt.clientX - rect.left;
             var elapsed = this.range.to - this.range.from;
             var ts = this.range.from + elapsed * (x / rect.width);
+            var y = evt.clientY - rect.top;
 
             return {
               x: x,
-              y: evt.clientY - rect.top,
+              y: y,
+              yRel: y / rect.height,
               ts: ts,
               evt: evt
             };
@@ -225,12 +229,22 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
             $(this.canvas).css('cursor', 'pointer');
             $(this.wrap).css('width', '100%');
 
-            console.log('link', this);
+            //  console.log( 'link', this );
 
             this.context = this.canvas.getContext('2d');
             this.canvas.addEventListener('mousemove', function (evt) {
               _this2.mouse.position = _this2.getMousePosition(evt);
               _this2.onMouseMoved(evt);
+              var info = {
+                pos: {
+                  pageX: evt.pageX,
+                  pageY: evt.pageY,
+                  x: _this2.mouse.position.ts,
+                  panelRelY: _this2.mouse.position.yRel
+                },
+                panel: _this2.panel
+              };
+              appEvents.emit('graph-hover', info);
             }, false);
 
             this.canvas.addEventListener('mouseout', function (evt) {
@@ -238,6 +252,7 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
               _this2.mouse.down = null;
               _this2.onRender();
               _this2.$tooltip.detach();
+              appEvents.emit('graph-hover-clear');
             }, false);
 
             this.canvas.addEventListener('mousedown', function (evt) {
@@ -266,6 +281,44 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular'], function (_e
               _this2.mouse.position = null;
               _this2.$tooltip.detach();
             }, false);
+
+            // global events
+            appEvents.on('graph-hover', function (event) {
+
+              // ignore other graph hover events if shared tooltip is disabled
+              if (!_this2.dashboard.sharedTooltipModeEnabled()) {
+                return;
+              }
+
+              // ignore if we are the emitter
+              if (event.panel.id === _this2.panel.id || _this2.otherPanelInFullscreenMode()) {
+                return;
+              }
+
+              var ts = event.pos.x;
+              var rect = _this2.canvas.getBoundingClientRect();
+              var elapsed = _this2.range.to - _this2.range.from;
+              var x = rect.left + (ts - _this2.range.from) / (elapsed * 1.0) * rect.width;
+
+              _this2.mouse.position = {
+                x: x,
+                y: event.pos.panelRelY * rect.height,
+                yRel: event.pos.panelRelY,
+                ts: ts,
+                evt: event
+              };
+              if (!_this2.dashboard.sharedCrosshairModeOnly()) {
+                // console.log( "TODO Full Tooltip", event);
+              }
+              _this2.render();
+            }, scope);
+
+            appEvents.on('graph-hover-clear', function (event, info) {
+              console.log("HOVER Clear", event);
+              _this2.mouse.position = null;
+              _this2.render();
+              _this2.$tooltip.detach();
+            }, scope);
           }
         }]);
 

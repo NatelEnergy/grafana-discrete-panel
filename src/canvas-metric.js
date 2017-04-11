@@ -5,6 +5,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import angular from 'angular';
 
+import appEvents from 'app/core/app_events';
+
 // Expects a template with:
 // <div class="canvas-spot"></div>
 export class CanvasPanelCtrl extends MetricsPanelCtrl {
@@ -109,7 +111,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   clearTT() {
-    this.$tooltip.detach(); 
+    this.$tooltip.detach();
   }
 
   getMousePosition(evt) {
@@ -117,10 +119,12 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     var x = evt.clientX - rect.left;
     var elapsed = this.range.to - this.range.from;
     var ts = this.range.from + (elapsed*(x/rect.width));
+    var y = evt.clientY - rect.top;
 
     return {
       x: x,
-      y: evt.clientY - rect.top,
+      y: y,
+      yRel: y/rect.height,
       ts: ts,
       evt: evt
     };
@@ -130,7 +134,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     var pos = this.mouse.position;
     var body = '<div class="graph-tooltip-time">hello</div>';
-    
+
     body += "<center>"
     body += this.dashboard.formatDate( moment(pos.ts) );
     body += "</center>"
@@ -157,19 +161,30 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     $(this.canvas).css( 'cursor', 'pointer' );
     $(this.wrap).css( 'width', '100%' );
 
-    console.log( 'link', this );
+  //  console.log( 'link', this );
 
     this.context = this.canvas.getContext('2d');
     this.canvas.addEventListener('mousemove', (evt) => {
       this.mouse.position = this.getMousePosition(evt);
       this.onMouseMoved(evt);
+      var info = {
+        pos: {
+          pageX: evt.pageX,
+          pageY: evt.pageY,
+          x: this.mouse.position.ts,
+          panelRelY: this.mouse.position.yRel
+        },
+        panel: this.panel
+      }
+      appEvents.emit('graph-hover', info);
     }, false);
 
     this.canvas.addEventListener('mouseout', (evt) => {
       this.mouse.position = null;
       this.mouse.down = null;
-      this.onRender(); 
+      this.onRender();
       this.$tooltip.detach();
+      appEvents.emit('graph-hover-clear');
     }, false);
 
     this.canvas.addEventListener('mousedown', (evt) => {
@@ -199,6 +214,45 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       this.mouse.position = null;
       this.$tooltip.detach();
     }, false);
+
+
+    // global events
+    appEvents.on('graph-hover', (event) => {
+
+      // ignore other graph hover events if shared tooltip is disabled
+      if (!this.dashboard.sharedTooltipModeEnabled()) {
+        return;
+      }
+
+      // ignore if we are the emitter
+      if (event.panel.id === this.panel.id || this.otherPanelInFullscreenMode()) {
+        return;
+      }
+
+      var ts = event.pos.x;
+      var rect = this.canvas.getBoundingClientRect();
+      var elapsed = this.range.to - this.range.from;
+      var x = rect.left + ((ts - this.range.from)/(elapsed*1.0))*rect.width;
+
+      this.mouse.position = {
+        x: x,
+        y: event.pos.panelRelY * rect.height,
+        yRel: event.pos.panelRelY,
+        ts: ts,
+        evt: event
+      };
+      if (!this.dashboard.sharedCrosshairModeOnly()) {
+       // console.log( "TODO Full Tooltip", event);
+      }
+      this.render();
+    }, scope);
+
+    appEvents.on('graph-hover-clear', (event, info) => {
+      console.log( "HOVER Clear", event);
+      this.mouse.position = null;
+      this.render();
+      this.$tooltip.detach();
+    }, scope);
   }
 }
 

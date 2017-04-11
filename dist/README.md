@@ -20,6 +20,7 @@ choice to display string or boolean data
 - Configure more colors (retzkek)
 - Fix tooltips (retzkek)
 - Configure Text Size
+- Support shared crosshair
 
 
 ##### v0.0.2
