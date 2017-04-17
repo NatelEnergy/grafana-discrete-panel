@@ -15,6 +15,11 @@ choice to display string or boolean data
 
 #### Changelog
 
+##### v0.0.4
+
+- ...
+
+
 ##### v0.0.3
 
 - Configure more colors (retzkek)

@@ -1,6 +1,6 @@
 {
   "name": "natel-discrete-panel",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Discrete Events in Grafana",
   "main": "src/module.js",
   "scripts": {
@@ -16,8 +16,8 @@
   ],
   "author": "ryantxu",
   "license": "MIT",
-  "repository" : { 
-    "type" : "git", 
+  "repository" : {
+    "type" : "git",
     "url" : "https://github.com/NatelEnergy/grafana-discrete-panel.git"
   },
   "devDependencies": {
