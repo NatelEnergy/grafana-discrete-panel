@@ -97,6 +97,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             highlightOnMouseover: true
           };
           _.defaults(_this.panel, panelDefaults);
+          _this.externalPT = false;
 
           _this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
           _this.events.on('render', _this.onRender.bind(_this));
@@ -281,34 +282,18 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 ctx.strokeStyle = '#e22c14';
                 ctx.lineWidth = 2;
                 ctx.stroke();
+
+                if (this.externalPT && rows > 1) {
+                  ctx.beginPath();
+                  ctx.arc(this.mouse.position.x, this.mouse.position.y, 3, 0, 2 * Math.PI, false);
+                  ctx.fillStyle = '#e22c14';
+                  ctx.fill();
+                  ctx.lineWidth = 1;
+                  ctx.strokeStyle = '#111';
+                  ctx.stroke();
+                }
               }
             }
-          }
-        }, {
-          key: 'showTooltip',
-          value: function showTooltip(pos, point) {
-            var from = point.start;
-            var to = point.start + point.ms;
-            var time = point.ms;
-            var val = point.val;
-
-            if (this.mouse.down != null) {
-              from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
-              to = Math.max(this.mouse.down.ts, this.mouse.position.ts);
-              time = to - from;
-              val = "Zoom To:";
-            }
-
-            var body = '<div class="graph-tooltip-time">' + val + '</div>';
-
-            body += "<center>";
-            body += this.dashboard.formatDate(moment(from)) + "<br/>";
-            body += "to<br/>";
-            body += this.dashboard.formatDate(moment(to)) + "<br/><br/>";
-            body += moment.duration(time).humanize() + "<br/>";
-            body += "</center>";
-
-            this.$tooltip.html(body).place_tt(pos.pageX + 20, pos.pageY);
           }
         }, {
           key: 'showLegandTooltip',
@@ -564,10 +549,39 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
             this.render();
           }
         }, {
-          key: 'onMouseMoved',
-          value: function onMouseMoved(evt) {
+          key: 'showTooltip',
+          value: function showTooltip(evt, point) {
+            var from = point.start;
+            var to = point.start + point.ms;
+            var time = point.ms;
+            var val = point.val;
+
+            if (this.mouse.down != null) {
+              from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
+              to = Math.max(this.mouse.down.ts, this.mouse.position.ts);
+              time = to - from;
+              val = "Zoom To:";
+            }
+
+            var body = '<div class="graph-tooltip-time">' + val + '</div>';
+
+            body += "<center>";
+            body += this.dashboard.formatDate(moment(from)) + "<br/>";
+            body += "to<br/>";
+            body += this.dashboard.formatDate(moment(to)) + "<br/><br/>";
+            body += moment.duration(time).humanize() + "<br/>";
+            body += "</center>";
+
+            var rect = this.canvas.getBoundingClientRect();
+            var pageY = rect.top + evt.pos.panelRelY * rect.height;
+
+            this.$tooltip.html(body).place_tt(evt.pos.pageX + 20, pageY);
+          }
+        }, {
+          key: 'onGraphHover',
+          value: function onGraphHover(evt, showTT, isExternal) {
+            this.externalPT = false;
             if (this.data) {
-              var range = this.timeSrv.timeRange();
               var hover = null;
               var j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
               if (j < 0) {
@@ -584,11 +598,15 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
                 hover = this.data[j].changes[i];
               }
               this.hoverPoint = hover;
-              this.showTooltip(evt, hover);
+
+              if (showTT) {
+                this.showTooltip(evt, hover);
+                this.externalPT = isExternal;
+              }
+              this.onRender(); // refresh the view
             } else {
               this.$tooltip.detach(); // make sure it is hidden
             }
-            this.onRender(); // refresh the view
           }
         }, {
           key: 'onMouseClicked',

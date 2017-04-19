@@ -115,33 +115,23 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   getMousePosition(evt) {
-    var rect = this.canvas.getBoundingClientRect();
-    var x = evt.clientX - rect.left;
     var elapsed = this.range.to - this.range.from;
-    var ts = this.range.from + (elapsed*(x/rect.width));
+    var rect = this.canvas.getBoundingClientRect();
+    var x = evt.offsetX; // - rect.left;
+    var ts = this.range.from + (elapsed*(x/parseFloat(rect.width)));
     var y = evt.clientY - rect.top;
 
     return {
       x: x,
       y: y,
-      yRel: y/rect.height,
+      yRel: y / parseFloat(rect.height),
       ts: ts,
       evt: evt
     };
   }
 
-  onMouseMoved(evt) {
-
-    var pos = this.mouse.position;
-    var body = '<div class="graph-tooltip-time">hello</div>';
-
-    body += "<center>"
-    body += this.dashboard.formatDate( moment(pos.ts) );
-    body += "</center>"
-
-    this.$tooltip.html(body).place_tt(pos.evt.pageX + 20, pos.evt.pageY);
-
-    this.render();
+  onGraphHover(evt, showTT, isExternal) {
+    console.log( "HOVER", evt, showTT, isExternal );
   }
 
   onMouseClicked(where) {
@@ -166,12 +156,12 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     this.context = this.canvas.getContext('2d');
     this.canvas.addEventListener('mousemove', (evt) => {
       this.mouse.position = this.getMousePosition(evt);
-      this.onMouseMoved(evt);
       var info = {
         pos: {
           pageX: evt.pageX,
           pageY: evt.pageY,
           x: this.mouse.position.ts,
+          y: this.mouse.position.y,
           panelRelY: this.mouse.position.yRel
         },
         panel: this.panel
@@ -220,31 +210,33 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     appEvents.on('graph-hover', (event) => {
 
       // ignore other graph hover events if shared tooltip is disabled
-      if (!this.dashboard.sharedTooltipModeEnabled()) {
+      var isThis = event.panel.id === this.panel.id;
+      if (!this.dashboard.sharedTooltipModeEnabled() && !isThis) {
         return;
       }
 
-      // ignore if we are the emitter
-      if (event.panel.id === this.panel.id || this.otherPanelInFullscreenMode()) {
+      // ignore if other panels are fullscreen
+      if (this.otherPanelInFullscreenMode()) {
         return;
       }
 
-      var ts = event.pos.x;
-      var rect = this.canvas.getBoundingClientRect();
-      var elapsed = this.range.to - this.range.from;
-      var x = rect.left + ((ts - this.range.from)/(elapsed*1.0))*rect.width;
+      // Calculate the mouse position when it came from somewhere else
+      if(!isThis) {
+        var ts = event.pos.x;
+        var rect = this.canvas.getBoundingClientRect();
+        var elapsed = parseFloat(this.range.to - this.range.from);
+        var x = ((ts - this.range.from)/elapsed)*rect.width;
 
-      this.mouse.position = {
-        x: x,
-        y: event.pos.panelRelY * rect.height,
-        yRel: event.pos.panelRelY,
-        ts: ts,
-        evt: event
-      };
-      if (!this.dashboard.sharedCrosshairModeOnly()) {
-       // console.log( "TODO Full Tooltip", event);
+        this.mouse.position = {
+          x: x,
+          y: event.pos.panelRelY * rect.height,
+          yRel: event.pos.panelRelY,
+          ts: ts,
+          evt: event
+        };
       }
-      this.render();
+
+      this.onGraphHover(event, isThis || !this.dashboard.sharedCrosshairModeOnly(), !isThis);
     }, scope);
 
     appEvents.on('graph-hover-clear', (event, info) => {

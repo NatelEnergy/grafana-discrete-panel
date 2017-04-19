@@ -177,34 +177,24 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
         }, {
           key: 'getMousePosition',
           value: function getMousePosition(evt) {
-            var rect = this.canvas.getBoundingClientRect();
-            var x = evt.clientX - rect.left;
             var elapsed = this.range.to - this.range.from;
-            var ts = this.range.from + elapsed * (x / rect.width);
+            var rect = this.canvas.getBoundingClientRect();
+            var x = evt.offsetX; // - rect.left;
+            var ts = this.range.from + elapsed * (x / parseFloat(rect.width));
             var y = evt.clientY - rect.top;
 
             return {
               x: x,
               y: y,
-              yRel: y / rect.height,
+              yRel: y / parseFloat(rect.height),
               ts: ts,
               evt: evt
             };
           }
         }, {
-          key: 'onMouseMoved',
-          value: function onMouseMoved(evt) {
-
-            var pos = this.mouse.position;
-            var body = '<div class="graph-tooltip-time">hello</div>';
-
-            body += "<center>";
-            body += this.dashboard.formatDate(moment(pos.ts));
-            body += "</center>";
-
-            this.$tooltip.html(body).place_tt(pos.evt.pageX + 20, pos.evt.pageY);
-
-            this.render();
+          key: 'onGraphHover',
+          value: function onGraphHover(evt, showTT, isExternal) {
+            console.log("HOVER", evt, showTT, isExternal);
           }
         }, {
           key: 'onMouseClicked',
@@ -234,12 +224,12 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             this.context = this.canvas.getContext('2d');
             this.canvas.addEventListener('mousemove', function (evt) {
               _this2.mouse.position = _this2.getMousePosition(evt);
-              _this2.onMouseMoved(evt);
               var info = {
                 pos: {
                   pageX: evt.pageX,
                   pageY: evt.pageY,
                   x: _this2.mouse.position.ts,
+                  y: _this2.mouse.position.y,
                   panelRelY: _this2.mouse.position.yRel
                 },
                 panel: _this2.panel
@@ -286,31 +276,33 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             appEvents.on('graph-hover', function (event) {
 
               // ignore other graph hover events if shared tooltip is disabled
-              if (!_this2.dashboard.sharedTooltipModeEnabled()) {
+              var isThis = event.panel.id === _this2.panel.id;
+              if (!_this2.dashboard.sharedTooltipModeEnabled() && !isThis) {
                 return;
               }
 
-              // ignore if we are the emitter
-              if (event.panel.id === _this2.panel.id || _this2.otherPanelInFullscreenMode()) {
+              // ignore if other panels are fullscreen
+              if (_this2.otherPanelInFullscreenMode()) {
                 return;
               }
 
-              var ts = event.pos.x;
-              var rect = _this2.canvas.getBoundingClientRect();
-              var elapsed = _this2.range.to - _this2.range.from;
-              var x = rect.left + (ts - _this2.range.from) / (elapsed * 1.0) * rect.width;
+              // Calculate the mouse position when it came from somewhere else
+              if (!isThis) {
+                var ts = event.pos.x;
+                var rect = _this2.canvas.getBoundingClientRect();
+                var elapsed = parseFloat(_this2.range.to - _this2.range.from);
+                var x = (ts - _this2.range.from) / elapsed * rect.width;
 
-              _this2.mouse.position = {
-                x: x,
-                y: event.pos.panelRelY * rect.height,
-                yRel: event.pos.panelRelY,
-                ts: ts,
-                evt: event
-              };
-              if (!_this2.dashboard.sharedCrosshairModeOnly()) {
-                // console.log( "TODO Full Tooltip", event);
+                _this2.mouse.position = {
+                  x: x,
+                  y: event.pos.panelRelY * rect.height,
+                  yRel: event.pos.panelRelY,
+                  ts: ts,
+                  evt: event
+                };
               }
-              _this2.render();
+
+              _this2.onGraphHover(event, isThis || !_this2.dashboard.sharedCrosshairModeOnly(), !isThis);
             }, scope);
 
             appEvents.on('graph-hover-clear', function (event, info) {
