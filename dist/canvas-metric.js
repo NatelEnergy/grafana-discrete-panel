@@ -235,6 +235,9 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
                 panel: _this2.panel
               };
               appEvents.emit('graph-hover', info);
+              if (_this2.mouse.down != null) {
+                $(_this2.canvas).css('cursor', 'col-resize');
+              }
             }, false);
 
             this.canvas.addEventListener('mouseout', function (evt) {
@@ -247,7 +250,6 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
 
             this.canvas.addEventListener('mousedown', function (evt) {
               _this2.mouse.down = _this2.getMousePosition(evt);
-              $(_this2.canvas).css('cursor', 'col-resize');
             }, false);
 
             this.canvas.addEventListener('mouseenter', function (evt) {
@@ -255,9 +257,12 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             }, false);
 
             this.canvas.addEventListener('mouseup', function (evt) {
+              _this2.$tooltip.detach();
               var up = _this2.getMousePosition(evt);
               if (_this2.mouse.down != null) {
                 if (up.x == _this2.mouse.down.x && up.y == _this2.mouse.down.y) {
+                  _this2.mouse.position = null;
+                  _this2.mouse.down = null;
                   _this2.onMouseClicked(up);
                 } else {
                   var min = Math.min(_this2.mouse.down.ts, up.ts);
@@ -269,7 +274,6 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
               }
               _this2.mouse.down = null;
               _this2.mouse.position = null;
-              _this2.$tooltip.detach();
             }, false);
 
             // global events
@@ -288,6 +292,11 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
 
               // Calculate the mouse position when it came from somewhere else
               if (!isThis) {
+                if (!event.pos.x) {
+                  console.log("Invalid hover point", event);
+                  return;
+                }
+
                 var ts = event.pos.x;
                 var rect = _this2.canvas.getBoundingClientRect();
                 var elapsed = parseFloat(_this2.range.to - _this2.range.from);
@@ -300,6 +309,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
                   ts: ts,
                   evt: event
                 };
+
+                //console.log( "Calculate mouseInfo", event, this.mouse.position);
               }
 
               _this2.onGraphHover(event, isThis || !_this2.dashboard.sharedCrosshairModeOnly(), !isThis);

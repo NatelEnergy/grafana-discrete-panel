@@ -167,6 +167,9 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         panel: this.panel
       }
       appEvents.emit('graph-hover', info);
+      if(this.mouse.down != null) {
+        $(this.canvas).css( 'cursor', 'col-resize' );
+      }
     }, false);
 
     this.canvas.addEventListener('mouseout', (evt) => {
@@ -179,7 +182,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     this.canvas.addEventListener('mousedown', (evt) => {
       this.mouse.down = this.getMousePosition(evt);
-      $(this.canvas).css( 'cursor', 'col-resize' );
     }, false);
 
     this.canvas.addEventListener('mouseenter', (evt) => {
@@ -187,9 +189,12 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }, false);
 
     this.canvas.addEventListener('mouseup', (evt) => {
+      this.$tooltip.detach();
       var up = this.getMousePosition(evt);
       if(this.mouse.down != null) {
         if(up.x == this.mouse.down.x && up.y == this.mouse.down.y ) {
+          this.mouse.position = null;
+          this.mouse.down = null;
           this.onMouseClicked(up);
         }
         else {
@@ -202,7 +207,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       }
       this.mouse.down = null;
       this.mouse.position = null;
-      this.$tooltip.detach();
     }, false);
 
 
@@ -222,6 +226,11 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
       // Calculate the mouse position when it came from somewhere else
       if(!isThis) {
+        if(!event.pos.x) {
+          console.log( "Invalid hover point", event );
+          return;
+        }
+
         var ts = event.pos.x;
         var rect = this.canvas.getBoundingClientRect();
         var elapsed = parseFloat(this.range.to - this.range.from);
@@ -234,6 +243,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           ts: ts,
           evt: event
         };
+
+        //console.log( "Calculate mouseInfo", event, this.mouse.position);
       }
 
       this.onGraphHover(event, isThis || !this.dashboard.sharedCrosshairModeOnly(), !isThis);

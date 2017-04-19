@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angular'], function (_export, _context) {
+System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angular', 'app/core/app_events'], function (_export, _context) {
   "use strict";
 
-  var config, CanvasPanelCtrl, _, moment, angular, _createClass, DiscretePanelCtrl;
+  var config, CanvasPanelCtrl, _, moment, angular, appEvents, _createClass, DiscretePanelCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -46,6 +46,8 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
       moment = _moment.default;
     }, function (_angular) {
       angular = _angular.default;
+    }, function (_appCoreApp_events) {
+      appEvents = _appCoreApp_events.default;
     }],
     execute: function () {
       _createClass = function () {
@@ -128,13 +130,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
           value: function onRender() {
             var _this2 = this;
 
-            if (!this.context) {
-              console.log('No context!');
-              return;
-            }
-
-            if (this.data == null) {
-              console.log('No data!');
+            if (this.data == null || !this.context) {
               return;
             }
 
@@ -613,15 +609,22 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
           value: function onMouseClicked(where) {
             var pt = this.hoverPoint;
             var range = { from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms) };
-            console.log("CLICK", up, pt, range);
             this.timeSrv.setTime(range);
-            $(this.canvas).css('cursor', 'wait');
+            this.clear();
           }
         }, {
           key: 'onMouseSelectedRange',
           value: function onMouseSelectedRange(range) {
             this.timeSrv.setTime(range);
+            this.clear();
+          }
+        }, {
+          key: 'clear',
+          value: function clear() {
+            this.hoverPoint = null;
             $(this.canvas).css('cursor', 'wait');
+            appEvents.emit('graph-hover-clear');
+            this.render();
           }
         }]);
 

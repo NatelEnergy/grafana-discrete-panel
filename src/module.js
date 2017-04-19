@@ -6,6 +6,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import angular from 'angular';
 
+import appEvents from 'app/core/app_events';
+
 class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   constructor($scope, $injector, $q) {
@@ -67,13 +69,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onRender() {
-    if( !(this.context) ) {
-      console.log( 'No context!');
-      return;
-    }
-
-    if(this.data == null) {
-      console.log( 'No data!');
+    if(this.data == null ||  !(this.context) ) {
       return;
     }
 
@@ -552,16 +548,21 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onMouseClicked(where) {
     var pt = this.hoverPoint;
     var range = {from: moment.utc(pt.start), to: moment.utc(pt.start+pt.ms) };
-    console.log( "CLICK", up, pt, range );
     this.timeSrv.setTime(range);
-    $(this.canvas).css( 'cursor', 'wait' );
+    this.clear();
   }
 
   onMouseSelectedRange(range) {
     this.timeSrv.setTime(range);
-    $(this.canvas).css( 'cursor', 'wait' );
+    this.clear();
   }
 
+  clear() {
+    this.hoverPoint = null;
+    $(this.canvas).css( 'cursor', 'wait' );
+    appEvents.emit('graph-hover-clear');
+    this.render();
+  }
 }
 DiscretePanelCtrl.templateUrl = 'module.html';
 

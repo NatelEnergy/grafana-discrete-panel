@@ -17,7 +17,7 @@ choice to display string or boolean data
 
 ##### v0.0.4
 
-- ...
+- Support shared tooltips (not just crosshair)
 
 
 ##### v0.0.3
