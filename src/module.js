@@ -558,6 +558,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   clear() {
+    this.mouse.position = null;
+    this.mouse.down = null;
     this.hoverPoint = null;
     $(this.canvas).css( 'cursor', 'wait' );
     appEvents.emit('graph-hover-clear');

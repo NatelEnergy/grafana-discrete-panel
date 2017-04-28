@@ -253,6 +253,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     appEvents.on('graph-hover-clear', (event, info) => {
       console.log( "HOVER Clear", event);
       this.mouse.position = null;
+      this.mouse.down = null;
       this.render();
       this.$tooltip.detach();
     }, scope);
