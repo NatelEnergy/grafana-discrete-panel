@@ -26,8 +26,8 @@
       { "name": "Multiple Results", "path": "img/screenshot-multiple.png"  },
       { "name": "Options",          "path": "img/screenshot-options.png"   }
     ],
-    "version": "0.0.4",
-    "updated": "2017-04-17"
+    "version": "0.0.5",
+    "updated": "2017-04-28"
   },
 
   "dependencies": {
