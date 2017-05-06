@@ -25,17 +25,15 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
     this.events.on('render', this.onRender.bind(this));
-
-    console.log( 'constructor', this );
   }
 
   onPanelInitalized() {
-    console.log("onPanelInitalized()");
+    //console.log("onPanelInitalized()");
     this.render();
   }
 
   onRefresh() {
-    console.log("onRefresh()");
+    //console.log("onRefresh()");
     this.render();
   }
 
@@ -251,11 +249,16 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }, scope);
 
     appEvents.on('graph-hover-clear', (event, info) => {
-      console.log( "HOVER Clear", event);
       this.mouse.position = null;
       this.render();
       this.$tooltip.detach();
     }, scope);
+
+    scope.$on('$destroy', function() {
+      tooltip.destroy();
+      elem.off();
+      elem.remove();
+    });
   }
 }
 

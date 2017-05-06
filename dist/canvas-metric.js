@@ -85,21 +85,19 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
           _this.events.on('panel-initialized', _this.onPanelInitalized.bind(_this));
           _this.events.on('refresh', _this.onRefresh.bind(_this));
           _this.events.on('render', _this.onRender.bind(_this));
-
-          console.log('constructor', _this);
           return _this;
         }
 
         _createClass(CanvasPanelCtrl, [{
           key: 'onPanelInitalized',
           value: function onPanelInitalized() {
-            console.log("onPanelInitalized()");
+            //console.log("onPanelInitalized()");
             this.render();
           }
         }, {
           key: 'onRefresh',
           value: function onRefresh() {
-            console.log("onRefresh()");
+            //console.log("onRefresh()");
             this.render();
           }
         }, {
@@ -317,11 +315,16 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             }, scope);
 
             appEvents.on('graph-hover-clear', function (event, info) {
-              console.log("HOVER Clear", event);
               _this2.mouse.position = null;
               _this2.render();
               _this2.$tooltip.detach();
             }, scope);
+
+            scope.$on('$destroy', function () {
+              tooltip.destroy();
+              elem.off();
+              elem.remove();
+            });
           }
         }]);
 

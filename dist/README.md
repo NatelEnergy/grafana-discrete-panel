@@ -15,6 +15,11 @@ choice to display string or boolean data
 
 #### Changelog
 
+##### v0.0.5
+
+- TODO... not released yet
+
+
 ##### v0.0.4
 
 - Support shared tooltips (not just crosshair)
