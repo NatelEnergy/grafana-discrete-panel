@@ -316,6 +316,7 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
 
             appEvents.on('graph-hover-clear', function (event, info) {
               _this2.mouse.position = null;
+              _this2.mouse.down = null;
               _this2.render();
               _this2.$tooltip.detach();
             }, scope);
