@@ -321,7 +321,7 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             }, scope);
 
             scope.$on('$destroy', function () {
-              tooltip.destroy();
+              _this2.$tooltip.destroy();
               elem.off();
               elem.remove();
             });

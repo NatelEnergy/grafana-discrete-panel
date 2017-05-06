@@ -254,8 +254,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       this.$tooltip.detach();
     }, scope);
 
-    scope.$on('$destroy', function() {
-      tooltip.destroy();
+    scope.$on('$destroy', () => {
+      this.$tooltip.destroy();
       elem.off();
       elem.remove();
     });
