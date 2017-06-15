@@ -23,7 +23,7 @@ choice to display string or boolean data
 - Clamp percentage stats within the query time window
 
 TODO.. hover issues!!
-maybe... fu
+maybe... indicate things that are in the future (crosshatch?)
 
 
 ##### v0.0.4
