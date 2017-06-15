@@ -17,7 +17,13 @@ choice to display string or boolean data
 
 ##### v0.0.5
 
-- TODO... not released yet
+- Support results in table format
+- Support results in ascending or decending order
+- Configure legend percentage decimal points
+- Clamp percentage stats within the query time window
+
+TODO.. hover issues!!
+maybe... fu
 
 
 ##### v0.0.4

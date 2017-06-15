@@ -6,11 +6,11 @@
         <h5 class="section-heading">Display</h5>
         <div class="gf-form">
           <label class="gf-form-label width-14">Row Height</label>
-          <input type="number" ng-model="ctrl.panel.rowHeight" class="gf-form-input max-width-5" ng-blur="ctrl.render()" />
+          <input type="number" ng-model="ctrl.panel.rowHeight" class="gf-form-input max-width-5" ng-blur="ctrl.render()" min="1"/>
         </div>
         <div class="gf-form">
           <label class="gf-form-label width-14">Text Size</label>
-          <input type="number" ng-model="ctrl.panel.textSize" class="gf-form-input max-width-5" ng-blur="ctrl.render()" />
+          <input type="number" ng-model="ctrl.panel.textSize" class="gf-form-input max-width-5" ng-blur="ctrl.render()" min="1"/>
         </div>
 
         <div class="gf-form">
@@ -64,6 +64,17 @@
                 checked="ctrl.panel.showLegendPercent"
                 on-change="ctrl.onConfigChanged()"></gf-form-switch>
             </div>
+
+            <div class="gf-form" ng-show="ctrl.panel.showLegendPercent">
+              <label class="gf-form-label width-14">Percent Decimals</label>
+              <input type="number" ng-model="ctrl.panel.legendPercentDecimals" class="gf-form-input max-width-5" ng-blur="ctrl.render()" placeholder="auto" min="0" max="10" />
+            </div>
+
+            <div class="gf-form">
+              <label class="gf-form-label width-14">Maximum Distinct Values</label>
+              <input type="number" ng-model="ctrl.panel.legendMaxValues" class="gf-form-input max-width-5" ng-blur="ctrl.render()" min="1" max="100" placeholder="all"/>
+            </div>
+
         </div>
     </div>
 

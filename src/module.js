@@ -1,10 +1,12 @@
 import config from 'app/core/config';
 
 import {CanvasPanelCtrl} from './canvas-metric';
+import DistinctPoints from './points';
 
 import _ from 'lodash';
 import moment from 'moment';
 import angular from 'angular';
+import kbn from 'app/core/utils/kbn';
 
 import appEvents from 'app/core/app_events';
 
@@ -338,81 +340,37 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   //-----------
 
-  _processLast(pt, end, res, valToInfo) {
-    pt.ms = (end - pt.start);
-    if(!res.tooManyValues) {
-      if(_.has(valToInfo, pt.val)) {
-        var v = valToInfo[pt.val];
-        v.ms += pt.ms;
-        v.count++;
-      }
-      else {
-        valToInfo[pt.val] = { 'val': pt.val, 'ms': pt.ms, 'count':1 };
-      }
-      res.tooManyValues = (valToInfo.length > 20);
-    }
-  }
-
   onDataReceived(dataList) {
     $(this.canvas).css( 'cursor', 'pointer' );
 
-    var elapsed = this.range.to - this.range.from;
+//    console.log('GOT', dataList);
+
     var data = [];
     _.forEach(dataList, (metric) => {
-      var valToInfo = {};
-      var res = {
-        name: metric.target,
-        changes: [],
-        tooManyValues: false,
-        legendInfo: [] };
-      data.push( res );
-
-      var last = null;
-      _.forEach(metric.datapoints, (point) => {
-
-        var norm = this.formatValue(point[0]);
-        if(last==null || norm != last.val) {
-          var pt = {
-            val: norm,
-            start: point[1],
-            ms: 0 // time in this state
-          }
-
-          if(last!=null) {
-            this._processLast( last, pt.start, res, valToInfo);
-          };
-
-          res.changes.push(pt);
-          last = pt;
+      if('table'=== metric.type) {
+        if('time' != metric.columns[0].type) {
+          throw 'Expected a time column from the table format';
         }
-      });
 
-      if(last!=null) {
-        this._processLast( last, this.range.to, res, valToInfo);
-      };
-
-      // Remove null from the legend if it is the first value and small (common for influx queries)
-      var nullText = this.formatValue(null);
-      if( res.changes.length > 1 && _.has(valToInfo, nullText ) ) {
-        var info = valToInfo[nullText];
-        if(info.count == 1 ) {
-          var per = (info.ms/elapsed);
-          if( per < .02 ) {
-            if(res.changes[0].val == nullText) {
-              console.log( 'Removing null', info );
-              delete valToInfo[nullText];
-
-              res.changes[1].start = res.changes[0].start;
-              res.changes[1].ms += res.changes[0].ms;
-              res.changes.splice(0, 1);
-            }
+        var last = null;
+        for(var i=1; i<metric.columns.length; i++) {
+          var res = new DistinctPoints(metric.columns[i].text);
+          for(var j=0; j<metric.rows.length; j++) {
+            var row = metric.rows[j];
+            res.add( row[0], this.formatValue( row[i] ) );
           }
+          res.finish( this );
+          data.push( res );
         }
       }
-      _.forEach(valToInfo, (value) => {
-        value.per = Math.round( (value.ms/elapsed)*100 );
-        res.legendInfo.push( value );
-      });
+      else {
+        var res = new DistinctPoints( metric.target );
+        _.forEach(metric.datapoints, (point) => {
+          res.add( point[1], this.formatValue(point[0]) );
+        });
+        res.finish( this );
+        data.push( res );
+      }
     });
     this.data = data;
 
@@ -478,8 +436,28 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onConfigChanged() {
-    console.log( "Config changed...");
+    //console.log( "Config changed...");
     this.render();
+  }
+
+  getLegendDisplay(info, metric) {
+    var disp = info.val;
+    if(this.panel.showLegendPercent) {
+      var dec = this.panel.legendPercentDecimals;
+      if(_.isNil(dec)) {
+        if(info.per>.99 && metric.changes.length>1) {
+          dec = 2;
+        }
+        else if(info.per<0.01) {
+          dec = 2;
+        }
+        else {
+          dec = 0;
+        }
+      }
+      return disp + " ("+kbn.valueFormats.percentunit(info.per, dec)+")";
+    }
+    return disp;
   }
 
   //------------------
