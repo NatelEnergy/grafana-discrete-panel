@@ -1,0 +1,15 @@
+
+<div class="canvas-spot" style="width:100%;"></div>
+
+
+<div ng-show="ctrl.panel.showLegend">
+    <div ng-repeat="metric in ctrl.data">
+        <span ng-show="ctrl.panel.showLegendNames">{{ metric.name }}: </span>
+        <div ng-repeat="info in metric.legendInfo | orderBy:'-ms' | limitTo:ctrl.panel.legendMaxValues" style="cursor: default; display:inline-block; margin-right:15px;" ng-mousemove="ctrl.showLegandTooltip($event, info);" ng-mouseleave="ctrl.clearTT()">
+            <div ng-style="{ 'background-color': ctrl.getColor(info.val) }" style="width:10px; height:10px; display:inline-block;"></div> {{ ctrl.getLegendDisplay( info, metric ) }}
+        </div>
+        <div ng-show="metric.legendHidingValues" style="display:inline-block;">
+          !!! hiding values from the legand (distinct:{{metric.distinctValues}})
+        </div>
+    </div>
+</div>
