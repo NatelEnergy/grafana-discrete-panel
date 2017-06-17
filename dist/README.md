@@ -17,13 +17,15 @@ choice to display string or boolean data
 
 ##### v0.0.5
 
-- Support results in table format
+- Support results from the table format
 - Support results in ascending or decending order
 - Configure legend percentage decimal points
+- Legend can show transition count and distinct value count
 - Clamp percentage stats within the query time window
 
 TODO.. hover issues!!
 maybe... indicate things that are in the future (crosshatch?)
+maybe... expand the query into the past by 2x interval
 
 
 ##### v0.0.4

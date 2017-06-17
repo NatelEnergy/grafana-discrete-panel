@@ -230,6 +230,7 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
                   y: _this2.mouse.position.y,
                   panelRelY: _this2.mouse.position.yRel
                 },
+                evt: evt,
                 panel: _this2.panel
               };
               appEvents.emit('graph-hover', info);
@@ -239,11 +240,17 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             }, false);
 
             this.canvas.addEventListener('mouseout', function (evt) {
-              _this2.mouse.position = null;
-              _this2.mouse.down = null;
-              _this2.onRender();
-              _this2.$tooltip.detach();
-              appEvents.emit('graph-hover-clear');
+              if (_this2.mouse.down == null) {
+                _this2.mouse.position = null;
+                _this2.onRender();
+                _this2.$tooltip.detach();
+                appEvents.emit('graph-hover-clear');
+              }
+              //this.mouse.position = null;
+              //this.mouse.down = null;
+              //this.onRender();
+              //this.$tooltip.detach();
+              //appEvents.emit('graph-hover-clear');
             }, false);
 
             this.canvas.addEventListener('mousedown', function (evt) {
@@ -251,6 +258,13 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             }, false);
 
             this.canvas.addEventListener('mouseenter', function (evt) {
+              if (_this2.mouse.down && !evt.buttons) {
+                _this2.mouse.position = null;
+                _this2.mouse.down = null;
+                _this2.onRender();
+                _this2.$tooltip.detach();
+                appEvents.emit('graph-hover-clear');
+              }
               $(_this2.canvas).css('cursor', 'pointer');
             }, false);
 
@@ -273,6 +287,16 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
               _this2.mouse.down = null;
               _this2.mouse.position = null;
             }, false);
+
+            this.canvas.addEventListener('dblclick', function (evt) {
+              _this2.mouse.position = null;
+              _this2.mouse.down = null;
+              _this2.onRender();
+              _this2.$tooltip.detach();
+              appEvents.emit('graph-hover-clear');
+
+              console.log('TODO, ZOOM OUT');
+            }, true);
 
             // global events
             appEvents.on('graph-hover', function (event) {

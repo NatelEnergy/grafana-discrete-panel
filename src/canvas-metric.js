@@ -162,8 +162,9 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           y: this.mouse.position.y,
           panelRelY: this.mouse.position.yRel
         },
+        evt: evt,
         panel: this.panel
-      }
+      };
       appEvents.emit('graph-hover', info);
       if(this.mouse.down != null) {
         $(this.canvas).css( 'cursor', 'col-resize' );
@@ -171,11 +172,17 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }, false);
 
     this.canvas.addEventListener('mouseout', (evt) => {
-      this.mouse.position = null;
-      this.mouse.down = null;
-      this.onRender();
-      this.$tooltip.detach();
-      appEvents.emit('graph-hover-clear');
+      if(this.mouse.down == null) {
+        this.mouse.position = null;
+        this.onRender();
+        this.$tooltip.detach();
+        appEvents.emit('graph-hover-clear');
+      }
+      //this.mouse.position = null;
+      //this.mouse.down = null;
+      //this.onRender();
+      //this.$tooltip.detach();
+      //appEvents.emit('graph-hover-clear');
     }, false);
 
     this.canvas.addEventListener('mousedown', (evt) => {
@@ -183,6 +190,13 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }, false);
 
     this.canvas.addEventListener('mouseenter', (evt) => {
+      if(this.mouse.down && !evt.buttons ) {
+        this.mouse.position = null;
+        this.mouse.down = null;
+        this.onRender();
+        this.$tooltip.detach();
+        appEvents.emit('graph-hover-clear');
+      }
       $(this.canvas).css( 'cursor', 'pointer' );
     }, false);
 
@@ -207,6 +221,16 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       this.mouse.position = null;
     }, false);
 
+    this.canvas.addEventListener('dblclick', (evt) => {
+      this.mouse.position = null;
+      this.mouse.down = null;
+      this.onRender();
+      this.$tooltip.detach();
+      appEvents.emit('graph-hover-clear');
+
+      console.log( 'TODO, ZOOM OUT' );
+
+    }, true);
 
     // global events
     appEvents.on('graph-hover', (event) => {

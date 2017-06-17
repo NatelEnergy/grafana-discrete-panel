@@ -43,8 +43,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       writeMetricNames: false,
       showLegend: true,
       showLegendNames: true,
+      showLegendValues: true,
       showLegendPercent: true,
       highlightOnMouseover: true,
+      legendSortBy: '-ms'
     };
     _.defaults(this.panel, panelDefaults);
     this.externalPT = false;
@@ -64,8 +66,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onInitEditMode() {
     this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/editor.html',1);
-    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/colors.html',3);
-    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/mappings.html', 4);
+    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/legend.html',3);
+    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/colors.html',4);
+    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/mappings.html', 5);
     this.editorTabIndex = 1;
     this.refresh();
   }
@@ -442,20 +445,42 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   getLegendDisplay(info, metric) {
     var disp = info.val;
-    if(this.panel.showLegendPercent) {
-      var dec = this.panel.legendPercentDecimals;
-      if(_.isNil(dec)) {
-        if(info.per>.99 && metric.changes.length>1) {
-          dec = 2;
-        }
-        else if(info.per<0.01) {
-          dec = 2;
-        }
-        else {
-          dec = 0;
-        }
+    if(this.panel.showLegendPercent || this.panel.showLegendCounts || this.panel.showLegendTime) {
+      disp += " (";
+      var hassomething = false;
+      if(this.panel.showLegendTime) {
+        disp += moment.duration(info.ms).humanize();
+        hassomething = true;
       }
-      return disp + " ("+kbn.valueFormats.percentunit(info.per, dec)+")";
+
+      if(this.panel.showLegendPercent) {
+        if(hassomething) {
+          disp += ", ";
+        }
+
+        var dec = this.panel.legendPercentDecimals;
+        if(_.isNil(dec)) {
+          if(info.per>.98 && metric.changes.length>1) {
+            dec = 2;
+          }
+          else if(info.per<0.02) {
+            dec = 2;
+          }
+          else {
+            dec = 0;
+          }
+        }
+        disp += kbn.valueFormats.percentunit(info.per, dec);
+        hassomething = true;
+      }
+
+      if(this.panel.showLegendCounts) {
+        if(hassomething) {
+          disp += ", ";
+        }
+        disp += info.count+"x";
+      }
+      disp += ")";
     }
     return disp;
   }
@@ -489,10 +514,14 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var rect = this.canvas.getBoundingClientRect();
     var pageY = rect.top + (evt.pos.panelRelY * rect.height);
 
+    console.log( 'ShowTT', evt, rect );
+
     this.$tooltip.html(body).place_tt(evt.pos.pageX + 20, pageY);
   };
 
   onGraphHover(evt, showTT, isExternal) {
+    console.log( 'OnGraphHover', evt, showTT, isExternal );
+
     this.externalPT = false;
     if(this.data) {
       var hover = null;
@@ -525,9 +554,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onMouseClicked(where) {
     var pt = this.hoverPoint;
-    var range = {from: moment.utc(pt.start), to: moment.utc(pt.start+pt.ms) };
-    this.timeSrv.setTime(range);
-    this.clear();
+    if(pt) {
+      var range = {from: moment.utc(pt.start), to: moment.utc(pt.start+pt.ms) };
+      this.timeSrv.setTime(range);
+      this.clear();
+    }
   }
 
   onMouseSelectedRange(range) {

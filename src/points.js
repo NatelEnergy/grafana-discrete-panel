@@ -75,6 +75,7 @@ export default class DistinctPoints {
       });
     }
 
+    this.transitionCount = 0;
     var valToInfo = {};
     var lastTS = 0;
     var legendCount = 0;
@@ -91,6 +92,10 @@ export default class DistinctPoints {
       if( s < ctrl.range.from ) {
         s = ctrl.range.from;
       }
+      else if(s<ctrl.range.to) {
+        this.transitionCount++;
+      }
+
       if( e > ctrl.range.to ) {
         e = ctrl.range.to;
       }
@@ -111,6 +116,7 @@ export default class DistinctPoints {
     }
 
     var elapsed = ctrl.range.to - ctrl.range.from;
+    this.elapsed = elapsed;
 
     // Remove null from the legend if it is the first value and small (common for influx queries)
     var nullText = ctrl.formatValue(null);
@@ -134,6 +140,7 @@ export default class DistinctPoints {
       value.per = (value.ms/elapsed);
       this.legendInfo.push( value );
     });
+    this.distinctValuesCount = _.size(this.legendInfo);
     //console.log( "FINISH", valToInfo, this );
   }
 }
