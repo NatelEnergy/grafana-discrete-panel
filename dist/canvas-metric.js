@@ -3,7 +3,7 @@
 System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app_events'], function (_export, _context) {
   "use strict";
 
-  var MetricsPanelCtrl, _, moment, angular, appEvents, _createClass, CanvasPanelCtrl;
+  var MetricsPanelCtrl, _, moment, angular, appEvents, _createClass, canvasID, CanvasPanelCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -66,6 +66,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
         };
       }();
 
+      canvasID = 1;
+
       _export('CanvasPanelCtrl', CanvasPanelCtrl = function (_MetricsPanelCtrl) {
         _inherits(CanvasPanelCtrl, _MetricsPanelCtrl);
 
@@ -80,7 +82,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
             position: null,
             down: null
           };
-          _this.$tooltip = $('<div id="tooltip" class="graph-tooltip">');
+          _this.canvasID = canvasID++;
+          _this.$tooltip = $('<div id="tooltip.' + canvasID + '" class="graph-tooltip">');
 
           _this.events.on('panel-initialized', _this.onPanelInitalized.bind(_this));
           _this.events.on('refresh', _this.onRefresh.bind(_this));
@@ -228,7 +231,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
                   pageY: evt.pageY,
                   x: _this2.mouse.position.ts,
                   y: _this2.mouse.position.y,
-                  panelRelY: _this2.mouse.position.yRel
+                  panelRelY: _this2.mouse.position.yRel,
+                  panelRelX: _this2.mouse.position.xRel
                 },
                 evt: evt,
                 panel: _this2.panel
@@ -246,11 +250,6 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
                 _this2.$tooltip.detach();
                 appEvents.emit('graph-hover-clear');
               }
-              //this.mouse.position = null;
-              //this.mouse.down = null;
-              //this.onRender();
-              //this.$tooltip.detach();
-              //appEvents.emit('graph-hover-clear');
             }, false);
 
             this.canvas.addEventListener('mousedown', function (evt) {
@@ -329,9 +328,8 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
                   y: event.pos.panelRelY * rect.height,
                   yRel: event.pos.panelRelY,
                   ts: ts,
-                  evt: event
+                  gevt: event
                 };
-
                 //console.log( "Calculate mouseInfo", event, this.mouse.position);
               }
 
@@ -345,11 +343,11 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
               _this2.$tooltip.detach();
             }, scope);
 
-            scope.$on('$destroy', function () {
-              _this2.$tooltip.destroy();
-              elem.off();
-              elem.remove();
-            });
+            // scope.$on('$destroy', () => {
+            //   this.$tooltip.destroy();
+            //   elem.off();
+            //   elem.remove();
+            // });
           }
         }]);
 

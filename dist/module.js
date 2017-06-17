@@ -549,7 +549,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
           }
         }, {
           key: 'showTooltip',
-          value: function showTooltip(evt, point) {
+          value: function showTooltip(evt, point, isExternal) {
             var from = point.start;
             var to = point.start + point.ms;
             var time = point.ms;
@@ -571,18 +571,31 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
             body += moment.duration(time).humanize() + "<br/>";
             body += "</center>";
 
-            var rect = this.canvas.getBoundingClientRect();
-            var pageY = rect.top + evt.pos.panelRelY * rect.height;
+            var pageX = 0;
+            var pageY = 0;
+            if (isExternal) {
+              var rect = this.canvas.getBoundingClientRect();
+              pageY = rect.top + evt.pos.panelRelY * rect.height;
+              if (pageY < 0 || pageY > $(window).innerHeight()) {
+                // Skip Hidden tooltip
+                this.$tooltip.detach();
+                return;
+              }
+              pageY += $(window).scrollTop();
 
-            console.log('ShowTT', evt, rect);
+              var elapsed = this.range.to - this.range.from;
+              var pX = (evt.pos.x - this.range.from) / elapsed;
+              pageX = rect.left + pX * rect.width;
+            } else {
+              pageX = evt.evt.pageX;
+              pageY = evt.evt.pageY;
+            }
 
-            this.$tooltip.html(body).place_tt(evt.pos.pageX + 20, pageY);
+            this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
           }
         }, {
           key: 'onGraphHover',
           value: function onGraphHover(evt, showTT, isExternal) {
-            console.log('OnGraphHover', evt, showTT, isExternal);
-
             this.externalPT = false;
             if (this.data) {
               var hover = null;
@@ -603,8 +616,8 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
               this.hoverPoint = hover;
 
               if (showTT) {
-                this.showTooltip(evt, hover);
                 this.externalPT = isExternal;
+                this.showTooltip(evt, hover, isExternal);
               }
               this.onRender(); // refresh the view
             } else {

@@ -7,6 +7,8 @@ import angular from 'angular';
 
 import appEvents from 'app/core/app_events';
 
+var canvasID = 1;
+
 // Expects a template with:
 // <div class="canvas-spot"></div>
 export class CanvasPanelCtrl extends MetricsPanelCtrl {
@@ -20,7 +22,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       position: null,
       down: null,
     };
-    this.$tooltip = $('<div id="tooltip" class="graph-tooltip">');
+    this.canvasID = canvasID++;
+    this.$tooltip = $('<div id="tooltip.'+canvasID+'" class="graph-tooltip">');
 
     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
@@ -160,7 +163,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           pageY: evt.pageY,
           x: this.mouse.position.ts,
           y: this.mouse.position.y,
-          panelRelY: this.mouse.position.yRel
+          panelRelY: this.mouse.position.yRel,
+          panelRelX: this.mouse.position.xRel
         },
         evt: evt,
         panel: this.panel
@@ -178,11 +182,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         this.$tooltip.detach();
         appEvents.emit('graph-hover-clear');
       }
-      //this.mouse.position = null;
-      //this.mouse.down = null;
-      //this.onRender();
-      //this.$tooltip.detach();
-      //appEvents.emit('graph-hover-clear');
     }, false);
 
     this.canvas.addEventListener('mousedown', (evt) => {
@@ -263,9 +262,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           y: event.pos.panelRelY * rect.height,
           yRel: event.pos.panelRelY,
           ts: ts,
-          evt: event
+          gevt: event
         };
-
         //console.log( "Calculate mouseInfo", event, this.mouse.position);
       }
 
@@ -279,11 +277,11 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       this.$tooltip.detach();
     }, scope);
 
-    scope.$on('$destroy', () => {
-      this.$tooltip.destroy();
-      elem.off();
-      elem.remove();
-    });
+    // scope.$on('$destroy', () => {
+    //   this.$tooltip.destroy();
+    //   elem.off();
+    //   elem.remove();
+    // });
   }
 }
 
