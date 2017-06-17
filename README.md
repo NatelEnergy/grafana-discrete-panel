@@ -22,6 +22,7 @@ choice to display string or boolean data
 - Configure legend percentage decimal points
 - Legend can show transition count and distinct value count
 - Clamp percentage stats within the query time window
+- Changed the grafana dependency version to 4.x.x, since 3.x.x was not really supported
 
 TODO.. hover issues!!
 maybe... indicate things that are in the future (crosshatch?)
