@@ -118,24 +118,6 @@ export default class DistinctPoints {
     var elapsed = ctrl.range.to - ctrl.range.from;
     this.elapsed = elapsed;
 
-    // Remove null from the legend if it is the first value and small (common for influx queries)
-    var nullText = ctrl.formatValue(null);
-    if( this.changes.length > 1 && _.has(valToInfo, nullText ) ) {
-      var info = valToInfo[nullText];
-      if(info.count == 1 ) {
-        var per = (info.ms/elapsed);
-        if( per < .02 ) {
-          if(this.changes[0].val == nullText) {
-            console.log( 'Removing null', info );
-            delete valToInfo[nullText];
-
-            this.changes[1].start = this.changes[0].start;
-            this.changes[1].ms += this.changes[0].ms;
-            this.changes.splice(0, 1);
-          }
-        }
-      }
-    }
     _.forEach(valToInfo, (value) => {
       value.per = (value.ms/elapsed);
       this.legendInfo.push( value );

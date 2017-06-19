@@ -209,7 +209,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
 
               ctx.fillStyle = "#000000";
 
-              if (_this2.panel.writeMetricNames && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover && (_this2.mouse.position == null || _this2.mouse.position.x > 200))) {
+              if (_this2.panel.writeMetricNames && _this2.mouse.position == null && (!_this2.panel.highlightOnMouseover || _this2.panel.highlightOnMouseover)) {
                 ctx.fillStyle = _this2.panel.metricNameColor;
                 ctx.textAlign = 'left';
                 ctx.fillText(metric.name, 10, centerV);
@@ -394,6 +394,52 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
               hash = hash & hash; // Convert to 32bit integer
             }
             return hash;
+          }
+        }, {
+          key: 'issueQueries',
+          value: function issueQueries(datasource) {
+            this.datasource = datasource;
+
+            if (!this.panel.targets || this.panel.targets.length === 0) {
+              return this.$q.when([]);
+            }
+
+            // make shallow copy of scoped vars,
+            // and add built in variables interval and interval_ms
+            var scopedVars = Object.assign({}, this.panel.scopedVars, {
+              "__interval": { text: this.interval, value: this.interval },
+              "__interval_ms": { text: this.intervalMs, value: this.intervalMs }
+            });
+
+            var range = this.range;
+            var rangeRaw = this.rangeRaw;
+            if (this.panel.expandFromQueryS > 0) {
+              range = {
+                from: this.range.from.clone(),
+                to: this.range.to
+              };
+              range.from.subtract(this.panel.expandFromQueryS, 's');
+
+              rangeRaw = {
+                from: range.from.format(),
+                to: this.rangeRaw.to
+              };
+            }
+
+            var metricsQuery = {
+              panelId: this.panel.id,
+              range: range,
+              rangeRaw: rangeRaw,
+              interval: this.interval,
+              intervalMs: this.intervalMs,
+              targets: this.panel.targets,
+              format: this.panel.renderer === 'png' ? 'png' : 'json',
+              maxDataPoints: this.resolution,
+              scopedVars: scopedVars,
+              cacheTimeout: this.panel.cacheTimeout
+            };
+
+            return datasource.query(metricsQuery);
           }
         }, {
           key: 'onDataReceived',

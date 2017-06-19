@@ -49,4 +49,15 @@
         </div>
     </div>
 
+    <div class="section gf-form-group">
+        <h5 class="section-heading">Query</h5>
+        <div class="gf-form">
+          <label class="gf-form-label width-12">Expand 'from' query
+            <info-popover mode="right-normal">This will expand the query to include time before the normal query range</info-popover>
+          </label>
+          <input type="number" ng-model="ctrl.panel.expandFromQueryS" class="gf-form-input max-width-5" ng-blur="ctrl.onConfigChanged()" min="0" />
+          &nbsp; Seconds
+        </div>
+    </div>
+
 </div>

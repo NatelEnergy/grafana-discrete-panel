@@ -148,7 +148,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       ctx.fillStyle = "#000000";
 
-      if(this.panel.writeMetricNames && (!this.panel.highlightOnMouseover || (this.panel.highlightOnMouseover && (this.mouse.position==null || this.mouse.position.x > 200 ) ) ) ) {
+      if( this.panel.writeMetricNames &&
+          this.mouse.position == null &&
+        (!this.panel.highlightOnMouseover || this.panel.highlightOnMouseover )
+      ) {
         ctx.fillStyle = this.panel.metricNameColor;
         ctx.textAlign = 'left';
         ctx.fillText( metric.name, 10, centerV);
@@ -341,7 +344,51 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     return hash;
   }
 
-  //-----------
+  // Copied from Metrics Panel, only used to expand the 'from' query
+  issueQueries(datasource) {
+    this.datasource = datasource;
+
+    if (!this.panel.targets || this.panel.targets.length === 0) {
+      return this.$q.when([]);
+    }
+
+    // make shallow copy of scoped vars,
+    // and add built in variables interval and interval_ms
+    var scopedVars = Object.assign({}, this.panel.scopedVars, {
+      "__interval":     {text: this.interval,   value: this.interval},
+      "__interval_ms":  {text: this.intervalMs, value: this.intervalMs},
+    });
+
+    var range = this.range;
+    var rangeRaw = this.rangeRaw;
+    if(this.panel.expandFromQueryS > 0) {
+      range = {
+        from: this.range.from.clone(),
+        to: this.range.to
+      };
+      range.from.subtract( this.panel.expandFromQueryS, 's' );
+
+      rangeRaw = {
+        from: range.from.format(),
+        to: this.rangeRaw.to
+      };
+    }
+
+    var metricsQuery = {
+      panelId: this.panel.id,
+      range: range,
+      rangeRaw: rangeRaw,
+      interval: this.interval,
+      intervalMs: this.intervalMs,
+      targets: this.panel.targets,
+      format: this.panel.renderer === 'png' ? 'png' : 'json',
+      maxDataPoints: this.resolution,
+      scopedVars: scopedVars,
+      cacheTimeout: this.panel.cacheTimeout
+    };
+
+    return datasource.query(metricsQuery);
+  }
 
   onDataReceived(dataList) {
     $(this.canvas).css( 'cursor', 'pointer' );

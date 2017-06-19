@@ -24,9 +24,7 @@ choice to display string or boolean data
 - Clamp percentage stats within the query time window
 - Changed the grafana dependency version to 4.x.x, since 3.x.x was not really supported
 - Fixed issues with tooltip hover position
-
-maybe... indicate things that are in the future (crosshatch?)
-maybe... expand the query into the past by 2x interval
+- Option to expand 'from' query so the inital state can avoid 'null'
 
 
 ##### v0.0.4
