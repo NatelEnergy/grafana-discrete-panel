@@ -24,7 +24,8 @@
       { "name": "Summary Tooltips", "path": "img/screenshot-single-3.png"  },
       { "name": "Show all values",  "path": "img/screenshot-single-4.png"  },
       { "name": "Multiple Results", "path": "img/screenshot-multiple.png"  },
-      { "name": "Options",          "path": "img/screenshot-options.png"   }
+      { "name": "Options",          "path": "img/screenshot-options-1.png" },
+      { "name": "Legend",           "path": "img/screenshot-options-2.png" }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
