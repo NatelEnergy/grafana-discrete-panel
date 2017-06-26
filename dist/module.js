@@ -221,9 +221,17 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               for (var i = 0; i < metric.changes.length; i++) {
                 point = metric.changes[i];
                 if (point.start <= _this2.range.to) {
-                  var xt = Math.max(point.start - _this2.range.from, 0);
-                  point.x = xt / elapsed * width;
-                  var w = width * (point.ms / elapsed);
+                  var xt = 0;
+                  var w = 0;
+                  if (point.start > _this2.range.from) {
+                    xt = point.start - _this2.range.from;
+                    point.x = xt / elapsed * width;
+                    w = width * (point.ms / elapsed);
+                  } else {
+                    xt = 0;
+                    point.x = 0;
+                    w = width * ((point.ms - (_this2.range.from - point.start)) / elapsed);
+                  }
                   if (point.x + w > width) {
                     w = width - point.x;
                   }

@@ -135,9 +135,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       for(var i=0; i<metric.changes.length; i++) {
         point = metric.changes[i];
         if(point.start <= this.range.to) {
-          var xt = Math.max( point.start - this.range.from, 0 );
-          point.x = (xt / elapsed) * width;
-          var w = width*(point.ms/elapsed);
+            var xt = 0;
+            var w = 0;
+            if (point.start > this.range.from) {
+                xt = point.start - this.range.from;
+                point.x = (xt / elapsed) * width;
+                w = width*(point.ms/elapsed);
+            } else {
+                xt = 0;
+                point.x = 0;
+                w = width*((point.ms-(this.range.from-point.start))/elapsed);
+            }
           if (point.x + w > width) {
             w = width-point.x;
           }
