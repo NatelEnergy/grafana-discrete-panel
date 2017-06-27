@@ -170,10 +170,10 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
 
             //   console.log( 'render', this.data);
 
-            $(this.wrap).css('margin-top', this.panel.padding.top);
-            $(this.wrap).css('margin-right', this.panel.padding.right);
-            $(this.wrap).css('margin-bottom', this.panel.padding.bottom);
-            $(this.wrap).css('margin-left', this.panel.padding.left);
+            $(this.wrap).css('padding-top', this.panel.padding.top);
+            $(this.wrap).css('padding-right', this.panel.padding.right);
+            $(this.wrap).css('padding-bottom', this.panel.padding.bottom);
+            $(this.wrap).css('padding-left', this.panel.padding.left);
 
             var rect = this.wrap.getBoundingClientRect();
 
@@ -321,7 +321,7 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
               top += rowHeight;
             });
 
-            if (this.mouse.position != null) {
+            if (this.mouse.position != null && this.mouse.position.x < width) {
               if (this.mouse.down != null) {
                 var xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
                 var xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
@@ -683,6 +683,25 @@ System.register(['app/core/config', './canvas-metric', 'lodash', 'moment', 'angu
           value: function onConfigChanged() {
             console.log("Config changed...");
             this.render();
+          }
+        }, {
+          key: 'getMousePosition',
+          value: function getMousePosition(evt) {
+            var rect = this.canvas.getBoundingClientRect();
+            var x = evt.clientX - rect.left;
+            var elapsed = this.range.to - this.range.from;
+            var width = rect.width;
+            if (this.panel.writeMetricNamesOnRight) {
+              width -= this.panel.metricNamesOnRightWidth;
+            }
+            var ts = this.range.from + elapsed * (x / width);
+
+            return {
+              x: x,
+              y: evt.clientY - rect.top,
+              ts: ts,
+              evt: evt
+            };
           }
         }, {
           key: 'onMouseMoved',
