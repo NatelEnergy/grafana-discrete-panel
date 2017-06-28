@@ -123,6 +123,11 @@ export default class DistinctPoints {
       this.legendInfo.push( value );
     });
     this.distinctValuesCount = _.size(this.legendInfo);
-    //console.log( "FINISH", valToInfo, this );
+
+
+    if(!ctrl.isTimeline) {
+      this.legendInfo = _.orderBy( this.legendInfo, ['ms'], ['desc'] );
+    }
+    //console.log( "FINISH", this );
   }
 }

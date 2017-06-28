@@ -16,6 +16,10 @@ choice to display string or boolean data
 
 #### Changelog
 
+
+##### v0.0.6
+... not yet released ...
+
 ##### v0.0.5
 
 - Support results from the table format

@@ -84,6 +84,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
 
           // Set and populate defaults
           var panelDefaults = {
+            display: 'timeline',
             rowHeight: 50,
             valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
             mappingTypes: [{ name: 'value to text', value: 1 }, { name: 'range to text', value: 2 }],
@@ -114,6 +115,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
           _this.events.on('refresh', _this.onRefresh.bind(_this));
 
           _this.updateColorInfo();
+          _this.onConfigChanged();
           return _this;
         }
 
@@ -179,13 +181,32 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
                 ctx.textAlign = 'left';
                 ctx.fillText("No Data", 10, centerV);
               }*/
+              if (_this2.isTimeline) {
+                var lastBS = 0;
+                var point = metric.changes[0];
+                for (var i = 0; i < metric.changes.length; i++) {
+                  point = metric.changes[i];
+                  if (point.start <= _this2.range.to) {
+                    var xt = Math.max(point.start - _this2.range.from, 0);
+                    point.x = xt / elapsed * width;
+                    ctx.fillStyle = _this2.getColor(point.val);
+                    ctx.fillRect(point.x, top, width, rowHeight);
 
-              var lastBS = 0;
-              var point = metric.changes[0];
-              for (var i = 0; i < metric.changes.length; i++) {
-                point = metric.changes[i];
-                if (point.start <= _this2.range.to) {
-                  var xt = Math.max(point.start - _this2.range.from, 0);
+                    if (_this2.panel.writeAllValues) {
+                      ctx.fillStyle = _this2.panel.valueTextColor;
+                      ctx.textAlign = 'left';
+                      ctx.fillText(point.val, point.x + 7, centerV);
+                    }
+                    lastBS = point.x;
+                  }
+                }
+              } else if (_this2.panel.display == 'stacked') {
+                var point = null;
+                var start = _this2.range.from;
+                for (var i = 0; i < metric.legendInfo.length; i++) {
+                  point = metric.legendInfo[i];
+
+                  var xt = Math.max(start - _this2.range.from, 0);
                   point.x = xt / elapsed * width;
                   ctx.fillStyle = _this2.getColor(point.val);
                   ctx.fillRect(point.x, top, width, rowHeight);
@@ -195,8 +216,11 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
                     ctx.textAlign = 'left';
                     ctx.fillText(point.val, point.x + 7, centerV);
                   }
-                  lastBS = point.x;
+
+                  start += point.ms;
                 }
+              } else {
+                console.log("Not supported yet...", _this2);
               }
 
               if (top > 0) {
@@ -219,14 +243,26 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
 
               if (_this2.mouse.down == null) {
                 if (_this2.panel.highlightOnMouseover && _this2.mouse.position != null) {
-                  point = metric.changes[0];
                   var next = null;
-                  for (var i = 0; i < metric.changes.length; i++) {
-                    if (metric.changes[i].start > _this2.mouse.position.ts) {
-                      next = metric.changes[i];
-                      break;
+
+                  if (_this2.isTimeline) {
+                    point = metric.changes[0];
+                    for (var i = 0; i < metric.changes.length; i++) {
+                      if (metric.changes[i].start > _this2.mouse.position.ts) {
+                        next = metric.changes[i];
+                        break;
+                      }
+                      point = metric.changes[i];
                     }
-                    point = metric.changes[i];
+                  } else if (_this2.panel.display == 'stacked') {
+                    point = metric.legendInfo[0];
+                    for (var i = 0; i < metric.legendInfo.length; i++) {
+                      if (metric.legendInfo[i].x > _this2.mouse.position.x) {
+                        next = metric.legendInfo[i];
+                        break;
+                      }
+                      point = metric.legendInfo[i];
+                    }
                   }
 
                   // Fill canvas using 'destination-out' and alpha at 0.05
@@ -255,7 +291,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
               top += rowHeight;
             });
 
-            if (this.mouse.position != null) {
+            if (this.isTimeline && this.mouse.position != null) {
               if (this.mouse.down != null) {
                 var xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
                 var xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
@@ -550,6 +586,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
           key: 'onConfigChanged',
           value: function onConfigChanged() {
             //console.log( "Config changed...");
+            this.isTimeline = this.panel.display == 'timeline';
             this.render();
           }
         }, {
@@ -652,20 +689,41 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
               if (j >= this.data.length) {
                 j = this.data.length - 1;
               }
-              hover = this.data[j].changes[0];
-              for (var i = 0; i < this.data[j].changes.length; i++) {
-                if (this.data[j].changes[i].start > this.mouse.position.ts) {
-                  break;
-                }
-                hover = this.data[j].changes[i];
-              }
-              this.hoverPoint = hover;
 
-              if (showTT) {
-                this.externalPT = isExternal;
-                this.showTooltip(evt, hover, isExternal);
+              if (this.isTimeline) {
+                hover = this.data[j].changes[0];
+                for (var i = 0; i < this.data[j].changes.length; i++) {
+                  if (this.data[j].changes[i].start > this.mouse.position.ts) {
+                    break;
+                  }
+                  hover = this.data[j].changes[i];
+                }
+                this.hoverPoint = hover;
+
+                if (showTT) {
+                  this.externalPT = isExternal;
+                  this.showTooltip(evt, hover, isExternal);
+                }
+                this.onRender(); // refresh the view
+              } else if (!isExternal) {
+                if (this.panel.display == 'stacked') {
+                  hover = this.data[j].legendInfo[0];
+                  for (var i = 0; i < this.data[j].legendInfo.length; i++) {
+                    if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
+                      break;
+                    }
+                    hover = this.data[j].legendInfo[i];
+                  }
+                  this.hoverPoint = hover;
+                  this.onRender(); // refresh the view
+
+                  if (showTT) {
+                    this.externalPT = isExternal;
+                    console.log("TODO, show TTip", evt, hover);
+                    this.showLegandTooltip(evt.evt, hover);
+                  }
+                }
               }
-              this.onRender(); // refresh the view
             } else {
               this.$tooltip.detach(); // make sure it is hidden
             }
@@ -674,7 +732,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
           key: 'onMouseClicked',
           value: function onMouseClicked(where) {
             var pt = this.hoverPoint;
-            if (pt) {
+            if (pt && pt.start) {
               var range = { from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms) };
               this.timeSrv.setTime(range);
               this.clear();
