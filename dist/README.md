@@ -19,6 +19,8 @@ choice to display string or boolean data
 
 ##### v0.0.6
 ... not yet released ...
+- Add option to show results as a stacked bar chart rather than timeline
+
 
 ##### v0.0.5
 

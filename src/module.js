@@ -663,7 +663,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           if(showTT) {
             this.externalPT = isExternal;
-            console.log("TODO, show TTip", evt, hover);
             this.showLegandTooltip(evt.evt, hover);
           }
         }

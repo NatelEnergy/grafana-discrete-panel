@@ -719,7 +719,6 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
 
                   if (showTT) {
                     this.externalPT = isExternal;
-                    console.log("TODO, show TTip", evt, hover);
                     this.showLegandTooltip(evt.evt, hover);
                   }
                 }
