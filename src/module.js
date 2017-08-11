@@ -623,7 +623,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onGraphHover(evt, showTT, isExternal) {
     this.externalPT = false;
-    if(this.data) {
+    if(this.data && this.data.length) {
       var hover = null;
       var j = Math.floor(this.mouse.position.y/this.panel.rowHeight);
       if (j < 0) {
