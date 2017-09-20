@@ -18,8 +18,8 @@ choice to display string or boolean data
 
 
 ##### v0.0.6
-... not yet released ...
-- Add option to show results as a stacked bar chart rather than timeline
+
+- Fix for grafana 4.5 (thanks @alin-amana)
 
 
 ##### v0.0.5

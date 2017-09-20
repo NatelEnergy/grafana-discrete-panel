@@ -39,6 +39,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       backgroundColor: 'rgba(128, 128, 128, 0.1)',
       lineColor: 'rgba(128, 128, 128, 1.0)',
       textSize: 24,
+      extendLastValue: true,
       writeLastValue: true,
       writeAllValues: false,
       writeMetricNames: false,
@@ -526,7 +527,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onConfigChanged() {
     //console.log( "Config changed...");
-    this.isTimeline = this.panel.display == 'timeline';
+    this.isTimeline = true; //this.panel.display == 'timeline';
     this.render();
   }
 

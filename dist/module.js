@@ -95,6 +95,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
             backgroundColor: 'rgba(128, 128, 128, 0.1)',
             lineColor: 'rgba(128, 128, 128, 1.0)',
             textSize: 24,
+            extendLastValue: true,
             writeLastValue: true,
             writeAllValues: false,
             writeMetricNames: false,
@@ -587,7 +588,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
           key: 'onConfigChanged',
           value: function onConfigChanged() {
             //console.log( "Config changed...");
-            this.isTimeline = this.panel.display == 'timeline';
+            this.isTimeline = true; //this.panel.display == 'timeline';
             this.render();
           }
         }, {
