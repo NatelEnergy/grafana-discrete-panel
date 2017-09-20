@@ -398,7 +398,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     });
 
     var range = this.range;
-    var rangeRaw = this.rangeRaw;
+    var rangeRaw = this.rangeRaw || this.range.raw;
     if(this.panel.expandFromQueryS > 0) {
       range = {
         from: this.range.from.clone(),
@@ -408,8 +408,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       rangeRaw = {
         from: range.from.format(),
-        to: this.rangeRaw.to
+        to: rangeRaw.to
       };
+      range.raw = rangeRaw;
     }
 
     var metricsQuery = {

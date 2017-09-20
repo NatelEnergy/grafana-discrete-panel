@@ -16,9 +16,9 @@
   ],
   "author": "ryantxu",
   "license": "MIT",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/NatelEnergy/grafana-discrete-panel.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NatelEnergy/grafana-discrete-panel.git"
   },
   "devDependencies": {
     "babel": "~6.5.1",
