@@ -448,7 +448,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
             });
 
             var range = this.range;
-            var rangeRaw = this.rangeRaw;
+            var rangeRaw = this.rangeRaw || this.range.raw;
             if (this.panel.expandFromQueryS > 0) {
               range = {
                 from: this.range.from.clone(),
@@ -458,8 +458,9 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
 
               rangeRaw = {
                 from: range.from.format(),
-                to: this.rangeRaw.to
+                to: rangeRaw.to
               };
+              range.raw = rangeRaw;
             }
 
             var metricsQuery = {
@@ -680,7 +681,7 @@ System.register(['app/core/config', './canvas-metric', './points', 'lodash', 'mo
           key: 'onGraphHover',
           value: function onGraphHover(evt, showTT, isExternal) {
             this.externalPT = false;
-            if (this.data) {
+            if (this.data && this.data.length) {
               var hover = null;
               var j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
               if (j < 0) {
