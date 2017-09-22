@@ -17,6 +17,12 @@ choice to display string or boolean data
 #### Changelog
 
 
+##### v0.0.7 (not released yet)
+
+- ???
+
+
+
 ##### v0.0.6
 
 - Fix for grafana 4.5 (thanks @alin-amana)
