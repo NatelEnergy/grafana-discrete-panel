@@ -156,6 +156,10 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     this.context = this.canvas.getContext('2d');
     this.canvas.addEventListener('mousemove', (evt) => {
+      if(!this.range) {
+        return; // skip events before we have loaded
+      }
+
       this.mouse.position = this.getMousePosition(evt);
       var info = {
         pos: {
