@@ -224,6 +224,10 @@ System.register(['app/plugins/sdk', 'lodash', 'moment', 'angular', 'app/core/app
 
             this.context = this.canvas.getContext('2d');
             this.canvas.addEventListener('mousemove', function (evt) {
+              if (!_this2.range) {
+                return; // skip events before we have loaded
+              }
+
               _this2.mouse.position = _this2.getMousePosition(evt);
               var info = {
                 pos: {
