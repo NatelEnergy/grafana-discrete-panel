@@ -1,29 +1,38 @@
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import {MetricsPanelCtrl} from  'app/plugins/sdk';
 
 import _ from 'lodash';
 import moment from 'moment';
 import angular from 'angular';
+import $ from 'jquery';
 
 import appEvents from 'app/core/app_events';
 
-var canvasID = 1;
+var _g_ttipID = 1;
 
 // Expects a template with:
 // <div class="canvas-spot"></div>
 export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
-  constructor($scope, $injector, $q) {
+  data: any;
+  mouse: any;
+  canvasID: number;
+  $tooltip: any;
+  wrap: any;
+  canvas: any;
+  context: any;
+
+  constructor($scope, $injector) {
     super($scope, $injector);
 
-    this.q = $q;
     this.data = null;
     this.mouse = {
       position: null,
       down: null,
     };
-    this.canvasID = canvasID++;
-    this.$tooltip = $('<div id="tooltip.'+canvasID+'" class="graph-tooltip">');
+    this.canvasID = _g_ttipID++;
+    this.$tooltip = $('<div id="tooltip.'+this.canvasID+'" class="graph-tooltip">');
 
     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
@@ -258,7 +267,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
         var ts = event.pos.x;
         var rect = this.canvas.getBoundingClientRect();
-        var elapsed = parseFloat(this.range.to - this.range.from);
+        var elapsed = this.range.to - this.range.from;
         var x = ((ts - this.range.from)/elapsed)*rect.width;
 
         this.mouse.position = {

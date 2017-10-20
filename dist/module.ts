@@ -1,9 +1,12 @@
+///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+
 import config from 'app/core/config';
 
 import {CanvasPanelCtrl} from './canvas-metric';
 import DistinctPoints from './points';
 
 import _ from 'lodash';
+import $ from 'jquery';
 import moment from 'moment';
 import angular from 'angular';
 import kbn from 'app/core/utils/kbn';
@@ -11,47 +14,53 @@ import kbn from 'app/core/utils/kbn';
 import appEvents from 'app/core/app_events';
 
 class DiscretePanelCtrl extends CanvasPanelCtrl {
+  static templateUrl = 'partials/module.html';
 
-  constructor($scope, $injector, $q) {
-    super($scope, $injector, $q);
+  defaults = {
+    display: 'timeline',
+    rowHeight: 50,
+    valueMaps: [
+      { value: 'null', op: '=', text: 'N/A' }
+    ],
+    mappingTypes: [
+      {name: 'value to text', value: 1},
+      {name: 'range to text', value: 2},
+    ],
+    rangeMaps: [
+      { from: 'null', to: 'null', text: 'N/A' }
+    ],
+    colorMaps: [
+      { text: 'N/A', color: '#CCC' }
+    ],
+    metricNameColor: '#000000',
+    valueTextColor: '#000000',
+    backgroundColor: 'rgba(128, 128, 128, 0.1)',
+    lineColor: 'rgba(128, 128, 128, 1.0)',
+    textSize: 24,
+    extendLastValue: true,
+    writeLastValue: true,
+    writeAllValues: false,
+    writeMetricNames: false,
+    showLegend: true,
+    showLegendNames: true,
+    showLegendValues: true,
+    showLegendPercent: true,
+    highlightOnMouseover: true,
+    legendSortBy: '-ms'
+  };
 
-    this.data = null;
+  data: any = null;
+  externalPT: boolean = false;
+  isTimeline: boolean = false;
+  hoverPoint: any = null;
+  colorMap: any = {};
 
-    // Set and populate defaults
-    var panelDefaults = {
-      display: 'timeline',
-      rowHeight: 50,
-      valueMaps: [
-        { value: 'null', op: '=', text: 'N/A' }
-      ],
-      mappingTypes: [
-        {name: 'value to text', value: 1},
-        {name: 'range to text', value: 2},
-      ],
-      rangeMaps: [
-        { from: 'null', to: 'null', text: 'N/A' }
-      ],
-      colorMaps: [
-        { text: 'N/A', color: '#CCC' }
-      ],
-      metricNameColor: '#000000',
-      valueTextColor: '#000000',
-      backgroundColor: 'rgba(128, 128, 128, 0.1)',
-      lineColor: 'rgba(128, 128, 128, 1.0)',
-      textSize: 24,
-      extendLastValue: true,
-      writeLastValue: true,
-      writeAllValues: false,
-      writeMetricNames: false,
-      showLegend: true,
-      showLegendNames: true,
-      showLegendValues: true,
-      showLegendPercent: true,
-      highlightOnMouseover: true,
-      legendSortBy: '-ms'
-    };
-    _.defaults(this.panel, panelDefaults);
-    this.externalPT = false;
+  constructor($scope, $injector) {
+    super($scope, $injector);
+
+    // defaults configs
+    _.defaultsDeep(this.panel, this.defaults);
+
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('render', this.onRender.bind(this));
@@ -68,10 +77,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onInitEditMode() {
-    this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/editor.html',1);
-    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/legend.html',3);
-    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/colors.html',4);
-    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/mappings.html', 5);
+    this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/partials/editor.html',1);
+    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/partials/legend.html',3);
+    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/partials/colors.html',4);
+    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/partials/mappings.html', 5);
     this.editorTabIndex = 1;
     this.refresh();
   }
@@ -304,7 +313,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.$tooltip.detach();
   }
 
-  formatValue(val, stats) {
+  formatValue(val) {
 
     if(_.isNumber(val) && this.panel.rangeMaps) {
       for (var i = 0; i < this.panel.rangeMaps.length; i++) {
@@ -399,7 +408,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     });
 
     var range = this.range;
-    var rangeRaw = this.rangeRaw || this.range.raw;
+    var rr = this.range.raw;
     if(this.panel.expandFromQueryS > 0) {
       range = {
         from: this.range.from.clone(),
@@ -407,17 +416,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       };
       range.from.subtract( this.panel.expandFromQueryS, 's' );
 
-      rangeRaw = {
+      rr = {
         from: range.from.format(),
-        to: rangeRaw.to
+        to: this.range.raw.to
       };
-      range.raw = rangeRaw;
+      range.raw = rr;
     }
 
     var metricsQuery = {
       panelId: this.panel.id,
       range: range,
-      rangeRaw: rangeRaw,
+      rangeRaw: rr,
       interval: this.interval,
       intervalMs: this.intervalMs,
       targets: this.panel.targets,
@@ -698,7 +707,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.render();
   }
 }
-DiscretePanelCtrl.templateUrl = 'module.html';
 
 export {
   DiscretePanelCtrl as PanelCtrl

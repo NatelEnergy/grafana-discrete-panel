@@ -2,19 +2,21 @@ import _ from "lodash";
 
 export default class DistinctPoints {
 
-  constructor(name) {
-    this.name = name;
-    this.changes = [];
-    this.legendInfo = [];
+  changes: Array<any> = [];
+  legendInfo: Array<any> = [];
+  last: any = null;
+  asc: boolean = false;
+  transitionCount: number = 0;
+  distinctValuesCount: number = 0;
+  elapsed: number = 0;
 
-    // last point we added
-    this.last = null;
-    this.asc = false;
+  constructor(public name) {
+
   }
 
   // ts numeric ms,
   // val is the normalized value
-  add( ts, val ) {
+  add( ts: number, val: any ) {
     if(this.last == null) {
       this.last = {
         val: val,

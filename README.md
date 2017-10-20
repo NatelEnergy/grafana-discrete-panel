@@ -14,12 +14,23 @@ choice to display string or boolean data
 ![options](https://raw.githubusercontent.com/NatelEnergy/grafana-discrete-panel/master/src/img/screenshot-options-1.png)
 ![options](https://raw.githubusercontent.com/NatelEnergy/grafana-discrete-panel/master/src/img/screenshot-options-2.png)
 
+
+### Building
+
+To complie, run:
+```
+npm install -g yarn
+yarn install --pure-lockfile
+grunt
+```
+
+
 #### Changelog
 
 
 ##### v0.0.7 (not released yet)
 
-- ???
+- Switch to typescript
 
 
 
