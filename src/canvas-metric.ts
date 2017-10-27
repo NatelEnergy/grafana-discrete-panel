@@ -1,15 +1,13 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
-import {MetricsPanelCtrl} from  'app/plugins/sdk';
+import {MetricsPanelCtrl} from 'app/plugins/sdk';
 
 import _ from 'lodash';
 import moment from 'moment';
-import angular from 'angular';
 import $ from 'jquery';
 
 import appEvents from 'app/core/app_events';
 
-var _g_ttipID = 1;
 
 // Expects a template with:
 // <div class="canvas-spot"></div>
@@ -31,8 +29,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       position: null,
       down: null,
     };
-    this.canvasID = _g_ttipID++;
-    this.$tooltip = $('<div id="tooltip.'+this.canvasID+'" class="graph-tooltip">');
+    this.$tooltip = $('<div class="graph-tooltip">');
 
     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
