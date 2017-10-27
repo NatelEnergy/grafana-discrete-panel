@@ -1,4 +1,4 @@
-export default class DistinctPoints {
+export declare class DistinctPoints {
     name: any;
     changes: Array<any>;
     legendInfo: Array<any>;

@@ -24,6 +24,13 @@ yarn install --pure-lockfile
 grunt
 ```
 
+To Check tslint:
+```
+yarn global add tslint typescript
+
+tslint  -c tslint.json 'src/**/*.ts'
+```
+
 
 #### Changelog
 

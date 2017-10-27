@@ -1,15 +1,13 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
-import {MetricsPanelCtrl} from  'app/plugins/sdk';
+import {MetricsPanelCtrl} from 'app/plugins/sdk';
 
 import _ from 'lodash';
 import moment from 'moment';
-import angular from 'angular';
 import $ from 'jquery';
 
 import appEvents from 'app/core/app_events';
 
-var _g_ttipID = 1;
 
 // Expects a template with:
 // <div class="canvas-spot"></div>
@@ -17,7 +15,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
   data: any;
   mouse: any;
-  canvasID: number;
   $tooltip: any;
   wrap: any;
   canvas: any;
@@ -31,8 +28,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       position: null,
       down: null,
     };
-    this.canvasID = _g_ttipID++;
-    this.$tooltip = $('<div id="tooltip.'+this.canvasID+'" class="graph-tooltip">');
+    this.$tooltip = $('<div class="graph-tooltip">');
 
     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
@@ -51,7 +47,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
   // Typically you will override this
   onRender() {
-    if( !(this.context) ) {
+    if ( !(this.context) ) {
       console.log( 'No context!');
       return;
     }
@@ -72,7 +68,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     ctx.textBaseline = 'middle';
 
     var time = "";
-    if(this.mouse.position != null) {
+    if (this.mouse.position != null) {
       time = this.dashboard.formatDate( moment(this.mouse.position.ts) );
     }
 
@@ -85,8 +81,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
 
 
-    if(this.mouse.position != null ) {
-      if(this.mouse.down != null) {
+    if (this.mouse.position != null ) {
+      if (this.mouse.down != null) {
         var xmin = Math.min( this.mouse.position.x, this.mouse.down.x);
         var xmax = Math.max( this.mouse.position.x, this.mouse.down.x);
 
@@ -101,8 +97,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         ctx.fillRect(xmax, 0, width, height);
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
-      }
-      else {
+      } else {
         ctx.strokeStyle = '#111';
         ctx.beginPath();
         ctx.moveTo(this.mouse.position.x, 0);
@@ -165,7 +160,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     this.context = this.canvas.getContext('2d');
     this.canvas.addEventListener('mousemove', (evt) => {
-      if(!this.range) {
+      if (!this.range) {
         return; // skip events before we have loaded
       }
 
@@ -183,13 +178,13 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         panel: this.panel
       };
       appEvents.emit('graph-hover', info);
-      if(this.mouse.down != null) {
+      if (this.mouse.down != null) {
         $(this.canvas).css( 'cursor', 'col-resize' );
       }
     }, false);
 
     this.canvas.addEventListener('mouseout', (evt) => {
-      if(this.mouse.down == null) {
+      if (this.mouse.down == null) {
         this.mouse.position = null;
         this.onRender();
         this.$tooltip.detach();
@@ -202,7 +197,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }, false);
 
     this.canvas.addEventListener('mouseenter', (evt) => {
-      if(this.mouse.down && !evt.buttons ) {
+      if (this.mouse.down && !evt.buttons ) {
         this.mouse.position = null;
         this.mouse.down = null;
         this.onRender();
@@ -215,13 +210,12 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     this.canvas.addEventListener('mouseup', (evt) => {
       this.$tooltip.detach();
       var up = this.getMousePosition(evt);
-      if(this.mouse.down != null) {
-        if(up.x == this.mouse.down.x && up.y == this.mouse.down.y ) {
+      if (this.mouse.down != null) {
+        if (up.x === this.mouse.down.x && up.y === this.mouse.down.y ) {
           this.mouse.position = null;
           this.mouse.down = null;
           this.onMouseClicked(up);
-        }
-        else {
+        } else {
           var min = Math.min(this.mouse.down.ts, up.ts);
           var max = Math.max(this.mouse.down.ts, up.ts);
           var range = {from: moment.utc(min), to: moment.utc(max) };
@@ -259,8 +253,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       }
 
       // Calculate the mouse position when it came from somewhere else
-      if(!isThis) {
-        if(!event.pos.x) {
+      if (!isThis) {
+        if (!event.pos.x) {
           console.log( "Invalid hover point", event );
           return;
         }

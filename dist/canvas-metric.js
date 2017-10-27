@@ -6,7 +6,7 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
     var sdk_1, moment_1, jquery_1, app_events_1;
-    var _g_ttipID, CanvasPanelCtrl;
+    var CanvasPanelCtrl;
     return {
         setters:[
             function (sdk_1_1) {
@@ -22,7 +22,6 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                 app_events_1 = app_events_1_1;
             }],
         execute: function() {
-            _g_ttipID = 1;
             // Expects a template with:
             // <div class="canvas-spot"></div>
             CanvasPanelCtrl = (function (_super) {
@@ -34,8 +33,7 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                         position: null,
                         down: null,
                     };
-                    this.canvasID = _g_ttipID++;
-                    this.$tooltip = jquery_1.default('<div id="tooltip.' + this.canvasID + '" class="graph-tooltip">');
+                    this.$tooltip = jquery_1.default('<div class="graph-tooltip">');
                     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
                     this.events.on('refresh', this.onRefresh.bind(this));
                     this.events.on('render', this.onRender.bind(this));
@@ -188,7 +186,7 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                         _this.$tooltip.detach();
                         var up = _this.getMousePosition(evt);
                         if (_this.mouse.down != null) {
-                            if (up.x == _this.mouse.down.x && up.y == _this.mouse.down.y) {
+                            if (up.x === _this.mouse.down.x && up.y === _this.mouse.down.y) {
                                 _this.mouse.position = null;
                                 _this.mouse.down = null;
                                 _this.onMouseClicked(up);

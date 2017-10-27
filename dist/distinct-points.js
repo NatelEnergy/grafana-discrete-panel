@@ -29,7 +29,7 @@ System.register(["lodash"], function(exports_1) {
                         };
                         this.changes.push(this.last);
                     }
-                    else if (ts == this.last.ts) {
+                    else if (ts === this.last.ts) {
                         console.log('skip point with duplicate timestamp', ts, val);
                         return;
                     }
@@ -37,12 +37,12 @@ System.register(["lodash"], function(exports_1) {
                         if (this.changes.length === 1) {
                             this.asc = ts > this.last.start;
                         }
-                        if ((ts > this.last.start) != this.asc) {
+                        if ((ts > this.last.start) !== this.asc) {
                             console.log('skip out of order point', ts, val);
                             return;
                         }
                         // Same value
-                        if (val == this.last.val) {
+                        if (val === this.last.val) {
                             if (!this.asc) {
                                 this.last.start = ts;
                             }
@@ -131,8 +131,8 @@ System.register(["lodash"], function(exports_1) {
                 };
                 return DistinctPoints;
             })();
-            exports_1("default", DistinctPoints);
+            exports_1("DistinctPoints", DistinctPoints);
         }
     }
 });
-//# sourceMappingURL=points.js.map
+//# sourceMappingURL=distinct-points.js.map

@@ -1,19 +1,19 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'app/core/utils/kbn', 'app/core/app_events'], function(exports_1) {
+System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'moment', 'app/core/utils/kbn', 'app/core/app_events'], function(exports_1) {
     var __extends = (this && this.__extends) || function (d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
-    var canvas_metric_1, points_1, lodash_1, jquery_1, moment_1, kbn_1, app_events_1;
+    var canvas_metric_1, distinct_points_1, lodash_1, jquery_1, moment_1, kbn_1, app_events_1;
     var DiscretePanelCtrl;
     return {
         setters:[
             function (canvas_metric_1_1) {
                 canvas_metric_1 = canvas_metric_1_1;
             },
-            function (points_1_1) {
-                points_1 = points_1_1;
+            function (distinct_points_1_1) {
+                distinct_points_1 = distinct_points_1_1;
             },
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
@@ -116,6 +116,7 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     // ctx.shadowBlur = 3;
                     var top = 0;
                     var elapsed = this.range.to - this.range.from;
+                    var point = null;
                     lodash_1.default.forEach(this.data, function (metric) {
                         var centerV = top + (rowHeight / 2);
                         // The no-data line
@@ -128,7 +129,7 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                         }*/
                         if (_this.isTimeline) {
                             var lastBS = 0;
-                            var point = metric.changes[0];
+                            point = metric.changes[0];
                             for (var i = 0; i < metric.changes.length; i++) {
                                 point = metric.changes[i];
                                 if (point.start <= _this.range.to) {
@@ -145,8 +146,8 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                                 }
                             }
                         }
-                        else if (_this.panel.display == 'stacked') {
-                            var point = null;
+                        else if (_this.panel.display === 'stacked') {
+                            point = null;
                             var start = _this.range.from;
                             for (var i = 0; i < metric.legendInfo.length; i++) {
                                 point = metric.legendInfo[i];
@@ -194,7 +195,7 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                                         point = metric.changes[i];
                                     }
                                 }
-                                else if (_this.panel.display == 'stacked') {
+                                else if (_this.panel.display === 'stacked') {
                                     point = metric.legendInfo[0];
                                     for (var i = 0; i < metric.legendInfo.length; i++) {
                                         if (metric.legendInfo[i].x > _this.mouse.position.x) {
@@ -300,16 +301,16 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                         val = val.toString(); // convert everything to a string
                     }
                     for (var i = 0; i < this.panel.valueMaps.length; i++) {
-                        var map = this.panel.valueMaps[i];
+                        var map_1 = this.panel.valueMaps[i];
                         // special null case
-                        if (map.value === 'null') {
+                        if (map_1.value === 'null') {
                             if (isNull) {
-                                return map.text;
+                                return map_1.text;
                             }
                             continue;
                         }
-                        if (val == map.value) {
-                            return map.text;
+                        if (val === map_1.value) {
+                            return map_1.text;
                         }
                     }
                     if (isNull) {
@@ -342,9 +343,11 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                 };
                 DiscretePanelCtrl.prototype.hashCode = function (str) {
                     var hash = 0;
-                    if (str.length == 0)
+                    if (str.length === 0) {
                         return hash;
+                    }
                     for (var i = 0; i < str.length; i++) {
+                        /* eslint-disable */
                         var char = str.charCodeAt(i);
                         hash = ((hash << 5) - hash) + char;
                         hash = hash & hash; // Convert to 32bit integer
@@ -398,12 +401,12 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     var data = [];
                     lodash_1.default.forEach(dataList, function (metric) {
                         if ('table' === metric.type) {
-                            if ('time' != metric.columns[0].type) {
-                                throw 'Expected a time column from the table format';
+                            if ('time' !== metric.columns[0].type) {
+                                throw new Error('Expected a time column from the table format');
                             }
                             var last = null;
                             for (var i = 1; i < metric.columns.length; i++) {
-                                var res = new points_1.default(metric.columns[i].text);
+                                var res = new distinct_points_1.DistinctPoints(metric.columns[i].text);
                                 for (var j = 0; j < metric.rows.length; j++) {
                                     var row = metric.rows[j];
                                     res.add(row[0], _this.formatValue(row[i]));
@@ -413,7 +416,7 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                             }
                         }
                         else {
-                            var res = new points_1.default(metric.target);
+                            var res = new distinct_points_1.DistinctPoints(metric.target);
                             lodash_1.default.forEach(metric.datapoints, function (point) {
                                 res.add(point[1], _this.formatValue(point[0]));
                             });
@@ -430,7 +433,6 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     this.panel.colorMaps.splice(index, 1);
                     this.updateColorInfo();
                 };
-                ;
                 DiscretePanelCtrl.prototype.updateColorInfo = function () {
                     var cm = {};
                     for (var i = 0; i < this.panel.colorMaps.length; i++) {
@@ -444,7 +446,7 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                 };
                 DiscretePanelCtrl.prototype.addColorMap = function (what) {
                     var _this = this;
-                    if (what == 'curent') {
+                    if (what === 'curent') {
                         lodash_1.default.forEach(this.data, function (metric) {
                             if (metric.legendInfo) {
                                 lodash_1.default.forEach(metric.legendInfo, function (info) {
@@ -465,7 +467,6 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     this.panel.valueMaps.splice(index, 1);
                     this.render();
                 };
-                ;
                 DiscretePanelCtrl.prototype.addValueMap = function () {
                     this.panel.valueMaps.push({ value: '', op: '=', text: '' });
                 };
@@ -474,7 +475,6 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     this.panel.rangeMaps.splice(index, 1);
                     this.render();
                 };
-                ;
                 DiscretePanelCtrl.prototype.addRangeMap = function () {
                     this.panel.rangeMaps.push({ from: '', to: '', text: '' });
                 };
@@ -563,7 +563,6 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     }
                     this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
                 };
-                ;
                 DiscretePanelCtrl.prototype.onGraphHover = function (evt, showTT, isExternal) {
                     this.externalPT = false;
                     if (this.data && this.data.length) {
@@ -591,7 +590,7 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                             this.onRender(); // refresh the view
                         }
                         else if (!isExternal) {
-                            if (this.panel.display == 'stacked') {
+                            if (this.panel.display === 'stacked') {
                                 hover = this.data[j].legendInfo[0];
                                 for (var i = 0; i < this.data[j].legendInfo.length; i++) {
                                     if (this.data[j].legendInfo[i].x > this.mouse.position.x) {

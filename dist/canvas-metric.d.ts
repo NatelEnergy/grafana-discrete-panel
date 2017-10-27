@@ -3,7 +3,6 @@ import { MetricsPanelCtrl } from 'app/plugins/sdk';
 export declare class CanvasPanelCtrl extends MetricsPanelCtrl {
     data: any;
     mouse: any;
-    canvasID: number;
     $tooltip: any;
     wrap: any;
     canvas: any;
