@@ -49,8 +49,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   };
 
   data: any = null;
-  externalPT: boolean = false;
-  isTimeline: boolean = false;
+  externalPT = false;
+  isTimeline = false;
   hoverPoint: any = null;
   colorMap: any = {};
 
@@ -114,6 +114,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var top = 0;
 
     var elapsed = this.range.to - this.range.from;
+    let point = null;
 
     _.forEach(this.data, (metric) => {
       var centerV = top + (rowHeight/2);
@@ -128,12 +129,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.fillText("No Data", 10, centerV);
       }*/
       if (this.isTimeline) {
-        var lastBS = 0;
-        var point = metric.changes[0];
-        for (var i = 0; i<metric.changes.length; i++) {
+        let lastBS = 0;
+        point = metric.changes[0];
+        for (let i = 0; i<metric.changes.length; i++) {
           point = metric.changes[i];
           if (point.start <= this.range.to) {
-            var xt = Math.max( point.start - this.range.from, 0 );
+            let xt = Math.max( point.start - this.range.from, 0 );
             point.x = (xt / elapsed) * width;
             ctx.fillStyle = this.getColor( point.val );
             ctx.fillRect(point.x, top, width, rowHeight);
@@ -146,13 +147,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
             lastBS = point.x;
           }
         }
-      } else if (this.panel.display == 'stacked') {
-        var point = null;
-        var start = this.range.from;
-        for (var i = 0; i<metric.legendInfo.length; i++) {
+      } else if (this.panel.display === 'stacked') {
+        point = null;
+        let start = this.range.from;
+        for (let i = 0; i<metric.legendInfo.length; i++) {
           point = metric.legendInfo[i];
 
-          var xt = Math.max( start - this.range.from, 0 );
+          let xt = Math.max( start - this.range.from, 0 );
           point.x = (xt / elapsed) * width;
           ctx.fillStyle = this.getColor( point.val );
           ctx.fillRect(point.x, top, width, rowHeight);
@@ -192,20 +193,20 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if ( this.mouse.down == null ) {
         if ( this.panel.highlightOnMouseover && this.mouse.position != null ) {
-          var next = null;
+          let next = null;
 
           if (this.isTimeline) {
             point = metric.changes[0];
-            for (var i = 0; i<metric.changes.length; i++) {
+            for (let i = 0; i<metric.changes.length; i++) {
               if (metric.changes[i].start > this.mouse.position.ts) {
                 next = metric.changes[i];
                 break;
               }
               point = metric.changes[i];
             }
-          } else if (this.panel.display == 'stacked') {
+          } else if (this.panel.display === 'stacked') {
             point = metric.legendInfo[0];
-            for (var i = 0; i<metric.legendInfo.length; i++) {
+            for (let i = 0; i<metric.legendInfo.length; i++) {
               if (metric.legendInfo[i].x > this.mouse.position.x) {
                 next = metric.legendInfo[i];
                 break;
@@ -310,7 +311,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   formatValue(val) {
 
     if (_.isNumber(val) && this.panel.rangeMaps) {
-      for (var i = 0; i < this.panel.rangeMaps.length; i++) {
+      for (let i = 0; i < this.panel.rangeMaps.length; i++) {
         var map = this.panel.rangeMaps[i];
 
         // value/number to range mapping
@@ -327,8 +328,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       val = val.toString(); // convert everything to a string
     }
 
-    for (var i = 0; i < this.panel.valueMaps.length; i++) {
-      var map = this.panel.valueMaps[i];
+    for (let i = 0; i < this.panel.valueMaps.length; i++) {
+      let map = this.panel.valueMaps[i];
       // special null case
       if (map.value === 'null') {
         if (isNull) {
@@ -337,7 +338,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         continue;
       }
 
-      if (val == map.value) {
+      if (val === map.value) {
         return map.text;
       }
     }
@@ -377,11 +378,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   hashCode(str) {
     var hash = 0;
-    if (str.length == 0) { return hash; }
+    if (str.length === 0) { return hash; }
     for (var i = 0; i < str.length; i++) {
+      /* eslint-disable */
       var char = str.charCodeAt(i);
       hash = ((hash<<5)-hash)+char;
       hash = hash & hash; // Convert to 32bit integer
+      /* eslint-enable */
     }
     return hash;
   }
@@ -441,13 +444,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var data = [];
     _.forEach(dataList, (metric) => {
       if ('table'=== metric.type) {
-        if ('time' != metric.columns[0].type) {
+        if ('time' !== metric.columns[0].type) {
           throw new Error('Expected a time column from the table format');
         }
 
         var last = null;
         for (var i = 1; i<metric.columns.length; i++) {
-          var res = new DistinctPoints(metric.columns[i].text);
+          let res = new DistinctPoints(metric.columns[i].text);
           for (var j = 0; j<metric.rows.length; j++) {
             var row = metric.rows[j];
             res.add( row[0], this.formatValue( row[i] ) );
@@ -456,7 +459,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           data.push( res );
         }
       } else {
-        var res = new DistinctPoints( metric.target );
+        let res = new DistinctPoints( metric.target );
         _.forEach(metric.datapoints, (point) => {
           res.add( point[1], this.formatValue(point[0]) );
         });
@@ -490,7 +493,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addColorMap(what) {
-    if (what == 'curent') {
+    if (what === 'curent') {
       _.forEach(this.data, (metric) => {
         if (metric.legendInfo) {
           _.forEach(metric.legendInfo, (info) => {
@@ -635,7 +638,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if (this.isTimeline) {
         hover = this.data[j].changes[0];
-        for (var i = 0; i<this.data[j].changes.length; i++) {
+        for (let i = 0; i<this.data[j].changes.length; i++) {
           if (this.data[j].changes[i].start > this.mouse.position.ts) {
             break;
           }
@@ -649,9 +652,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         }
         this.onRender(); // refresh the view
       } else if (!isExternal) {
-        if (this.panel.display == 'stacked') {
+        if (this.panel.display === 'stacked') {
           hover = this.data[j].legendInfo[0];
-          for (var i = 0; i<this.data[j].legendInfo.length; i++) {
+          for (let i = 0; i<this.data[j].legendInfo.length; i++) {
             if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
               break;
             }

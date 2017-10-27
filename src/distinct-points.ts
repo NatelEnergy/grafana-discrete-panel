@@ -5,10 +5,10 @@ export class DistinctPoints {
   changes: Array<any> = [];
   legendInfo: Array<any> = [];
   last: any = null;
-  asc: boolean = false;
-  transitionCount: number = 0;
-  distinctValuesCount: number = 0;
-  elapsed: number = 0;
+  asc = false;
+  transitionCount = 0;
+  distinctValuesCount = 0;
+  elapsed = 0;
 
   constructor(public name) {
 
@@ -24,7 +24,7 @@ export class DistinctPoints {
         ms: 0
       };
       this.changes.push(this.last);
-    } else if (ts == this.last.ts ) {
+    } else if (ts === this.last.ts ) {
       console.log('skip point with duplicate timestamp', ts, val);
       return;
     } else {
@@ -32,13 +32,13 @@ export class DistinctPoints {
         this.asc = ts > this.last.start;
       }
 
-      if ( (ts > this.last.start) != this.asc ) {
+      if ( (ts > this.last.start) !== this.asc ) {
         console.log('skip out of order point', ts, val);
         return;
       }
 
       // Same value
-      if (val == this.last.val) {
+      if (val === this.last.val) {
         if (!this.asc) {
           this.last.start = ts;
         }

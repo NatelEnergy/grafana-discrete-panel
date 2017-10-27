@@ -15,7 +15,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
   data: any;
   mouse: any;
-  canvasID: number;
   $tooltip: any;
   wrap: any;
   canvas: any;
@@ -212,7 +211,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       this.$tooltip.detach();
       var up = this.getMousePosition(evt);
       if (this.mouse.down != null) {
-        if (up.x == this.mouse.down.x && up.y == this.mouse.down.y ) {
+        if (up.x === this.mouse.down.x && up.y === this.mouse.down.y ) {
           this.mouse.position = null;
           this.mouse.down = null;
           this.onMouseClicked(up);
