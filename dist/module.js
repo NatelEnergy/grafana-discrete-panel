@@ -86,10 +86,10 @@ System.register(['./canvas-metric', './points', 'lodash', 'jquery', 'moment', 'a
                     console.log("onDataError", err);
                 };
                 DiscretePanelCtrl.prototype.onInitEditMode = function () {
-                    this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/partials/editor.html', 1);
-                    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/partials/legend.html', 3);
-                    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/partials/colors.html', 4);
-                    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/partials/mappings.html', 5);
+                    this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/partials/editor.options.html', 1);
+                    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/partials/editor.legend.html', 3);
+                    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/partials/editor.colors.html', 4);
+                    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/partials/editor.mappings.html', 5);
                     this.editorTabIndex = 1;
                     this.refresh();
                 };
