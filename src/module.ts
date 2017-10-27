@@ -85,7 +85,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onRender() {
-    if(this.data == null ||  !(this.context) ) {
+    if (this.data == null ||  !(this.context) ) {
       return;
     }
 
@@ -127,18 +127,18 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.textAlign = 'left';
         ctx.fillText("No Data", 10, centerV);
       }*/
-      if(this.isTimeline) {
+      if (this.isTimeline) {
         var lastBS = 0;
         var point = metric.changes[0];
-        for(var i=0; i<metric.changes.length; i++) {
+        for (var i = 0; i<metric.changes.length; i++) {
           point = metric.changes[i];
-          if(point.start <= this.range.to) {
+          if (point.start <= this.range.to) {
             var xt = Math.max( point.start - this.range.from, 0 );
             point.x = (xt / elapsed) * width;
             ctx.fillStyle = this.getColor( point.val );
             ctx.fillRect(point.x, top, width, rowHeight);
 
-            if(this.panel.writeAllValues) {
+            if (this.panel.writeAllValues) {
               ctx.fillStyle = this.panel.valueTextColor;
               ctx.textAlign = 'left';
               ctx.fillText(point.val, point.x+7, centerV);
@@ -146,11 +146,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
             lastBS = point.x;
           }
         }
-      }
-      else if(this.panel.display == 'stacked') {
+      } else if (this.panel.display == 'stacked') {
         var point = null;
         var start = this.range.from;
-        for(var i=0; i<metric.legendInfo.length; i++) {
+        for (var i = 0; i<metric.legendInfo.length; i++) {
           point = metric.legendInfo[i];
 
           var xt = Math.max( start - this.range.from, 0 );
@@ -158,7 +157,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           ctx.fillStyle = this.getColor( point.val );
           ctx.fillRect(point.x, top, width, rowHeight);
 
-          if(this.panel.writeAllValues) {
+          if (this.panel.writeAllValues) {
             ctx.fillStyle = this.panel.valueTextColor;
             ctx.textAlign = 'left';
             ctx.fillText(point.val, point.x+7, centerV);
@@ -166,12 +165,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           start += point.ms;
         }
-      }
-      else {
+      } else {
         console.log( "Not supported yet...", this );
       }
 
-      if(top>0) {
+      if (top>0) {
         ctx.strokeStyle = this.panel.lineColor;
         ctx.beginPath();
         ctx.moveTo(0, top);
@@ -181,7 +179,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       ctx.fillStyle = "#000000";
 
-      if( this.panel.writeMetricNames &&
+      if ( this.panel.writeMetricNames &&
           this.mouse.position == null &&
         (!this.panel.highlightOnMouseover || this.panel.highlightOnMouseover )
       ) {
@@ -192,24 +190,23 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       ctx.textAlign = 'right';
 
-      if( this.mouse.down == null ) {
-        if( this.panel.highlightOnMouseover && this.mouse.position != null ) {
+      if ( this.mouse.down == null ) {
+        if ( this.panel.highlightOnMouseover && this.mouse.position != null ) {
           var next = null;
 
-          if(this.isTimeline) {
+          if (this.isTimeline) {
             point = metric.changes[0];
-            for(var i=0; i<metric.changes.length; i++) {
-              if(metric.changes[i].start > this.mouse.position.ts) {
+            for (var i = 0; i<metric.changes.length; i++) {
+              if (metric.changes[i].start > this.mouse.position.ts) {
                 next = metric.changes[i];
                 break;
               }
               point = metric.changes[i];
             }
-          }
-          else if(this.panel.display == 'stacked') {
+          } else if (this.panel.display == 'stacked') {
             point = metric.legendInfo[0];
-            for(var i=0; i<metric.legendInfo.length; i++) {
-              if(metric.legendInfo[i].x > this.mouse.position.x) {
+            for (var i = 0; i<metric.legendInfo.length; i++) {
+              if (metric.legendInfo[i].x > this.mouse.position.x) {
                 next = metric.legendInfo[i];
                 break;
               }
@@ -224,7 +221,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           ctx.fillRect(0, top, point.x, rowHeight);
           ctx.fill();
 
-          if(next != null) {
+          if (next != null) {
             ctx.beginPath();
             ctx.fillRect(next.x, top, width, rowHeight);
             ctx.fill();
@@ -235,8 +232,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           ctx.fillStyle = "#000000";
           ctx.textAlign = 'left';
           ctx.fillText( point.val, point.x+7, centerV);
-        }
-        else if( this.panel.writeLastValue ) {
+        } else if ( this.panel.writeLastValue ) {
           ctx.fillText( point.val, width-7, centerV );
         }
       }
@@ -246,8 +242,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
 
 
-    if( this.isTimeline && this.mouse.position != null ) {
-      if(this.mouse.down != null) {
+    if ( this.isTimeline && this.mouse.position != null ) {
+      if (this.mouse.down != null) {
         var xmin = Math.min( this.mouse.position.x, this.mouse.down.x);
         var xmax = Math.max( this.mouse.position.x, this.mouse.down.x);
 
@@ -262,8 +258,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.fillRect(xmax, 0, width, height);
         ctx.fill();
         ctx.globalCompositeOperation = 'source-over';
-      }
-      else {
+      } else {
         ctx.strokeStyle = '#111';
         ctx.beginPath();
         ctx.moveTo(this.mouse.position.x, 0);
@@ -278,7 +273,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        if(this.externalPT && rows>1) {
+        if (this.externalPT && rows>1) {
           ctx.beginPath();
           ctx.arc(this.mouse.position.x, this.mouse.position.y, 3, 0, 2 * Math.PI, false);
           ctx.fillStyle = '#e22c14';
@@ -296,14 +291,14 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var body = '<div class="graph-tooltip-time">'+ info.val +'</div>';
 
     body += "<center>";
-    if(info.count > 1) {
+    if (info.count > 1) {
       body += info.count + " times<br/>for<br/>";
     }
     body += moment.duration(info.ms).humanize();
-    if(info.count > 1) {
+    if (info.count > 1) {
       body += "<br/>total";
     }
-    body += "</center>"
+    body += "</center>";
 
     this.$tooltip.html(body).place_tt(pos.pageX + 20, pos.pageY);
   }
@@ -314,7 +309,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   formatValue(val) {
 
-    if(_.isNumber(val) && this.panel.rangeMaps) {
+    if (_.isNumber(val) && this.panel.rangeMaps) {
       for (var i = 0; i < this.panel.rangeMaps.length; i++) {
         var map = this.panel.rangeMaps[i];
 
@@ -328,7 +323,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     var isNull = _.isNil(val);
-    if(!isNull && !_.isString(val)) {
+    if (!isNull && !_.isString(val)) {
       val = val.toString(); // convert everything to a string
     }
 
@@ -342,19 +337,19 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         continue;
       }
 
-      if(val == map.value) {
+      if (val == map.value) {
         return map.text;
       }
     }
 
-    if(isNull) {
+    if (isNull) {
       return "null";
     }
     return val;
   }
 
   getColor(val) {
-    if(_.has(this.colorMap, val)) {
+    if (_.has(this.colorMap, val)) {
       return this.colorMap[val];
     }
 
@@ -374,15 +369,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   randomColor() {
     var letters = 'ABCDE'.split('');
     var color = '#';
-    for (var i=0; i<3; i++ ) {
+    for (var i = 0; i<3; i++ ) {
         color += letters[Math.floor(Math.random() * letters.length)];
     }
     return color;
   }
 
-  hashCode(str){
+  hashCode(str) {
     var hash = 0;
-    if (str.length == 0) return hash;
+    if (str.length == 0) { return hash; }
     for (var i = 0; i < str.length; i++) {
       var char = str.charCodeAt(i);
       hash = ((hash<<5)-hash)+char;
@@ -408,7 +403,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     var range = this.range;
     var rr = this.range.raw;
-    if(this.panel.expandFromQueryS > 0) {
+    if (this.panel.expandFromQueryS > 0) {
       range = {
         from: this.range.from.clone(),
         to: this.range.to
@@ -445,23 +440,22 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     var data = [];
     _.forEach(dataList, (metric) => {
-      if('table'=== metric.type) {
-        if('time' != metric.columns[0].type) {
-          throw 'Expected a time column from the table format';
+      if ('table'=== metric.type) {
+        if ('time' != metric.columns[0].type) {
+          throw new Error('Expected a time column from the table format');
         }
 
         var last = null;
-        for(var i=1; i<metric.columns.length; i++) {
+        for (var i = 1; i<metric.columns.length; i++) {
           var res = new DistinctPoints(metric.columns[i].text);
-          for(var j=0; j<metric.rows.length; j++) {
+          for (var j = 0; j<metric.rows.length; j++) {
             var row = metric.rows[j];
             res.add( row[0], this.formatValue( row[i] ) );
           }
           res.finish( this );
           data.push( res );
         }
-      }
-      else {
+      } else {
         var res = new DistinctPoints( metric.target );
         _.forEach(metric.datapoints, (point) => {
           res.add( point[1], this.formatValue(point[0]) );
@@ -481,13 +475,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var index = _.indexOf(this.panel.colorMaps, map);
     this.panel.colorMaps.splice(index, 1);
     this.updateColorInfo();
-  };
+  }
 
   updateColorInfo() {
     var cm = {};
-    for(var i=0; i<this.panel.colorMaps.length; i++) {
+    for (var i = 0; i<this.panel.colorMaps.length; i++) {
       var m = this.panel.colorMaps[i];
-      if(m.text) {
+      if (m.text) {
         cm[m.text] = m.color;
       }
     }
@@ -496,18 +490,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addColorMap(what) {
-    if(what == 'curent') {
+    if (what == 'curent') {
       _.forEach(this.data, (metric) => {
-        if(metric.legendInfo) {
+        if (metric.legendInfo) {
           _.forEach(metric.legendInfo, (info) => {
-            if(!_.has(info.val)) {
+            if (!_.has(info.val)) {
               this.panel.colorMaps.push({text: info.val, color: this.getColor(info.val) });
             }
           });
         }
       });
-    }
-    else {
+    } else {
       this.panel.colorMaps.push({text: '???', color: this.randomColor() });
     }
     this.updateColorInfo();
@@ -517,7 +510,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var index = _.indexOf(this.panel.valueMaps, map);
     this.panel.valueMaps.splice(index, 1);
     this.render();
-  };
+  }
 
   addValueMap() {
     this.panel.valueMaps.push({value: '', op: '=', text: '' });
@@ -527,7 +520,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var index = _.indexOf(this.panel.rangeMaps, rangeMap);
     this.panel.rangeMaps.splice(index, 1);
     this.render();
-  };
+  }
 
   addRangeMap() {
     this.panel.rangeMaps.push({from: '', to: '', text: ''});
@@ -541,28 +534,26 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   getLegendDisplay(info, metric) {
     var disp = info.val;
-    if(this.panel.showLegendPercent || this.panel.showLegendCounts || this.panel.showLegendTime) {
+    if (this.panel.showLegendPercent || this.panel.showLegendCounts || this.panel.showLegendTime) {
       disp += " (";
       var hassomething = false;
-      if(this.panel.showLegendTime) {
+      if (this.panel.showLegendTime) {
         disp += moment.duration(info.ms).humanize();
         hassomething = true;
       }
 
-      if(this.panel.showLegendPercent) {
-        if(hassomething) {
+      if (this.panel.showLegendPercent) {
+        if (hassomething) {
           disp += ", ";
         }
 
         var dec = this.panel.legendPercentDecimals;
-        if(_.isNil(dec)) {
-          if(info.per>.98 && metric.changes.length>1) {
+        if (_.isNil(dec)) {
+          if (info.per>.98 && metric.changes.length>1) {
             dec = 2;
-          }
-          else if(info.per<0.02) {
+          } else if (info.per<0.02) {
             dec = 2;
-          }
-          else {
+          } else {
             dec = 0;
           }
         }
@@ -570,8 +561,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         hassomething = true;
       }
 
-      if(this.panel.showLegendCounts) {
-        if(hassomething) {
+      if (this.panel.showLegendCounts) {
+        if (hassomething) {
           disp += ", ";
         }
         disp += info.count+"x";
@@ -591,7 +582,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var time = point.ms;
     var val = point.val;
 
-    if(this.mouse.down != null) {
+    if (this.mouse.down != null) {
       from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
       to   = Math.max(this.mouse.down.ts, this.mouse.position.ts);
       time = to - from;
@@ -600,19 +591,19 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     var body = '<div class="graph-tooltip-time">'+ val + '</div>';
 
-    body += "<center>"
+    body += "<center>";
     body += this.dashboard.formatDate( moment(from) ) + "<br/>";
     body += "to<br/>";
     body += this.dashboard.formatDate( moment(to) ) + "<br/><br/>";
     body += moment.duration(time).humanize() + "<br/>";
-    body += "</center>"
+    body += "</center>";
 
     var pageX = 0;
     var pageY = 0;
-    if(isExternal) {
+    if (isExternal) {
       var rect = this.canvas.getBoundingClientRect();
       pageY = rect.top + (evt.pos.panelRelY * rect.height);
-      if(pageY < 0 || pageY > $(window).innerHeight()) {
+      if (pageY < 0 || pageY > $(window).innerHeight()) {
         // Skip Hidden tooltip
         this.$tooltip.detach();
         return;
@@ -622,18 +613,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       var elapsed = this.range.to - this.range.from;
       var pX = (evt.pos.x - this.range.from) / elapsed;
       pageX = rect.left + (pX * rect.width);
-    }
-    else {
+    } else {
       pageX = evt.evt.pageX;
       pageY = evt.evt.pageY;
     }
 
     this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
-  };
+  }
 
   onGraphHover(evt, showTT, isExternal) {
     this.externalPT = false;
-    if(this.data && this.data.length) {
+    if (this.data && this.data.length) {
       var hover = null;
       var j = Math.floor(this.mouse.position.y/this.panel.rowHeight);
       if (j < 0) {
@@ -643,27 +633,26 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         j = this.data.length-1;
       }
 
-      if(this.isTimeline) {
+      if (this.isTimeline) {
         hover = this.data[j].changes[0];
-        for(var i=0; i<this.data[j].changes.length; i++) {
-          if(this.data[j].changes[i].start > this.mouse.position.ts) {
+        for (var i = 0; i<this.data[j].changes.length; i++) {
+          if (this.data[j].changes[i].start > this.mouse.position.ts) {
             break;
           }
           hover = this.data[j].changes[i];
         }
         this.hoverPoint = hover;
 
-        if(showTT) {
+        if (showTT) {
           this.externalPT = isExternal;
           this.showTooltip( evt, hover, isExternal );
         }
         this.onRender(); // refresh the view
-      }
-      else if(!isExternal) {
-        if(this.panel.display == 'stacked') {
+      } else if (!isExternal) {
+        if (this.panel.display == 'stacked') {
           hover = this.data[j].legendInfo[0];
-          for(var i=0; i<this.data[j].legendInfo.length; i++) {
-            if(this.data[j].legendInfo[i].x > this.mouse.position.x) {
+          for (var i = 0; i<this.data[j].legendInfo.length; i++) {
+            if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
               break;
             }
             hover = this.data[j].legendInfo[i];
@@ -671,21 +660,20 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           this.hoverPoint = hover;
           this.onRender(); // refresh the view
 
-          if(showTT) {
+          if (showTT) {
             this.externalPT = isExternal;
             this.showLegandTooltip(evt.evt, hover);
           }
         }
       }
-    }
-    else {
+    } else {
       this.$tooltip.detach(); // make sure it is hidden
     }
   }
 
   onMouseClicked(where) {
     var pt = this.hoverPoint;
-    if(pt && pt.start) {
+    if (pt && pt.start) {
       var range = {from: moment.utc(pt.start), to: moment.utc(pt.start+pt.ms) };
       this.timeSrv.setTime(range);
       this.clear();
