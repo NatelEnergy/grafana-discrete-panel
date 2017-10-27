@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-export default class DistinctPoints {
+export class DistinctPoints {
 
   changes: Array<any> = [];
   legendInfo: Array<any> = [];

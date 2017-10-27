@@ -3,12 +3,11 @@
 import config from 'app/core/config';
 
 import {CanvasPanelCtrl} from './canvas-metric';
-import DistinctPoints from './points';
+import {DistinctPoints} from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
-import angular from 'angular';
 import kbn from 'app/core/utils/kbn';
 
 import appEvents from 'app/core/app_events';
