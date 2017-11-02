@@ -98,13 +98,18 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     var height = rowHeight * rows;
     var width = rect.width;
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = width * this._devicePixelRatio;
+    this.canvas.height = height * this._devicePixelRatio;
+    
+    $(this.canvas).css('width', width + 'px');
+    $(this.canvas).css('height', height + 'px');
 
     var ctx = this.context;
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
+    
+    ctx.scale(this._devicePixelRatio, this._devicePixelRatio);
 
     // ctx.shadowOffsetX = 1;
     // ctx.shadowOffsetY = 1;
