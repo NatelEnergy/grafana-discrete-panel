@@ -78,6 +78,11 @@ declare module 'app/core/utils/kbn' {
   // export function getUnitFormats(): any;
 }
 
+declare module 'app/core/utils/colors' {
+  var colors: [string];
+  export default colors;
+}
+
 declare module 'app/core/store' {
   var store: any;
   export default store;
