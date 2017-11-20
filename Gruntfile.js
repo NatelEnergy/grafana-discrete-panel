@@ -12,14 +12,6 @@ module.exports = function(grunt) {
     clean: ['dist'],
 
     copy: {
-      hack_grafana_sdk: { // See: https://github.com/grafana/grafana-sdk-mocks/issues/1
-        expand: true,
-        flatten: true,
-        cwd: 'hack',
-        src: ['*.ts'],
-        dest: 'node_modules/grafana-sdk-mocks/app/headers'
-      },
-
       dist_js: {
         expand: true,
         cwd: 'src',
@@ -103,7 +95,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', [
     'clean',
-    'copy:hack_grafana_sdk',
     'copy:dist_js',
     'typescript:build',
     'copy:dist_html',
