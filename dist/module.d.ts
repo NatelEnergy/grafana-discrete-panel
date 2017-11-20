@@ -44,6 +44,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     isTimeline: boolean;
     hoverPoint: any;
     colorMap: any;
+    _colorsPaleteCash: any;
     constructor($scope: any, $injector: any);
     onDataError(err: any): void;
     onInitEditMode(): void;
@@ -53,7 +54,6 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     formatValue(val: any): any;
     getColor(val: any): any;
     randomColor(): string;
-    hashCode(str: any): number;
     issueQueries(datasource: any): any;
     onDataReceived(dataList: any): void;
     removeColorMap(map: any): void;

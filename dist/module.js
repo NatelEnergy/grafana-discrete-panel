@@ -6,7 +6,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
     var canvas_metric_1, distinct_points_1, lodash_1, jquery_1, moment_1, kbn_1, app_events_1;
-    var DiscretePanelCtrl;
+    var grafanaColors, DiscretePanelCtrl;
     return {
         setters:[
             function (canvas_metric_1_1) {
@@ -31,6 +31,15 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 app_events_1 = app_events_1_1;
             }],
         execute: function() {
+            grafanaColors = [
+                "#7EB26D", "#EAB839", "#6ED0E0", "#EF843C", "#E24D42", "#1F78C1", "#BA43A9", "#705DA0",
+                "#508642", "#CCA300", "#447EBC", "#C15C17", "#890F02", "#0A437C", "#6D1F62", "#584477",
+                "#B7DBAB", "#F4D598", "#70DBED", "#F9BA8F", "#F29191", "#82B5D8", "#E5A8E2", "#AEA2E0",
+                "#629E51", "#E5AC0E", "#64B0C8", "#E0752D", "#BF1B00", "#0A50A1", "#962D82", "#614D93",
+                "#9AC48A", "#F2C96D", "#65C5DB", "#F9934E", "#EA6460", "#5195CE", "#D683CE", "#806EB7",
+                "#3F6833", "#967302", "#2F575E", "#99440A", "#58140C", "#052B51", "#511749", "#3F2B5B",
+                "#E0F9D7", "#FCEACA", "#CFFAFF", "#F9E2D2", "#FCE2DE", "#BADFF4", "#F9D9F9", "#DEDAF7"
+            ]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0 (https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
             DiscretePanelCtrl = (function (_super) {
                 __extends(DiscretePanelCtrl, _super);
                 function DiscretePanelCtrl($scope, $injector) {
@@ -72,6 +81,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.isTimeline = false;
                     this.hoverPoint = null;
                     this.colorMap = {};
+                    this._colorsPaleteCash = null;
                     // defaults configs
                     lodash_1.default.defaultsDeep(this.panel, this.defaults);
                     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
@@ -325,16 +335,12 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     if (lodash_1.default.has(this.colorMap, val)) {
                         return this.colorMap[val];
                     }
-                    var palet = [
-                        '#FF4444',
-                        '#9933CC',
-                        '#32D1DF',
-                        '#ed2e18',
-                        '#CC3900',
-                        '#F79520',
-                        '#33B5E5'
-                    ];
-                    return palet[Math.abs(this.hashCode(val + '')) % palet.length];
+                    if (this._colorsPaleteCash[val] === undefined) {
+                        var c = grafanaColors[this._colorsPaleteCash.length % grafanaColors.length];
+                        this._colorsPaleteCash[val] = c;
+                        this._colorsPaleteCash.length++;
+                    }
+                    return this._colorsPaleteCash[val];
                 };
                 DiscretePanelCtrl.prototype.randomColor = function () {
                     var letters = 'ABCDE'.split('');
@@ -343,19 +349,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         color += letters[Math.floor(Math.random() * letters.length)];
                     }
                     return color;
-                };
-                DiscretePanelCtrl.prototype.hashCode = function (str) {
-                    var hash = 0;
-                    if (str.length === 0) {
-                        return hash;
-                    }
-                    for (var i = 0; i < str.length; i++) {
-                        /* eslint-disable */
-                        var char = str.charCodeAt(i);
-                        hash = ((hash << 5) - hash) + char;
-                        hash = hash & hash; // Convert to 32bit integer
-                    }
-                    return hash;
                 };
                 // Copied from Metrics Panel, only used to expand the 'from' query
                 DiscretePanelCtrl.prototype.issueQueries = function (datasource) {
@@ -444,6 +437,8 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             cm[m.text] = m.color;
                         }
                     }
+                    this._colorsPaleteCash = {};
+                    this._colorsPaleteCash.length = 0;
                     this.colorMap = cm;
                     this.render();
                 };

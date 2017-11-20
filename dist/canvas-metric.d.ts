@@ -7,6 +7,7 @@ export declare class CanvasPanelCtrl extends MetricsPanelCtrl {
     wrap: any;
     canvas: any;
     context: any;
+    _devicePixelRatio: number;
     constructor($scope: any, $injector: any);
     onPanelInitalized(): void;
     onRefresh(): void;
