@@ -34,9 +34,9 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
     this.events.on('render', this.onRender.bind(this));
-    
+
     this._devicePixelRatio = 1;
-    if(window.devicePixelRatio !== undefined) {
+    if (window.devicePixelRatio !== undefined) {
       this._devicePixelRatio = window.devicePixelRatio;
     }
   }

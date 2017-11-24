@@ -21,7 +21,8 @@ const grafanaColors = [
   "#9AC48A", "#F2C96D", "#65C5DB", "#F9934E", "#EA6460", "#5195CE", "#D683CE", "#806EB7",
   "#3F6833", "#967302", "#2F575E", "#99440A", "#58140C", "#052B51", "#511749", "#3F2B5B",
   "#E0F9D7", "#FCEACA", "#CFFAFF", "#F9E2D2", "#FCE2DE", "#BADFF4", "#F9D9F9", "#DEDAF7"
-]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0 (https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
+]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0
+//(https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
 
 
 
@@ -114,7 +115,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var width = rect.width;
     this.canvas.width = width * this._devicePixelRatio;
     this.canvas.height = height * this._devicePixelRatio;
-    
+
     $(this.canvas).css('width', width + 'px');
     $(this.canvas).css('height', height + 'px');
 
@@ -122,7 +123,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
-    
+
     ctx.scale(this._devicePixelRatio, this._devicePixelRatio);
 
     // ctx.shadowOffsetX = 1;
@@ -372,12 +373,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     if (_.has(this.colorMap, val)) {
       return this.colorMap[val];
     }
-    if(this._colorsPaleteCash[val] === undefined) {
+    if (this._colorsPaleteCash[val] === undefined) {
       var c = grafanaColors[this._colorsPaleteCash.length % grafanaColors.length];
       this._colorsPaleteCash[val] = c;
       this._colorsPaleteCash.length++;
     }
-    return this._colorsPaleteCash[val];    
+    return this._colorsPaleteCash[val];
   }
 
   randomColor() {
