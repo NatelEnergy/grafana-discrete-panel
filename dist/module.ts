@@ -21,7 +21,8 @@ const grafanaColors = [
   "#9AC48A", "#F2C96D", "#65C5DB", "#F9934E", "#EA6460", "#5195CE", "#D683CE", "#806EB7",
   "#3F6833", "#967302", "#2F575E", "#99440A", "#58140C", "#052B51", "#511749", "#3F2B5B",
   "#E0F9D7", "#FCEACA", "#CFFAFF", "#F9E2D2", "#FCE2DE", "#BADFF4", "#F9D9F9", "#DEDAF7"
-]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0 (https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
+]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0
+//(https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
 
 
 
@@ -58,7 +59,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     showLegendValues: true,
     showLegendPercent: true,
     highlightOnMouseover: true,
-    legendSortBy: '-ms'
+    legendSortBy: '-ms',
+    units: 'short'
   };
 
   data: any = null;
@@ -67,6 +69,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   hoverPoint: any = null;
   colorMap: any = {};
   _colorsPaleteCash: any = null;
+  unitFormats: any = null; // only used for editor
+  formatter: any = null;
 
   constructor($scope, $injector) {
     super($scope, $injector);
@@ -90,6 +94,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onInitEditMode() {
+    this.unitFormats = kbn.getUnitFormats();
+
     this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/partials/editor.options.html',1);
     this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/partials/editor.legend.html',3);
     this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/partials/editor.colors.html',4);
@@ -114,7 +120,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     var width = rect.width;
     this.canvas.width = width * this._devicePixelRatio;
     this.canvas.height = height * this._devicePixelRatio;
-    
+
     $(this.canvas).css('width', width + 'px');
     $(this.canvas).css('height', height + 'px');
 
@@ -122,7 +128,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
-    
+
     ctx.scale(this._devicePixelRatio, this._devicePixelRatio);
 
     // ctx.shadowOffsetX = 1;
@@ -329,16 +335,21 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   formatValue(val) {
 
-    if (_.isNumber(val) && this.panel.rangeMaps) {
-      for (let i = 0; i < this.panel.rangeMaps.length; i++) {
-        var map = this.panel.rangeMaps[i];
+    if (_.isNumber(val) ) {
+      if( this.panel.rangeMaps ) {
+        for (let i = 0; i < this.panel.rangeMaps.length; i++) {
+          var map = this.panel.rangeMaps[i];
 
-        // value/number to range mapping
-        var from = parseFloat(map.from);
-        var to = parseFloat(map.to);
-        if (to >= val && from <= val) {
-          return map.text;
+          // value/number to range mapping
+          var from = parseFloat(map.from);
+          var to = parseFloat(map.to);
+          if (to >= val && from <= val) {
+            return map.text;
+          }
         }
+      }
+      if( this.formatter ) {
+        return this.formatter( val, this.panel.decimals );
       }
     }
 
@@ -372,12 +383,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     if (_.has(this.colorMap, val)) {
       return this.colorMap[val];
     }
-    if(this._colorsPaleteCash[val] === undefined) {
+    if (this._colorsPaleteCash[val] === undefined) {
       var c = grafanaColors[this._colorsPaleteCash.length % grafanaColors.length];
       this._colorsPaleteCash[val] = c;
       this._colorsPaleteCash.length++;
     }
-    return this._colorsPaleteCash[val];    
+    return this._colorsPaleteCash[val];
   }
 
   randomColor() {
@@ -389,52 +400,18 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     return color;
   }
 
-  // Copied from Metrics Panel, only used to expand the 'from' query
-  issueQueries(datasource) {
-    this.datasource = datasource;
+  // Override the 
+  applyPanelTimeOverrides() {
+    super.applyPanelTimeOverrides();
 
-    if (!this.panel.targets || this.panel.targets.length === 0) {
-      return this.$q.when([]);
-    }
-
-    // make shallow copy of scoped vars,
-    // and add built in variables interval and interval_ms
-    var scopedVars = Object.assign({}, this.panel.scopedVars, {
-      "__interval":     {text: this.interval,   value: this.interval},
-      "__interval_ms":  {text: this.intervalMs, value: this.intervalMs},
-    });
-
-    var range = this.range;
-    var rr = this.range.raw;
     if (this.panel.expandFromQueryS > 0) {
-      range = {
-        from: this.range.from.clone(),
-        to: this.range.to
-      };
-      range.from.subtract( this.panel.expandFromQueryS, 's' );
-
-      rr = {
-        from: range.from.format(),
-        to: this.range.raw.to
-      };
-      range.raw = rr;
+      console.log( "Expand Query: ", this.panel.expandFromQueryS );
+      let from = this.range.from.subtract( this.panel.expandFromQueryS, 's' );
+      this.range.from = from;
+      this.range.raw.from = from;
     }
-
-    var metricsQuery = {
-      panelId: this.panel.id,
-      range: range,
-      rangeRaw: rr,
-      interval: this.interval,
-      intervalMs: this.intervalMs,
-      targets: this.panel.targets,
-      format: this.panel.renderer === 'png' ? 'png' : 'json',
-      maxDataPoints: this.resolution,
-      scopedVars: scopedVars,
-      cacheTimeout: this.panel.cacheTimeout
-    };
-
-    return datasource.query(metricsQuery);
   }
+
 
   onDataReceived(dataList) {
     $(this.canvas).css( 'cursor', 'pointer' );
@@ -531,10 +508,21 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.panel.rangeMaps.push({from: '', to: '', text: ''});
   }
 
-  onConfigChanged() {
+  onConfigChanged( update = false ) {
     //console.log( "Config changed...");
     this.isTimeline = true; //this.panel.display == 'timeline';
-    this.render();
+
+    this.formatter = null;
+    if(this.panel.units && 'none' != this.panel.units ) {
+      this.formatter = kbn.valueFormats[this.panel.units]
+    }
+
+    if(update) {
+      this.refresh();
+    }
+    else {
+      this.render();
+    }
   }
 
   getLegendDisplay(info, metric) {

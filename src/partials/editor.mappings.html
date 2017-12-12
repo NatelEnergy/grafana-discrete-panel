@@ -46,3 +46,24 @@
     </div>
   </div>
 </div>
+
+
+
+<div class="editor-row">
+  <h5 class="page-heading">Numeric Conversion</h5>
+  <div class="gf-form-group">
+    <div class="gf-form">
+      <label class="gf-form-label width-6">Unit</label>
+      <div class="gf-form-dropdown-typeahead max-width-20" ng-model="ctrl.panel.units" 
+        dropdown-typeahead2="ctrl.unitFormats" 
+        dropdown-typeahead-on-select="ctrl.panel.units = $subItem.value; ctrl.onConfigChanged(true);"></div>
+    </div>
+
+    <div class="gf-form">
+      <label class="gf-form-label width-6">Decimals</label>
+      <input type="number" class="gf-form-input max-width-20" placeholder="auto" empty-to-null bs-tooltip="'Override automatic decimal precision'" data-placement="right" ng-model="ctrl.panel.decimals" ng-change="ctrl.onConfigChanged(true);" ng-model-onblur>
+    </div>
+
+  </div>
+</div>
+

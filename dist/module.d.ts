@@ -38,6 +38,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
         showLegendPercent: boolean;
         highlightOnMouseover: boolean;
         legendSortBy: string;
+        units: string;
     };
     data: any;
     externalPT: boolean;
@@ -45,6 +46,8 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     hoverPoint: any;
     colorMap: any;
     _colorsPaleteCash: any;
+    unitFormats: any;
+    formatter: any;
     constructor($scope: any, $injector: any);
     onDataError(err: any): void;
     onInitEditMode(): void;
@@ -54,7 +57,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     formatValue(val: any): any;
     getColor(val: any): any;
     randomColor(): string;
-    issueQueries(datasource: any): any;
+    applyPanelTimeOverrides(): void;
     onDataReceived(dataList: any): void;
     removeColorMap(map: any): void;
     updateColorInfo(): void;
@@ -63,7 +66,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     addValueMap(): void;
     removeRangeMap(rangeMap: any): void;
     addRangeMap(): void;
-    onConfigChanged(): void;
+    onConfigChanged(update?: boolean): void;
     getLegendDisplay(info: any, metric: any): any;
     showTooltip(evt: any, point: any, isExternal: any): void;
     onGraphHover(evt: any, showTT: any, isExternal: any): void;
