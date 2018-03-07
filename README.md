@@ -40,6 +40,7 @@ tslint  -c tslint.json 'src/**/*.ts'
 - Switch to typescript
 - Override applyPanelTimeOverrides rather than issueQueries to extend time
 - Support numeric unit conversion
+- New rendering pipeline
 
 
 
