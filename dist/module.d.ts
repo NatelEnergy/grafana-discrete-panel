@@ -43,11 +43,14 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     data: any;
     externalPT: boolean;
     isTimeline: boolean;
+    isStacked: boolean;
     hoverPoint: any;
     colorMap: any;
     _colorsPaleteCash: any;
     unitFormats: any;
     formatter: any;
+    _renderDimensions: any;
+    _selectionMatrix: Array<Array<String>>;
     constructor($scope: any, $injector: any);
     onDataError(err: any): void;
     onInitEditMode(): void;
@@ -73,5 +76,14 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     onMouseClicked(where: any): void;
     onMouseSelectedRange(range: any): void;
     clear(): void;
+    _updateRenderDimensions(): void;
+    _updateSelectionMatrix(): void;
+    _updateCanvasSize(): void;
+    _getVal(metricIndex: any, rectIndex: any): any;
+    _getWidth(metricIndex: any, rectIndex: any): number;
+    _renderRects(): void;
+    _renderLabels(): void;
+    _renderSelection(): void;
+    _renderCrosshair(): void;
 }
 export { DiscretePanelCtrl as PanelCtrl };

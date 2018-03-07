@@ -38,7 +38,9 @@ tslint  -c tslint.json 'src/**/*.ts'
 ##### v0.0.7 (not released yet)
 
 - Switch to typescript
-- New rendering pipeline
+- Override applyPanelTimeOverrides rather than issueQueries to extend time
+- Support numeric unit conversion
+- New rendering pipeline (thanks @jonyrock)
 
 
 

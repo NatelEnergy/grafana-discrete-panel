@@ -81,11 +81,14 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.data = null;
                     this.externalPT = false;
                     this.isTimeline = false;
+                    this.isStacked = false;
                     this.hoverPoint = null;
                     this.colorMap = {};
                     this._colorsPaleteCash = null;
                     this.unitFormats = null; // only used for editor
                     this.formatter = null;
+                    this._renderDimensions = {};
+                    this._selectionMatrix = [];
                     // defaults configs
                     lodash_1.default.defaultsDeep(this.panel, this.defaults);
                     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
@@ -109,182 +112,16 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.refresh();
                 };
                 DiscretePanelCtrl.prototype.onRender = function () {
-                    var _this = this;
                     if (this.data == null || !(this.context)) {
                         return;
                     }
-                    //   console.log( 'render', this.data);
-                    var rect = this.wrap.getBoundingClientRect();
-                    var rows = this.data.length;
-                    var rowHeight = this.panel.rowHeight;
-                    var height = rowHeight * rows;
-                    var width = rect.width;
-                    this.canvas.width = width * this._devicePixelRatio;
-                    this.canvas.height = height * this._devicePixelRatio;
-                    jquery_1.default(this.canvas).css('width', width + 'px');
-                    jquery_1.default(this.canvas).css('height', height + 'px');
-                    var ctx = this.context;
-                    ctx.lineWidth = 1;
-                    ctx.textBaseline = 'middle';
-                    ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
-                    ctx.scale(this._devicePixelRatio, this._devicePixelRatio);
-                    // ctx.shadowOffsetX = 1;
-                    // ctx.shadowOffsetY = 1;
-                    // ctx.shadowColor = "rgba(0,0,0,0.3)";
-                    // ctx.shadowBlur = 3;
-                    var top = 0;
-                    var elapsed = this.range.to - this.range.from;
-                    var point = null;
-                    lodash_1.default.forEach(this.data, function (metric) {
-                        var centerV = top + (rowHeight / 2);
-                        // The no-data line
-                        ctx.fillStyle = _this.panel.backgroundColor;
-                        ctx.fillRect(0, top, width, rowHeight);
-                        /*if(!this.panel.writeMetricNames) {
-                          ctx.fillStyle = "#111111";
-                          ctx.textAlign = 'left';
-                          ctx.fillText("No Data", 10, centerV);
-                        }*/
-                        if (_this.isTimeline) {
-                            var lastBS = 0;
-                            point = metric.changes[0];
-                            for (var i = 0; i < metric.changes.length; i++) {
-                                point = metric.changes[i];
-                                if (point.start <= _this.range.to) {
-                                    var xt = Math.max(point.start - _this.range.from, 0);
-                                    point.x = (xt / elapsed) * width;
-                                    ctx.fillStyle = _this.getColor(point.val);
-                                    ctx.fillRect(point.x, top, width, rowHeight);
-                                    if (_this.panel.writeAllValues) {
-                                        ctx.fillStyle = _this.panel.valueTextColor;
-                                        ctx.textAlign = 'left';
-                                        ctx.fillText(point.val, point.x + 7, centerV);
-                                    }
-                                    lastBS = point.x;
-                                }
-                            }
-                        }
-                        else if (_this.panel.display === 'stacked') {
-                            point = null;
-                            var start = _this.range.from;
-                            for (var i = 0; i < metric.legendInfo.length; i++) {
-                                point = metric.legendInfo[i];
-                                var xt = Math.max(start - _this.range.from, 0);
-                                point.x = (xt / elapsed) * width;
-                                ctx.fillStyle = _this.getColor(point.val);
-                                ctx.fillRect(point.x, top, width, rowHeight);
-                                if (_this.panel.writeAllValues) {
-                                    ctx.fillStyle = _this.panel.valueTextColor;
-                                    ctx.textAlign = 'left';
-                                    ctx.fillText(point.val, point.x + 7, centerV);
-                                }
-                                start += point.ms;
-                            }
-                        }
-                        else {
-                            console.log("Not supported yet...", _this);
-                        }
-                        if (top > 0) {
-                            ctx.strokeStyle = _this.panel.lineColor;
-                            ctx.beginPath();
-                            ctx.moveTo(0, top);
-                            ctx.lineTo(width, top);
-                            ctx.stroke();
-                        }
-                        ctx.fillStyle = "#000000";
-                        if (_this.panel.writeMetricNames &&
-                            _this.mouse.position == null &&
-                            (!_this.panel.highlightOnMouseover || _this.panel.highlightOnMouseover)) {
-                            ctx.fillStyle = _this.panel.metricNameColor;
-                            ctx.textAlign = 'left';
-                            ctx.fillText(metric.name, 10, centerV);
-                        }
-                        ctx.textAlign = 'right';
-                        if (_this.mouse.down == null) {
-                            if (_this.panel.highlightOnMouseover && _this.mouse.position != null) {
-                                var next = null;
-                                if (_this.isTimeline) {
-                                    point = metric.changes[0];
-                                    for (var i = 0; i < metric.changes.length; i++) {
-                                        if (metric.changes[i].start > _this.mouse.position.ts) {
-                                            next = metric.changes[i];
-                                            break;
-                                        }
-                                        point = metric.changes[i];
-                                    }
-                                }
-                                else if (_this.panel.display === 'stacked') {
-                                    point = metric.legendInfo[0];
-                                    for (var i = 0; i < metric.legendInfo.length; i++) {
-                                        if (metric.legendInfo[i].x > _this.mouse.position.x) {
-                                            next = metric.legendInfo[i];
-                                            break;
-                                        }
-                                        point = metric.legendInfo[i];
-                                    }
-                                }
-                                // Fill canvas using 'destination-out' and alpha at 0.05
-                                ctx.globalCompositeOperation = 'destination-out';
-                                ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-                                ctx.beginPath();
-                                ctx.fillRect(0, top, point.x, rowHeight);
-                                ctx.fill();
-                                if (next != null) {
-                                    ctx.beginPath();
-                                    ctx.fillRect(next.x, top, width, rowHeight);
-                                    ctx.fill();
-                                }
-                                ctx.globalCompositeOperation = 'source-over';
-                                // Now Draw the value
-                                ctx.fillStyle = "#000000";
-                                ctx.textAlign = 'left';
-                                ctx.fillText(point.val, point.x + 7, centerV);
-                            }
-                            else if (_this.panel.writeLastValue) {
-                                ctx.fillText(point.val, width - 7, centerV);
-                            }
-                        }
-                        top += rowHeight;
-                    });
-                    if (this.isTimeline && this.mouse.position != null) {
-                        if (this.mouse.down != null) {
-                            var xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
-                            var xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
-                            // Fill canvas using 'destination-out' and alpha at 0.05
-                            ctx.globalCompositeOperation = 'destination-out';
-                            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-                            ctx.beginPath();
-                            ctx.fillRect(0, 0, xmin, height);
-                            ctx.fill();
-                            ctx.beginPath();
-                            ctx.fillRect(xmax, 0, width, height);
-                            ctx.fill();
-                            ctx.globalCompositeOperation = 'source-over';
-                        }
-                        else {
-                            ctx.strokeStyle = '#111';
-                            ctx.beginPath();
-                            ctx.moveTo(this.mouse.position.x, 0);
-                            ctx.lineTo(this.mouse.position.x, height);
-                            ctx.lineWidth = 3;
-                            ctx.stroke();
-                            ctx.beginPath();
-                            ctx.moveTo(this.mouse.position.x, 0);
-                            ctx.lineTo(this.mouse.position.x, height);
-                            ctx.strokeStyle = '#e22c14';
-                            ctx.lineWidth = 2;
-                            ctx.stroke();
-                            if (this.externalPT && rows > 1) {
-                                ctx.beginPath();
-                                ctx.arc(this.mouse.position.x, this.mouse.position.y, 3, 0, 2 * Math.PI, false);
-                                ctx.fillStyle = '#e22c14';
-                                ctx.fill();
-                                ctx.lineWidth = 1;
-                                ctx.strokeStyle = '#111';
-                                ctx.stroke();
-                            }
-                        }
-                    }
+                    this._updateRenderDimensions();
+                    this._updateSelectionMatrix();
+                    this._updateCanvasSize();
+                    this._renderRects();
+                    this._renderLabels();
+                    this._renderSelection();
+                    this._renderCrosshair();
                 };
                 DiscretePanelCtrl.prototype.showLegandTooltip = function (pos, info) {
                     var body = '<div class="graph-tooltip-time">' + info.val + '</div>';
@@ -364,7 +201,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 DiscretePanelCtrl.prototype.applyPanelTimeOverrides = function () {
                     _super.prototype.applyPanelTimeOverrides.call(this);
                     if (this.panel.expandFromQueryS > 0) {
-                        console.log("Expand Query: ", this.panel.expandFromQueryS);
                         var from = this.range.from.subtract(this.panel.expandFromQueryS, 's');
                         this.range.from = from;
                         this.range.raw.from = from;
@@ -459,7 +295,8 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 DiscretePanelCtrl.prototype.onConfigChanged = function (update) {
                     if (update === void 0) { update = false; }
                     //console.log( "Config changed...");
-                    this.isTimeline = true; //this.panel.display == 'timeline';
+                    this.isTimeline = this.panel.display == 'timeline';
+                    this.isStacked = this.panel.display == 'stacked';
                     this.formatter = null;
                     if (this.panel.units && 'none' != this.panel.units) {
                         this.formatter = kbn_1.default.valueFormats[this.panel.units];
@@ -578,7 +415,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             this.onRender(); // refresh the view
                         }
                         else if (!isExternal) {
-                            if (this.panel.display === 'stacked') {
+                            if (this.isStacked) {
                                 hover = this.data[j].legendInfo[0];
                                 for (var i = 0; i < this.data[j].legendInfo.length; i++) {
                                     if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
@@ -618,6 +455,267 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     jquery_1.default(this.canvas).css('cursor', 'wait');
                     app_events_1.default.emit('graph-hover-clear');
                     this.render();
+                };
+                DiscretePanelCtrl.prototype._updateRenderDimensions = function () {
+                    var _this = this;
+                    this._renderDimensions = {};
+                    var rect = this._renderDimensions.rect = this.wrap.getBoundingClientRect();
+                    var rows = this._renderDimensions.rows = this.data.length;
+                    var rowHeight = this._renderDimensions.rowHeight = this.panel.rowHeight;
+                    var height = this._renderDimensions.height = rowHeight * rows;
+                    var width = this._renderDimensions.width = rect.width;
+                    var rectHeight = this._renderDimensions.rectHeight = rowHeight;
+                    var top = 0;
+                    var elapsed = this.range.to - this.range.from;
+                    this._renderDimensions.matrix = [];
+                    lodash_1.default.forEach(this.data, function (metric) {
+                        var positions = [];
+                        if (_this.isTimeline) {
+                            var lastBS = 0;
+                            var point = metric.changes[0];
+                            for (var i = 0; i < metric.changes.length; i++) {
+                                point = metric.changes[i];
+                                if (point.start <= _this.range.to) {
+                                    var xt = Math.max(point.start - _this.range.from, 0);
+                                    var x = (xt / elapsed) * width;
+                                    positions.push(x);
+                                }
+                            }
+                        }
+                        if (_this.isStacked) {
+                            var point = null;
+                            var start = _this.range.from;
+                            for (var i = 0; i < metric.legendInfo.length; i++) {
+                                point = metric.legendInfo[i];
+                                var xt = Math.max(start - _this.range.from, 0);
+                                var x = (xt / elapsed) * width;
+                                positions.push(x);
+                                start += point.ms;
+                            }
+                        }
+                        _this._renderDimensions.matrix.push({
+                            y: top,
+                            positions: positions
+                        });
+                        top += rowHeight;
+                    });
+                };
+                DiscretePanelCtrl.prototype._updateSelectionMatrix = function () {
+                    var selectionPredicates = {
+                        all: function () { return true; },
+                        crosshairHover: function (i, j) {
+                            if (j + 1 === this.data[i].changes.length) {
+                                return this.data[i].changes[j].start <= this.mouse.position.ts;
+                            }
+                            return this.data[i].changes[j].start <= this.mouse.position.ts &&
+                                this.mouse.position.ts < this.data[i].changes[j + 1].start;
+                        },
+                        mouseX: function (i, j) {
+                            var row = this._renderDimensions.matrix[i];
+                            if (j + 1 === row.positions.length) {
+                                return row.positions[j] <= this.mouse.position.x;
+                            }
+                            return row.positions[j] <= this.mouse.position.x &&
+                                this.mouse.position.x < row.positions[j + 1];
+                        },
+                        metric: function (i) {
+                            return this.data[i] === this._selectedMetric;
+                        },
+                        legendItem: function (i, j) {
+                            if (this.data[i] !== this._selectedMetric) {
+                                return false;
+                            }
+                            return this._selectedLegendItem.val === this._getVal(i, j);
+                        }
+                    };
+                    function getPredicate() {
+                        if (this._selectedLegendItem !== undefined) {
+                            return 'legendItem';
+                        }
+                        ;
+                        if (this._selectedMetric !== undefined) {
+                            return 'metric';
+                        }
+                        ;
+                        if (this.mouse.down !== null) {
+                            return 'all';
+                        }
+                        if (this.panel.highlightOnMouseover && this.mouse.position != null) {
+                            if (this.isTimeline) {
+                                return 'crosshairHover';
+                            }
+                            if (this.isStacked) {
+                                return 'mouseX';
+                            }
+                        }
+                        return 'all';
+                    }
+                    var pn = getPredicate.bind(this)();
+                    var predicate = selectionPredicates[pn].bind(this);
+                    this._selectionMatrix = [];
+                    for (var i = 0; i < this._renderDimensions.matrix.length; i++) {
+                        var rs = [];
+                        var r = this._renderDimensions.matrix[i];
+                        for (var j = 0; j < r.positions.length; j++) {
+                            rs.push(predicate(i, j));
+                        }
+                        this._selectionMatrix.push(rs);
+                    }
+                };
+                DiscretePanelCtrl.prototype._updateCanvasSize = function () {
+                    this.canvas.width = this._renderDimensions.width * this._devicePixelRatio;
+                    this.canvas.height = this._renderDimensions.height * this._devicePixelRatio;
+                    jquery_1.default(this.canvas).css('width', this._renderDimensions.width + 'px');
+                    jquery_1.default(this.canvas).css('height', this._renderDimensions.height + 'px');
+                    this.context.scale(this._devicePixelRatio, this._devicePixelRatio);
+                };
+                DiscretePanelCtrl.prototype._getVal = function (metricIndex, rectIndex) {
+                    var point = undefined;
+                    if (this.isTimeline) {
+                        point = this.data[metricIndex].changes[rectIndex];
+                    }
+                    if (this.isStacked) {
+                        point = this.data[metricIndex].legendInfo[rectIndex];
+                    }
+                    return point.val;
+                };
+                DiscretePanelCtrl.prototype._getWidth = function (metricIndex, rectIndex) {
+                    var positions = this._renderDimensions.matrix[metricIndex].positions;
+                    if (rectIndex + 1 === positions.length) {
+                        return this._renderDimensions.width - positions[rectIndex];
+                    }
+                    return positions[rectIndex + 1] - positions[rectIndex];
+                };
+                DiscretePanelCtrl.prototype._renderRects = function () {
+                    var _this = this;
+                    var matrix = this._renderDimensions.matrix;
+                    var ctx = this.context;
+                    lodash_1.default.forEach(this.data, function (metric, i) {
+                        var rowObj = matrix[i];
+                        for (var j = 0; j < rowObj.positions.length; j++) {
+                            var currentX = rowObj.positions[j];
+                            var nextX = _this._renderDimensions.width;
+                            if (j + 1 !== rowObj.positions.length) {
+                                nextX = rowObj.positions[j + 1];
+                            }
+                            ctx.fillStyle = _this.getColor(_this._getVal(i, j));
+                            var globalAlphaTemp = ctx.globalAlpha;
+                            if (!_this._selectionMatrix[i][j]) {
+                                ctx.globalAlpha = 0.3;
+                            }
+                            ctx.fillRect(currentX, matrix[i].y, nextX - currentX, _this._renderDimensions.rectHeight);
+                            ctx.globalAlpha = globalAlphaTemp;
+                        }
+                    });
+                };
+                DiscretePanelCtrl.prototype._renderLabels = function () {
+                    var _this = this;
+                    var ctx = this.context;
+                    ctx.lineWidth = 1;
+                    ctx.textBaseline = 'middle';
+                    ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
+                    function findLength(text, width) {
+                        for (var length = 1; length < text.length + 1; length++) {
+                            var testLine = text.substr(0, length);
+                            var measure = ctx.measureText(testLine);
+                            if (measure.width > width) {
+                                break;
+                            }
+                        }
+                        return text.substr(0, length - 1);
+                    }
+                    lodash_1.default.forEach(this.data, function (metric, i) {
+                        var _a = _this._renderDimensions.matrix[i], y = _a.y, positions = _a.positions;
+                        var rectHeight = _this._renderDimensions.rectHeight;
+                        var centerV = y + (rectHeight / 2);
+                        var labelPositionMetricName = y + rectHeight - _this.panel.textSize / 2;
+                        var labelPositionLastValue = y + rectHeight - _this.panel.textSize / 2;
+                        var labelPositionValue = y + _this.panel.textSize / 2;
+                        if (_this.mouse.position == null) {
+                            if (_this.panel.writeMetricNames) {
+                                ctx.fillStyle = _this.panel.metricNameColor;
+                                ctx.textAlign = 'left';
+                                ctx.fillText(metric.name, 10, labelPositionMetricName);
+                            }
+                            if (_this.panel.writeLastValue) {
+                                var val = _this._getVal(i, positions.length - 1);
+                                ctx.fillStyle = _this.panel.valueTextColor;
+                                ctx.textAlign = 'right';
+                                ctx.fillText(val, _this._renderDimensions.width, labelPositionLastValue);
+                            }
+                        }
+                        else {
+                            for (var j = 0; j < positions.length; j++) {
+                                if (positions[j] <= _this.mouse.position.x) {
+                                    if (j >= positions.length - 1 || positions[j + 1] >= _this.mouse.position.x) {
+                                        var val = _this._getVal(i, j);
+                                        ctx.fillStyle = _this.panel.valueTextColor;
+                                        ctx.textAlign = 'left';
+                                        ctx.fillText(val, positions[j], labelPositionValue);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (_this.panel.writeAllValues) {
+                            ctx.fillStyle = _this.panel.valueTextColor;
+                            ctx.textAlign = 'left';
+                            for (var j = 0; j < positions.length; j++) {
+                                var val = _this._getVal(i, j);
+                                var width = _this._getWidth(i, j);
+                                var cval = findLength(val, width);
+                                ctx.fillText(cval, positions[j], labelPositionValue);
+                            }
+                        }
+                    });
+                };
+                DiscretePanelCtrl.prototype._renderSelection = function () {
+                    if (this.mouse.down === null) {
+                        return;
+                    }
+                    if (this.mouse.position === null) {
+                        return;
+                    }
+                    if (!this.isTimeline) {
+                        return;
+                    }
+                    var ctx = this.context;
+                    var height = this._renderDimensions.height;
+                    var xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
+                    var xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
+                    ctx.fillStyle = "rgba(110, 110, 110, 0.5)";
+                    ctx.strokeStyle = "rgba(110, 110, 110, 0.5)";
+                    ctx.beginPath();
+                    ctx.fillRect(xmin, 0, xmax - xmin, height);
+                    ctx.strokeRect(xmin, 0, xmax - xmin, height);
+                };
+                DiscretePanelCtrl.prototype._renderCrosshair = function () {
+                    if (this.mouse.down != null) {
+                        return;
+                    }
+                    if (this.mouse.position === null) {
+                        return;
+                    }
+                    if (!this.isTimeline) {
+                        return;
+                    }
+                    var ctx = this.context;
+                    var rows = this.data.length;
+                    var rowHeight = this.panel.rowHeight;
+                    var height = this._renderDimensions.height;
+                    ctx.beginPath();
+                    ctx.moveTo(this.mouse.position.x, 0);
+                    ctx.lineTo(this.mouse.position.x, height);
+                    ctx.strokeStyle = this.panel.crosshairColor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    if (this.externalPT && rows > 1) {
+                        ctx.beginPath();
+                        ctx.arc(this.mouse.position.x, this.mouse.position.y, 3, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = this.panel.crosshairColor;
+                        ctx.fill();
+                        ctx.lineWidth = 1;
+                    }
                 };
                 DiscretePanelCtrl.templateUrl = 'partials/module.html';
                 return DiscretePanelCtrl;
