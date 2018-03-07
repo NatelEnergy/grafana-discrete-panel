@@ -683,9 +683,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       var rectHeight = this._renderDimensions.rectHeight;
 
       var centerV = y + (rectHeight / 2);
-      var labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
-      var labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
-      var labelPositionValue = y + this.panel.textSize / 2;
+      // var labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
+      // var labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
+      // var labelPositionValue = y + this.panel.textSize / 2;
+      var labelPositionMetricName = y + (rectHeight / 2);
+      var labelPositionLastValue = labelPositionMetricName;
+      var labelPositionValue = labelPositionMetricName;
 
       if (this.mouse.position == null) {
         if (this.panel.writeMetricNames) {
@@ -773,6 +776,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.lineWidth = 1;
     ctx.stroke();
 
+    // Draw a Circle around the point if showing a tooltip
     if (this.externalPT && rows > 1) {
       ctx.beginPath();
       ctx.arc(this.mouse.position.x, this.mouse.position.y, 3, 0, 2 * Math.PI, false);

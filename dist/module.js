@@ -628,9 +628,12 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         var _a = _this._renderDimensions.matrix[i], y = _a.y, positions = _a.positions;
                         var rectHeight = _this._renderDimensions.rectHeight;
                         var centerV = y + (rectHeight / 2);
-                        var labelPositionMetricName = y + rectHeight - _this.panel.textSize / 2;
-                        var labelPositionLastValue = y + rectHeight - _this.panel.textSize / 2;
-                        var labelPositionValue = y + _this.panel.textSize / 2;
+                        // var labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
+                        // var labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
+                        // var labelPositionValue = y + this.panel.textSize / 2;
+                        var labelPositionMetricName = y + (rectHeight / 2);
+                        var labelPositionLastValue = labelPositionMetricName;
+                        var labelPositionValue = labelPositionMetricName;
                         if (_this.mouse.position == null) {
                             if (_this.panel.writeMetricNames) {
                                 ctx.fillStyle = _this.panel.metricNameColor;
@@ -709,6 +712,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     ctx.strokeStyle = this.panel.crosshairColor;
                     ctx.lineWidth = 1;
                     ctx.stroke();
+                    // Draw a Circle around the point if showing a tooltip
                     if (this.externalPT && rows > 1) {
                         ctx.beginPath();
                         ctx.arc(this.mouse.position.x, this.mouse.position.y, 3, 0, 2 * Math.PI, false);
