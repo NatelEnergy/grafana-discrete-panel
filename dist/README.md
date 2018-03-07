@@ -38,6 +38,7 @@ tslint  -c tslint.json 'src/**/*.ts'
 ##### v0.0.7 (not released yet)
 
 - Switch to typescript
+- New rendering pipeline
 
 
 
