@@ -665,6 +665,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.textBaseline = 'middle';
     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
+    // What is this supposed to do?
     function findLength(text, width) {
       for (let length = 1; length < text.length + 1; length++) {
         let testLine = text.substr(0, length);
@@ -676,6 +677,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       return text.substr(0, length - 1);
     }
+
+    const offset = 2;
 
     _.forEach(this.data, (metric, i) => {
       let { y, positions } = this._renderDimensions.matrix[i];
@@ -693,13 +696,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if (this.panel.writeMetricNames) {
           ctx.fillStyle = this.panel.metricNameColor;
           ctx.textAlign = 'left';
-          ctx.fillText(metric.name, 10, labelPositionMetricName);
+          ctx.fillText(metric.name, offset, labelPositionMetricName);
         }
         if (this.panel.writeLastValue) {
           let val = this._getVal(i, positions.length - 1);
           ctx.fillStyle = this.panel.valueTextColor;
           ctx.textAlign = 'right';
-          ctx.fillText(val, this._renderDimensions.width, labelPositionLastValue);
+          ctx.fillText(val, this._renderDimensions.width-offset, labelPositionLastValue);
         }
       } else {
         for (let j = 0; j < positions.length; j++) {
@@ -708,7 +711,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
               let val = this._getVal(i, j);
               ctx.fillStyle = this.panel.valueTextColor;
               ctx.textAlign = 'left';
-              ctx.fillText(val, positions[j], labelPositionValue);
+              ctx.fillText(val, positions[j]+offset, labelPositionValue);
               break;
             }
           }
@@ -719,10 +722,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.fillStyle = this.panel.valueTextColor;
         ctx.textAlign = 'left';
         for (let j = 0; j < positions.length; j++) {
-          let val = this._getVal(i, j);
-          let width = this._getWidth(i, j);
-          let cval = findLength(val, width);
-          ctx.fillText(cval, positions[j], labelPositionValue);
+          const val = this._getVal(i, j);
+          const width = this._getWidth(i, j);
+          //let cval = findLength(val, width);
+          ctx.fillText(val, positions[j]+offset, labelPositionValue);
         }
       }
     });
