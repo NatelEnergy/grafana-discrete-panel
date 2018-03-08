@@ -161,16 +161,16 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         val = val.toString(); // convert everything to a string
                     }
                     for (var i = 0; i < this.panel.valueMaps.length; i++) {
-                        var map_1 = this.panel.valueMaps[i];
+                        var map = this.panel.valueMaps[i];
                         // special null case
-                        if (map_1.value === 'null') {
+                        if (map.value === 'null') {
                             if (isNull) {
-                                return map_1.text;
+                                return map.text;
                             }
                             continue;
                         }
-                        if (val === map_1.value) {
-                            return map_1.text;
+                        if (val === map.value) {
+                            return map.text;
                         }
                     }
                     if (isNull) {
@@ -197,7 +197,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     }
                     return color;
                 };
-                // Override the 
+                // Override the
                 DiscretePanelCtrl.prototype.applyPanelTimeOverrides = function () {
                     _super.prototype.applyPanelTimeOverrides.call(this);
                     if (this.panel.expandFromQueryS > 0) {
@@ -295,10 +295,10 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 DiscretePanelCtrl.prototype.onConfigChanged = function (update) {
                     if (update === void 0) { update = false; }
                     //console.log( "Config changed...");
-                    this.isTimeline = this.panel.display == 'timeline';
-                    this.isStacked = this.panel.display == 'stacked';
+                    this.isTimeline = this.panel.display === 'timeline';
+                    this.isStacked = this.panel.display === 'stacked';
                     this.formatter = null;
-                    if (this.panel.units && 'none' != this.panel.units) {
+                    if (this.panel.units && 'none' !== this.panel.units) {
                         this.formatter = kbn_1.default.valueFormats[this.panel.units];
                     }
                     if (update) {
@@ -532,11 +532,9 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         if (this._selectedLegendItem !== undefined) {
                             return 'legendItem';
                         }
-                        ;
                         if (this._selectedMetric !== undefined) {
                             return 'metric';
                         }
-                        ;
                         if (this.mouse.down !== null) {
                             return 'all';
                         }
@@ -614,9 +612,10 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     ctx.lineWidth = 1;
                     ctx.textBaseline = 'middle';
                     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
+                    // What is this supposed to do?
                     function findLength(text, width) {
-                        for (var length = 1; length < text.length + 1; length++) {
-                            var testLine = text.substr(0, length);
+                        for (var length_1 = 1; length_1 < text.length + 1; length_1++) {
+                            var testLine = text.substr(0, length_1);
                             var measure = ctx.measureText(testLine);
                             if (measure.width > width) {
                                 break;
@@ -624,13 +623,14 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         }
                         return text.substr(0, length - 1);
                     }
+                    var offset = 2;
                     lodash_1.default.forEach(this.data, function (metric, i) {
                         var _a = _this._renderDimensions.matrix[i], y = _a.y, positions = _a.positions;
                         var rectHeight = _this._renderDimensions.rectHeight;
                         var centerV = y + (rectHeight / 2);
-                        // var labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
-                        // var labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
-                        // var labelPositionValue = y + this.panel.textSize / 2;
+                        // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
+                        // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
+                        // let labelPositionValue = y + this.panel.textSize / 2;
                         var labelPositionMetricName = y + (rectHeight / 2);
                         var labelPositionLastValue = labelPositionMetricName;
                         var labelPositionValue = labelPositionMetricName;
@@ -638,13 +638,13 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             if (_this.panel.writeMetricNames) {
                                 ctx.fillStyle = _this.panel.metricNameColor;
                                 ctx.textAlign = 'left';
-                                ctx.fillText(metric.name, 10, labelPositionMetricName);
+                                ctx.fillText(metric.name, offset, labelPositionMetricName);
                             }
                             if (_this.panel.writeLastValue) {
                                 var val = _this._getVal(i, positions.length - 1);
                                 ctx.fillStyle = _this.panel.valueTextColor;
                                 ctx.textAlign = 'right';
-                                ctx.fillText(val, _this._renderDimensions.width, labelPositionLastValue);
+                                ctx.fillText(val, _this._renderDimensions.width - offset, labelPositionLastValue);
                             }
                         }
                         else {
@@ -654,7 +654,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                         var val = _this._getVal(i, j);
                                         ctx.fillStyle = _this.panel.valueTextColor;
                                         ctx.textAlign = 'left';
-                                        ctx.fillText(val, positions[j], labelPositionValue);
+                                        ctx.fillText(val, positions[j] + offset, labelPositionValue);
                                         break;
                                     }
                                 }
@@ -666,8 +666,8 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             for (var j = 0; j < positions.length; j++) {
                                 var val = _this._getVal(i, j);
                                 var width = _this._getWidth(i, j);
-                                var cval = findLength(val, width);
-                                ctx.fillText(cval, positions[j], labelPositionValue);
+                                //let cval = findLength(val, width);
+                                ctx.fillText(val, positions[j] + offset, labelPositionValue);
                             }
                         }
                     });
