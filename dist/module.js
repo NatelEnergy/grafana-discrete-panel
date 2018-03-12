@@ -722,6 +722,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     }
                 };
                 DiscretePanelCtrl.templateUrl = 'partials/module.html';
+                DiscretePanelCtrl.scrollable = true;
                 return DiscretePanelCtrl;
             })(canvas_metric_1.CanvasPanelCtrl);
             exports_1("PanelCtrl", DiscretePanelCtrl);
