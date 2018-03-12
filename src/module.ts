@@ -727,60 +727,59 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.textBaseline = 'middle';
     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
-    // What is this supposed to do?
-    function findLength(text, width) {
-      for (let length = 1; length < text.length + 1; length++) {
-        let testLine = text.substr(0, length);
-        let measure = ctx.measureText(testLine);
-        if (measure.width > width) {
-          break;
-        }
-      }
-
-      return text.substr(0, length - 1);
-    }
-
     const offset = 2;
-
     const rectHeight = this._renderDimensions.rectHeight;
     _.forEach(this.data, (metric, i) => {
       const {y, positions} = this._renderDimensions.matrix[i];
 
-      let centerV = y + rectHeight / 2;
+      const centerY = y + rectHeight / 2;
       // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
       // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
       // let labelPositionValue = y + this.panel.textSize / 2;
-      let labelPositionMetricName = y + rectHeight / 2;
-      let labelPositionLastValue = labelPositionMetricName;
-      let labelPositionValue = labelPositionMetricName;
+      let labelPositionMetricName = centerY;
+      let labelPositionLastValue = centerY;
+      let labelPositionValue = centerY;
 
-      if (this.mouse.position == null) {
-        if (this.panel.writeMetricNames) {
-          ctx.fillStyle = this.panel.metricNameColor;
-          ctx.textAlign = 'left';
-          ctx.fillText(metric.name, offset, labelPositionMetricName);
-        }
-        if (this.panel.writeLastValue) {
-          let val = this._getVal(i, positions.length - 1);
-          ctx.fillStyle = this.panel.valueTextColor;
-          ctx.textAlign = 'right';
-          ctx.fillText(
-            val,
-            this._renderDimensions.width - offset,
-            labelPositionLastValue
-          );
-        }
-      } else {
+      let hoverTextStart = -1;
+      let hoverTextEnd = -1;
+
+      if (this.mouse.position) {
         for (let j = 0; j < positions.length; j++) {
           if (positions[j] <= this.mouse.position.x) {
             if (j >= positions.length - 1 || positions[j + 1] >= this.mouse.position.x) {
               let val = this._getVal(i, j);
               ctx.fillStyle = this.panel.valueTextColor;
               ctx.textAlign = 'left';
-              ctx.fillText(val, positions[j] + offset, labelPositionValue);
+              hoverTextStart = positions[j] + offset;
+              ctx.fillText(val, hoverTextStart, labelPositionValue);
+              const txtinfo = ctx.measureText(val);
+              hoverTextEnd = hoverTextStart + txtinfo.width;
               break;
             }
           }
+        }
+      }
+
+      if (this.panel.writeMetricNames) {
+        ctx.fillStyle = this.panel.metricNameColor;
+        ctx.textAlign = 'left';
+        const txtinfo = ctx.measureText(metric.name);
+        if (hoverTextStart < 0 || hoverTextStart > txtinfo.width) {
+          ctx.fillText(metric.name, offset, labelPositionMetricName);
+        }
+      }
+      if (this.panel.writeLastValue) {
+        let val = this._getVal(i, positions.length - 1);
+        ctx.fillStyle = this.panel.valueTextColor;
+        ctx.textAlign = 'right';
+        const txtinfo = ctx.measureText(val);
+        const xval = this._renderDimensions.width - offset - txtinfo.width;
+        if (xval > hoverTextEnd) {
+          ctx.fillText(
+            val,
+            this._renderDimensions.width - offset,
+            labelPositionLastValue
+          );
         }
       }
 
@@ -789,18 +788,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.textAlign = 'left';
         for (let j = 0; j < positions.length; j++) {
           const val = this._getVal(i, j);
-
           let nextX = this._renderDimensions.width;
           if (j + 1 !== positions.length) {
             nextX = positions[j + 1];
           }
           const width = nextX - positions[j];
 
+          // This clips the text within the given bounds
           ctx.save();
           ctx.rect(positions[j], y, width, rectHeight);
           ctx.clip();
 
-          //let cval = findLength(val, width);
           ctx.fillText(val, positions[j] + offset, labelPositionValue);
           ctx.restore();
         }
