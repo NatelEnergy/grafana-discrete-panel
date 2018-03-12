@@ -11,10 +11,6 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
       op: string;
       text: string;
     }[];
-    mappingTypes: {
-      name: string;
-      value: number;
-    }[];
     rangeMaps: {
       from: string;
       to: string;
@@ -39,6 +35,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     showLegendValues: boolean;
     showLegendPercent: boolean;
     highlightOnMouseover: boolean;
+    expandFromQueryS: number;
     legendSortBy: string;
     units: string;
   };

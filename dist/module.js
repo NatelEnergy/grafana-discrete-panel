@@ -120,10 +120,6 @@ System.register(
               display: 'timeline',
               rowHeight: 50,
               valueMaps: [{value: 'null', op: '=', text: 'N/A'}],
-              mappingTypes: [
-                {name: 'value to text', value: 1},
-                {name: 'range to text', value: 2},
-              ],
               rangeMaps: [{from: 'null', to: 'null', text: 'N/A'}],
               colorMaps: [{text: 'N/A', color: '#CCC'}],
               metricNameColor: '#000000',
@@ -141,6 +137,7 @@ System.register(
               showLegendValues: true,
               showLegendPercent: true,
               highlightOnMouseover: true,
+              expandFromQueryS: 0,
               legendSortBy: '-ms',
               units: 'short',
             };
@@ -282,7 +279,7 @@ System.register(
           // Override the
           DiscretePanelCtrl.prototype.applyPanelTimeOverrides = function() {
             _super.prototype.applyPanelTimeOverrides.call(this);
-            if (this.panel.expandFromQueryS > 0) {
+            if (this.panel.expandFromQueryS && this.panel.expandFromQueryS > 0) {
               var from = this.range.from.subtract(this.panel.expandFromQueryS, 's');
               this.range.from = from;
               this.range.raw.from = from;

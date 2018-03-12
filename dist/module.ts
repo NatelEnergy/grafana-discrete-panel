@@ -77,10 +77,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   static scrollable = true;
 
   defaults = {
-    display: 'timeline',
+    display: 'timeline', // or 'stacked'
     rowHeight: 50,
     valueMaps: [{value: 'null', op: '=', text: 'N/A'}],
-    mappingTypes: [{name: 'value to text', value: 1}, {name: 'range to text', value: 2}],
     rangeMaps: [{from: 'null', to: 'null', text: 'N/A'}],
     colorMaps: [{text: 'N/A', color: '#CCC'}],
     metricNameColor: '#000000',
@@ -98,6 +97,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     showLegendValues: true,
     showLegendPercent: true,
     highlightOnMouseover: true,
+    expandFromQueryS: 0,
     legendSortBy: '-ms',
     units: 'short',
   };
@@ -266,7 +266,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   applyPanelTimeOverrides() {
     super.applyPanelTimeOverrides();
 
-    if (this.panel.expandFromQueryS > 0) {
+    if (this.panel.expandFromQueryS && this.panel.expandFromQueryS > 0) {
       let from = this.range.from.subtract(this.panel.expandFromQueryS, 's');
       this.range.from = from;
       this.range.raw.from = from;
