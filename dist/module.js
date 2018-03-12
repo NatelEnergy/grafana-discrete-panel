@@ -6,7 +6,11 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
     var canvas_metric_1, distinct_points_1, lodash_1, jquery_1, moment_1, kbn_1, app_events_1;
-    var grafanaColors, DiscretePanelCtrl;
+    var grafanaColors,
+    
+    DiscretePanelCtrl;
+
+
     return {
         setters:[
             function (canvas_metric_1_1) {
