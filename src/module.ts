@@ -694,21 +694,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     return point.val;
   }
 
-  _getWidth(metricIndex, rectIndex) {
-    let positions = this._renderDimensions.matrix[metricIndex].positions;
-    if (rectIndex + 1 === positions.length) {
-      return this._renderDimensions.width - positions[rectIndex];
-    }
-    return positions[rectIndex + 1] - positions[rectIndex];
-  }
-
   _renderRects() {
-    let matrix = this._renderDimensions.matrix;
-    let ctx = this.context;
+    const matrix = this._renderDimensions.matrix;
+    const ctx = this.context;
     _.forEach(this.data, (metric, i) => {
-      let rowObj = matrix[i];
+      const rowObj = matrix[i];
       for (let j = 0; j < rowObj.positions.length; j++) {
-        let currentX = rowObj.positions[j];
+        const currentX = rowObj.positions[j];
         let nextX = this._renderDimensions.width;
         if (j + 1 !== rowObj.positions.length) {
           nextX = rowObj.positions[j + 1];
@@ -750,9 +742,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     const offset = 2;
 
+    const rectHeight = this._renderDimensions.rectHeight;
     _.forEach(this.data, (metric, i) => {
-      let {y, positions} = this._renderDimensions.matrix[i];
-      let rectHeight = this._renderDimensions.rectHeight;
+      const {y, positions} = this._renderDimensions.matrix[i];
 
       let centerV = y + rectHeight / 2;
       // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
@@ -797,9 +789,20 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.textAlign = 'left';
         for (let j = 0; j < positions.length; j++) {
           const val = this._getVal(i, j);
-          const width = this._getWidth(i, j);
+
+          let nextX = this._renderDimensions.width;
+          if (j + 1 !== positions.length) {
+            nextX = positions[j + 1];
+          }
+          const width = nextX - positions[j];
+
+          ctx.save();
+          ctx.rect(positions[j], y, width, rectHeight);
+          ctx.clip();
+
           //let cval = findLength(val, width);
           ctx.fillText(val, positions[j] + offset, labelPositionValue);
+          ctx.restore();
         }
       }
     });
