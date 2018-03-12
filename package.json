@@ -4,20 +4,24 @@
   "description": "Discrete Events in Grafana",
   "scripts": {
     "build": "grunt",
-    "test": "./node_modules/karma/bin/karma start"
+    "test": "./node_modules/karma/bin/karma start",
+    "precommit": "pretty-quick --staged",
+    "pretty": "prettier --write src/**/*.ts"
   },
   "author": "ryantxu",
   "license": "MIT",
-  "keywords": [
-    "discrete",
-    "canvas",
-    "grafana",
-    "plugin",
-    "panel"
-  ],
+  "keywords": ["discrete", "canvas", "grafana", "plugin", "panel"],
   "repository": {
     "type": "git",
     "url": "https://github.com/NatelEnergy/grafana-discrete-panel.git"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "useTabs": false,
+    "printWidth": 90,
+    "bracketSpacing": false,
+    "semi": true
   },
   "dependencies": {
     "lodash": "^4.17.4",
@@ -34,6 +38,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-string-replace": "^1.3",
     "grunt-typescript": "^0.8.0",
+    "husky": "^0.14.3",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-expect": "^1.1.3",
@@ -41,9 +46,11 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-sinon": "^1.0.5",
     "karma-systemjs": "^0.16.0",
+    "load-grunt-tasks": "^3.5.2",
     "plugin-typescript": "^7.1.0",
+    "prettier": "1.11.1",
+    "pretty-quick": "^1.4.1",
     "sinon": "^3.2.1",
-    "systemjs-plugin-css": "^0.1.35",
-    "load-grunt-tasks": "^3.5.2"
+    "systemjs-plugin-css": "^0.1.35"
   }
 }
