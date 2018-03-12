@@ -85,8 +85,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     metricNameColor: '#000000',
     valueTextColor: '#000000',
     crosshairColor: '#8F070C',
-    backgroundColor: 'rgba(128, 128, 128, 0.1)',
-    lineColor: 'rgba(128, 128, 128, 0.5)',
+    backgroundColor: 'rgba(128,128,128,0.1)',
+    lineColor: 'rgba(0,0,0,0.1)',
     textSize: 24,
     extendLastValue: true,
     writeLastValue: true,
@@ -719,7 +719,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.globalAlpha = globalAlphaTemp;
       }
 
-      if (i>0) {
+      if (i > 0) {
         const top = matrix[i].y;
         ctx.strokeStyle = this.panel.lineColor;
         ctx.beginPath();
