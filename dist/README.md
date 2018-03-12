@@ -23,17 +23,15 @@ yarn install --pure-lockfile
 grunt
 ```
 
-To Check tslint:
+To lint everything:
 
 ```
-yarn global add tslint typescript
-
-tslint  -c tslint.json 'src/**/*.ts'
+yarn pretty
 ```
 
 #### Changelog
 
-##### v0.0.7 (not released yet)
+##### v0.0.7
 
 * Switch to typescript
 * Override applyPanelTimeOverrides rather than issueQueries to extend time
