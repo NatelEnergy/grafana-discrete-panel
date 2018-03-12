@@ -48,6 +48,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ],
     metricNameColor: '#000000',
     valueTextColor: '#000000',
+    crosshairColor: '#8F070C',
     backgroundColor: 'rgba(128, 128, 128, 0.1)',
     lineColor: 'rgba(128, 128, 128, 1.0)',
     textSize: 24,
@@ -285,8 +286,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       _.forEach(this.data, (metric) => {
         if (metric.legendInfo) {
           _.forEach(metric.legendInfo, (info) => {
-            if (!_.has(info.val)) {
-              this.panel.colorMaps.push({text: info.val, color: this.getColor(info.val) });
+            if (!_.has(this.colorMap, info.val)) {
+              let v = {text: info.val, color: this.getColor(info.val) };
+              this.panel.colorMaps.push(v);
+              this.colorMap[info.val] = v;
             }
           });
         }

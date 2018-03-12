@@ -41,6 +41,7 @@ tslint  -c tslint.json 'src/**/*.ts'
 - Override applyPanelTimeOverrides rather than issueQueries to extend time
 - Support numeric unit conversion
 - New rendering pipeline (thanks @jonyrock)
+- Don't detect duplicate colors from metrics
 
 
 
