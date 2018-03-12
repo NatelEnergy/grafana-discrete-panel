@@ -2,6 +2,7 @@
 import { CanvasPanelCtrl } from './canvas-metric';
 declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     static templateUrl: string;
+    static scrollable: boolean;
     defaults: {
         display: string;
         rowHeight: number;

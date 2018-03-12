@@ -28,6 +28,7 @@ const grafanaColors = [
 
 class DiscretePanelCtrl extends CanvasPanelCtrl {
   static templateUrl = 'partials/module.html';
+  static scrollable = true;
 
   defaults = {
     display: 'timeline',
