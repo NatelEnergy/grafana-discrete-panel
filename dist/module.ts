@@ -5,7 +5,6 @@ import config from 'app/core/config';
 import {CanvasPanelCtrl} from './canvas-metric';
 import {DistinctPoints} from './distinct-points';
 
-
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
@@ -14,17 +13,64 @@ import kbn from 'app/core/utils/kbn';
 import appEvents from 'app/core/app_events';
 
 const grafanaColors = [
-  "#7EB26D", "#EAB839", "#6ED0E0", "#EF843C", "#E24D42", "#1F78C1", "#BA43A9", "#705DA0",
-  "#508642", "#CCA300", "#447EBC", "#C15C17", "#890F02", "#0A437C", "#6D1F62", "#584477",
-  "#B7DBAB", "#F4D598", "#70DBED", "#F9BA8F", "#F29191", "#82B5D8", "#E5A8E2", "#AEA2E0",
-  "#629E51", "#E5AC0E", "#64B0C8", "#E0752D", "#BF1B00", "#0A50A1", "#962D82", "#614D93",
-  "#9AC48A", "#F2C96D", "#65C5DB", "#F9934E", "#EA6460", "#5195CE", "#D683CE", "#806EB7",
-  "#3F6833", "#967302", "#2F575E", "#99440A", "#58140C", "#052B51", "#511749", "#3F2B5B",
-  "#E0F9D7", "#FCEACA", "#CFFAFF", "#F9E2D2", "#FCE2DE", "#BADFF4", "#F9D9F9", "#DEDAF7"
+  '#7EB26D',
+  '#EAB839',
+  '#6ED0E0',
+  '#EF843C',
+  '#E24D42',
+  '#1F78C1',
+  '#BA43A9',
+  '#705DA0',
+  '#508642',
+  '#CCA300',
+  '#447EBC',
+  '#C15C17',
+  '#890F02',
+  '#0A437C',
+  '#6D1F62',
+  '#584477',
+  '#B7DBAB',
+  '#F4D598',
+  '#70DBED',
+  '#F9BA8F',
+  '#F29191',
+  '#82B5D8',
+  '#E5A8E2',
+  '#AEA2E0',
+  '#629E51',
+  '#E5AC0E',
+  '#64B0C8',
+  '#E0752D',
+  '#BF1B00',
+  '#0A50A1',
+  '#962D82',
+  '#614D93',
+  '#9AC48A',
+  '#F2C96D',
+  '#65C5DB',
+  '#F9934E',
+  '#EA6460',
+  '#5195CE',
+  '#D683CE',
+  '#806EB7',
+  '#3F6833',
+  '#967302',
+  '#2F575E',
+  '#99440A',
+  '#58140C',
+  '#052B51',
+  '#511749',
+  '#3F2B5B',
+  '#E0F9D7',
+  '#FCEACA',
+  '#CFFAFF',
+  '#F9E2D2',
+  '#FCE2DE',
+  '#BADFF4',
+  '#F9D9F9',
+  '#DEDAF7',
 ]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0
 //(https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
-
-
 
 class DiscretePanelCtrl extends CanvasPanelCtrl {
   static templateUrl = 'partials/module.html';
@@ -33,21 +79,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   defaults = {
     display: 'timeline',
     rowHeight: 50,
-    valueMaps: [
-      { value: 'null', op: '=', text: 'N/A' }
-    ],
-    mappingTypes: [
-      {name: 'value to text', value: 1},
-      {name: 'range to text', value: 2},
-    ],
-    rangeMaps: [
-      { from: 'null', to: 'null', text: 'N/A' }
-    ],
-    colorMaps: [
-      { text: 'N/A', color: '#CCC' }
-    ],
+    valueMaps: [{value: 'null', op: '=', text: 'N/A'}],
+    mappingTypes: [{name: 'value to text', value: 1}, {name: 'range to text', value: 2}],
+    rangeMaps: [{from: 'null', to: 'null', text: 'N/A'}],
+    colorMaps: [{text: 'N/A', color: '#CCC'}],
     metricNameColor: '#000000',
     valueTextColor: '#000000',
+    crosshairColor: '#8F070C',
     backgroundColor: 'rgba(128, 128, 128, 0.1)',
     lineColor: 'rgba(128, 128, 128, 1.0)',
     textSize: 24,
@@ -61,7 +99,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     showLegendPercent: true,
     highlightOnMouseover: true,
     legendSortBy: '-ms',
-    units: 'short'
+    units: 'short',
   };
 
   data: any = null;
@@ -83,7 +121,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     // defaults configs
     _.defaultsDeep(this.panel, this.defaults);
 
-
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('render', this.onRender.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
@@ -95,22 +132,38 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onDataError(err) {
-    console.log("onDataError", err);
+    console.log('onDataError', err);
   }
 
   onInitEditMode() {
     this.unitFormats = kbn.getUnitFormats();
 
-    this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/partials/editor.options.html',1);
-    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/partials/editor.legend.html',3);
-    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/partials/editor.colors.html',4);
-    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/partials/editor.mappings.html', 5);
+    this.addEditorTab(
+      'Options',
+      'public/plugins/natel-discrete-panel/partials/editor.options.html',
+      1
+    );
+    this.addEditorTab(
+      'Legend',
+      'public/plugins/natel-discrete-panel/partials/editor.legend.html',
+      3
+    );
+    this.addEditorTab(
+      'Colors',
+      'public/plugins/natel-discrete-panel/partials/editor.colors.html',
+      4
+    );
+    this.addEditorTab(
+      'Mappings',
+      'public/plugins/natel-discrete-panel/partials/editor.mappings.html',
+      5
+    );
     this.editorTabIndex = 1;
     this.refresh();
   }
 
   onRender() {
-    if (this.data == null ||  !(this.context) ) {
+    if (this.data == null || !this.context) {
       return;
     }
 
@@ -124,17 +177,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   showLegandTooltip(pos, info) {
-    let body = '<div class="graph-tooltip-time">'+ info.val +'</div>';
+    let body = '<div class="graph-tooltip-time">' + info.val + '</div>';
 
-    body += "<center>";
+    body += '<center>';
     if (info.count > 1) {
-      body += info.count + " times<br/>for<br/>";
+      body += info.count + ' times<br/>for<br/>';
     }
     body += moment.duration(info.ms).humanize();
     if (info.count > 1) {
-      body += "<br/>total";
+      body += '<br/>total';
     }
-    body += "</center>";
+    body += '</center>';
 
     this.$tooltip.html(body).place_tt(pos.pageX + 20, pos.pageY);
   }
@@ -144,9 +197,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   formatValue(val) {
-
-    if (_.isNumber(val) ) {
-      if ( this.panel.rangeMaps ) {
+    if (_.isNumber(val)) {
+      if (this.panel.rangeMaps) {
         for (let i = 0; i < this.panel.rangeMaps.length; i++) {
           let map = this.panel.rangeMaps[i];
 
@@ -158,8 +210,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           }
         }
       }
-      if ( this.formatter ) {
-        return this.formatter( val, this.panel.decimals );
+      if (this.formatter) {
+        return this.formatter(val, this.panel.decimals);
       }
     }
 
@@ -184,7 +236,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     if (isNull) {
-      return "null";
+      return 'null';
     }
     return val;
   }
@@ -215,42 +267,41 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     super.applyPanelTimeOverrides();
 
     if (this.panel.expandFromQueryS > 0) {
-      let from = this.range.from.subtract( this.panel.expandFromQueryS, 's' );
+      let from = this.range.from.subtract(this.panel.expandFromQueryS, 's');
       this.range.from = from;
       this.range.raw.from = from;
     }
   }
 
-
   onDataReceived(dataList) {
-    $(this.canvas).css( 'cursor', 'pointer' );
+    $(this.canvas).css('cursor', 'pointer');
 
-//    console.log('GOT', dataList);
+    //    console.log('GOT', dataList);
 
     let data = [];
-    _.forEach(dataList, (metric) => {
-      if ('table'=== metric.type) {
+    _.forEach(dataList, metric => {
+      if ('table' === metric.type) {
         if ('time' !== metric.columns[0].type) {
           throw new Error('Expected a time column from the table format');
         }
 
         let last = null;
-        for (let i = 1; i<metric.columns.length; i++) {
+        for (let i = 1; i < metric.columns.length; i++) {
           let res = new DistinctPoints(metric.columns[i].text);
-          for (let j = 0; j<metric.rows.length; j++) {
+          for (let j = 0; j < metric.rows.length; j++) {
             let row = metric.rows[j];
-            res.add( row[0], this.formatValue( row[i] ) );
+            res.add(row[0], this.formatValue(row[i]));
           }
-          res.finish( this );
-          data.push( res );
+          res.finish(this);
+          data.push(res);
         }
       } else {
-        let res = new DistinctPoints( metric.target );
-        _.forEach(metric.datapoints, (point) => {
-          res.add( point[1], this.formatValue(point[0]) );
+        let res = new DistinctPoints(metric.target);
+        _.forEach(metric.datapoints, point => {
+          res.add(point[1], this.formatValue(point[0]));
         });
-        res.finish( this );
-        data.push( res );
+        res.finish(this);
+        data.push(res);
       }
     });
     this.data = data;
@@ -268,7 +319,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   updateColorInfo() {
     let cm = {};
-    for (let i = 0; i<this.panel.colorMaps.length; i++) {
+    for (let i = 0; i < this.panel.colorMaps.length; i++) {
       let m = this.panel.colorMaps[i];
       if (m.text) {
         cm[m.text] = m.color;
@@ -282,17 +333,19 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   addColorMap(what) {
     if (what === 'curent') {
-      _.forEach(this.data, (metric) => {
+      _.forEach(this.data, metric => {
         if (metric.legendInfo) {
-          _.forEach(metric.legendInfo, (info) => {
-            if (!_.has(info.val)) {
-              this.panel.colorMaps.push({text: info.val, color: this.getColor(info.val) });
+          _.forEach(metric.legendInfo, info => {
+            if (!_.has(this.colorMap, info.val)) {
+              let v = {text: info.val, color: this.getColor(info.val)};
+              this.panel.colorMaps.push(v);
+              this.colorMap[info.val] = v;
             }
           });
         }
       });
     } else {
-      this.panel.colorMaps.push({text: '???', color: this.randomColor() });
+      this.panel.colorMaps.push({text: '???', color: this.randomColor()});
     }
     this.updateColorInfo();
   }
@@ -304,7 +357,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addValueMap() {
-    this.panel.valueMaps.push({value: '', op: '=', text: '' });
+    this.panel.valueMaps.push({value: '', op: '=', text: ''});
   }
 
   removeRangeMap(rangeMap) {
@@ -317,27 +370,31 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.panel.rangeMaps.push({from: '', to: '', text: ''});
   }
 
-  onConfigChanged( update = false ) {
+  onConfigChanged(update = false) {
     //console.log( "Config changed...");
     this.isTimeline = this.panel.display === 'timeline';
     this.isStacked = this.panel.display === 'stacked';
 
     this.formatter = null;
-    if (this.panel.units && 'none' !== this.panel.units ) {
+    if (this.panel.units && 'none' !== this.panel.units) {
       this.formatter = kbn.valueFormats[this.panel.units];
     }
 
     if (update) {
       this.refresh();
-    }else {
+    } else {
       this.render();
     }
   }
 
   getLegendDisplay(info, metric) {
     let disp = info.val;
-    if (this.panel.showLegendPercent || this.panel.showLegendCounts || this.panel.showLegendTime) {
-      disp += " (";
+    if (
+      this.panel.showLegendPercent ||
+      this.panel.showLegendCounts ||
+      this.panel.showLegendTime
+    ) {
+      disp += ' (';
       let hassomething = false;
       if (this.panel.showLegendTime) {
         disp += moment.duration(info.ms).humanize();
@@ -346,14 +403,14 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if (this.panel.showLegendPercent) {
         if (hassomething) {
-          disp += ", ";
+          disp += ', ';
         }
 
         let dec = this.panel.legendPercentDecimals;
         if (_.isNil(dec)) {
-          if (info.per>.98 && metric.changes.length>1) {
+          if (info.per > 0.98 && metric.changes.length > 1) {
             dec = 2;
-          } else if (info.per<0.02) {
+          } else if (info.per < 0.02) {
             dec = 2;
           } else {
             dec = 0;
@@ -365,11 +422,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       if (this.panel.showLegendCounts) {
         if (hassomething) {
-          disp += ", ";
+          disp += ', ';
         }
-        disp += info.count+"x";
+        disp += info.count + 'x';
       }
-      disp += ")";
+      disp += ')';
     }
     return disp;
   }
@@ -386,25 +443,25 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     if (this.mouse.down != null) {
       from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
-      to   = Math.max(this.mouse.down.ts, this.mouse.position.ts);
+      to = Math.max(this.mouse.down.ts, this.mouse.position.ts);
       time = to - from;
-      val = "Zoom To:";
+      val = 'Zoom To:';
     }
 
-    let body = '<div class="graph-tooltip-time">'+ val + '</div>';
+    let body = '<div class="graph-tooltip-time">' + val + '</div>';
 
-    body += "<center>";
-    body += this.dashboard.formatDate( moment(from) ) + "<br/>";
-    body += "to<br/>";
-    body += this.dashboard.formatDate( moment(to) ) + "<br/><br/>";
-    body += moment.duration(time).humanize() + "<br/>";
-    body += "</center>";
+    body += '<center>';
+    body += this.dashboard.formatDate(moment(from)) + '<br/>';
+    body += 'to<br/>';
+    body += this.dashboard.formatDate(moment(to)) + '<br/><br/>';
+    body += moment.duration(time).humanize() + '<br/>';
+    body += '</center>';
 
     let pageX = 0;
     let pageY = 0;
     if (isExternal) {
       let rect = this.canvas.getBoundingClientRect();
-      pageY = rect.top + (evt.pos.panelRelY * rect.height);
+      pageY = rect.top + evt.pos.panelRelY * rect.height;
       if (pageY < 0 || pageY > $(window).innerHeight()) {
         // Skip Hidden tooltip
         this.$tooltip.detach();
@@ -414,7 +471,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       let elapsed = this.range.to - this.range.from;
       let pX = (evt.pos.x - this.range.from) / elapsed;
-      pageX = rect.left + (pX * rect.width);
+      pageX = rect.left + pX * rect.width;
     } else {
       pageX = evt.evt.pageX;
       pageY = evt.evt.pageY;
@@ -427,17 +484,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.externalPT = false;
     if (this.data && this.data.length) {
       let hover = null;
-      let j = Math.floor(this.mouse.position.y/this.panel.rowHeight);
+      let j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
       if (j < 0) {
         j = 0;
       }
       if (j >= this.data.length) {
-        j = this.data.length-1;
+        j = this.data.length - 1;
       }
 
       if (this.isTimeline) {
         hover = this.data[j].changes[0];
-        for (let i = 0; i<this.data[j].changes.length; i++) {
+        for (let i = 0; i < this.data[j].changes.length; i++) {
           if (this.data[j].changes[i].start > this.mouse.position.ts) {
             break;
           }
@@ -447,13 +504,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
         if (showTT) {
           this.externalPT = isExternal;
-          this.showTooltip( evt, hover, isExternal );
+          this.showTooltip(evt, hover, isExternal);
         }
         this.onRender(); // refresh the view
       } else if (!isExternal) {
         if (this.isStacked) {
           hover = this.data[j].legendInfo[0];
-          for (let i = 0; i<this.data[j].legendInfo.length; i++) {
+          for (let i = 0; i < this.data[j].legendInfo.length; i++) {
             if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
               break;
             }
@@ -476,7 +533,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onMouseClicked(where) {
     let pt = this.hoverPoint;
     if (pt && pt.start) {
-      let range = {from: moment.utc(pt.start), to: moment.utc(pt.start+pt.ms) };
+      let range = {from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms)};
       this.timeSrv.setTime(range);
       this.clear();
     }
@@ -491,7 +548,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.mouse.position = null;
     this.mouse.down = null;
     this.hoverPoint = null;
-    $(this.canvas).css( 'cursor', 'wait' );
+    $(this.canvas).css('cursor', 'wait');
     appEvents.emit('graph-hover-clear');
     this.render();
   }
@@ -499,12 +556,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _updateRenderDimensions() {
     this._renderDimensions = {};
 
-    let rect = this._renderDimensions.rect = this.wrap.getBoundingClientRect();
-    let rows = this._renderDimensions.rows = this.data.length;
-    let rowHeight = this._renderDimensions.rowHeight = this.panel.rowHeight;
-    let height = this._renderDimensions.height = rowHeight * rows;
-    let width = this._renderDimensions.width = rect.width;
-    let rectHeight = this._renderDimensions.rectHeight = rowHeight;
+    let rect = (this._renderDimensions.rect = this.wrap.getBoundingClientRect());
+    let rows = (this._renderDimensions.rows = this.data.length);
+    let rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
+    let height = (this._renderDimensions.height = rowHeight * rows);
+    let width = (this._renderDimensions.width = rect.width);
+    let rectHeight = (this._renderDimensions.rectHeight = rowHeight);
 
     let top = 0;
     let elapsed = this.range.to - this.range.from;
@@ -520,7 +577,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           point = metric.changes[i];
           if (point.start <= this.range.to) {
             let xt = Math.max(point.start - this.range.from, 0);
-            let x = (xt / elapsed) * width;
+            let x = xt / elapsed * width;
             positions.push(x);
           }
         }
@@ -532,7 +589,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         for (let i = 0; i < metric.legendInfo.length; i++) {
           point = metric.legendInfo[i];
           let xt = Math.max(start - this.range.from, 0);
-          let x = (xt / elapsed) * width;
+          let x = xt / elapsed * width;
           positions.push(x);
           start += point.ms;
         }
@@ -540,7 +597,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       this._renderDimensions.matrix.push({
         y: top,
-        positions: positions
+        positions: positions,
       });
 
       top += rowHeight;
@@ -549,31 +606,37 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   _updateSelectionMatrix() {
     let selectionPredicates = {
-      all: function () { return true; },
-      crosshairHover: function (i, j) {
+      all: function() {
+        return true;
+      },
+      crosshairHover: function(i, j) {
         if (j + 1 === this.data[i].changes.length) {
           return this.data[i].changes[j].start <= this.mouse.position.ts;
         }
-        return this.data[i].changes[j].start <= this.mouse.position.ts &&
-          this.mouse.position.ts < this.data[i].changes[j + 1].start;
+        return (
+          this.data[i].changes[j].start <= this.mouse.position.ts &&
+          this.mouse.position.ts < this.data[i].changes[j + 1].start
+        );
       },
-      mouseX: function (i, j) {
+      mouseX: function(i, j) {
         let row = this._renderDimensions.matrix[i];
         if (j + 1 === row.positions.length) {
           return row.positions[j] <= this.mouse.position.x;
         }
-        return row.positions[j] <= this.mouse.position.x &&
-          this.mouse.position.x < row.positions[j + 1];
+        return (
+          row.positions[j] <= this.mouse.position.x &&
+          this.mouse.position.x < row.positions[j + 1]
+        );
       },
-      metric: function (i) {
+      metric: function(i) {
         return this.data[i] === this._selectedMetric;
       },
-      legendItem: function (i, j) {
+      legendItem: function(i, j) {
         if (this.data[i] !== this._selectedMetric) {
           return false;
         }
         return this._selectedLegendItem.val === this._getVal(i, j);
-      }
+      },
     };
 
     function getPredicate() {
@@ -622,8 +685,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   _getVal(metricIndex, rectIndex) {
     let point = undefined;
-    if (this.isTimeline) { point = this.data[metricIndex].changes[rectIndex]; }
-    if (this.isStacked) { point = this.data[metricIndex].legendInfo[rectIndex]; }
+    if (this.isTimeline) {
+      point = this.data[metricIndex].changes[rectIndex];
+    }
+    if (this.isStacked) {
+      point = this.data[metricIndex].legendInfo[rectIndex];
+    }
     return point.val;
   }
 
@@ -652,8 +719,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           ctx.globalAlpha = 0.3;
         }
         ctx.fillRect(
-          currentX, matrix[i].y,
-          nextX - currentX, this._renderDimensions.rectHeight
+          currentX,
+          matrix[i].y,
+          nextX - currentX,
+          this._renderDimensions.rectHeight
         );
         ctx.globalAlpha = globalAlphaTemp;
       }
@@ -682,14 +751,14 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const offset = 2;
 
     _.forEach(this.data, (metric, i) => {
-      let { y, positions } = this._renderDimensions.matrix[i];
+      let {y, positions} = this._renderDimensions.matrix[i];
       let rectHeight = this._renderDimensions.rectHeight;
 
-      let centerV = y + (rectHeight / 2);
+      let centerV = y + rectHeight / 2;
       // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
       // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
       // let labelPositionValue = y + this.panel.textSize / 2;
-      let labelPositionMetricName = y + (rectHeight / 2);
+      let labelPositionMetricName = y + rectHeight / 2;
       let labelPositionLastValue = labelPositionMetricName;
       let labelPositionValue = labelPositionMetricName;
 
@@ -703,7 +772,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           let val = this._getVal(i, positions.length - 1);
           ctx.fillStyle = this.panel.valueTextColor;
           ctx.textAlign = 'right';
-          ctx.fillText(val, this._renderDimensions.width-offset, labelPositionLastValue);
+          ctx.fillText(
+            val,
+            this._renderDimensions.width - offset,
+            labelPositionLastValue
+          );
         }
       } else {
         for (let j = 0; j < positions.length; j++) {
@@ -712,7 +785,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
               let val = this._getVal(i, j);
               ctx.fillStyle = this.panel.valueTextColor;
               ctx.textAlign = 'left';
-              ctx.fillText(val, positions[j]+offset, labelPositionValue);
+              ctx.fillText(val, positions[j] + offset, labelPositionValue);
               break;
             }
           }
@@ -726,7 +799,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           const val = this._getVal(i, j);
           const width = this._getWidth(i, j);
           //let cval = findLength(val, width);
-          ctx.fillText(val, positions[j]+offset, labelPositionValue);
+          ctx.fillText(val, positions[j] + offset, labelPositionValue);
         }
       }
     });
@@ -749,8 +822,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
     let xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
 
-    ctx.fillStyle = "rgba(110, 110, 110, 0.5)";
-    ctx.strokeStyle = "rgba(110, 110, 110, 0.5)";
+    ctx.fillStyle = 'rgba(110, 110, 110, 0.5)';
+    ctx.strokeStyle = 'rgba(110, 110, 110, 0.5)';
     ctx.beginPath();
     ctx.fillRect(xmin, 0, xmax - xmin, height);
     ctx.strokeRect(xmin, 0, xmax - xmin, height);
@@ -790,8 +863,4 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 }
 
-export {
-  DiscretePanelCtrl as PanelCtrl
-};
-
-
+export {DiscretePanelCtrl as PanelCtrl};
