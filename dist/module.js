@@ -624,13 +624,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     }
                     return point.val;
                 };
-                DiscretePanelCtrl.prototype._getWidth = function (metricIndex, rectIndex) {
-                    var positions = this._renderDimensions.matrix[metricIndex].positions;
-                    if (rectIndex + 1 === positions.length) {
-                        return this._renderDimensions.width - positions[rectIndex];
-                    }
-                    return positions[rectIndex + 1] - positions[rectIndex];
-                };
                 DiscretePanelCtrl.prototype._renderRects = function () {
                     var _this = this;
                     var matrix = this._renderDimensions.matrix;
@@ -659,52 +652,51 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     ctx.lineWidth = 1;
                     ctx.textBaseline = 'middle';
                     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
-                    // What is this supposed to do?
-                    function findLength(text, width) {
-                        for (var length_1 = 1; length_1 < text.length + 1; length_1++) {
-                            var testLine = text.substr(0, length_1);
-                            var measure = ctx.measureText(testLine);
-                            if (measure.width > width) {
-                                break;
-                            }
-                        }
-                        return text.substr(0, length - 1);
-                    }
                     var offset = 2;
+                    var rectHeight = this._renderDimensions.rectHeight;
                     lodash_1.default.forEach(this.data, function (metric, i) {
                         var _a = _this._renderDimensions.matrix[i], y = _a.y, positions = _a.positions;
-                        var rectHeight = _this._renderDimensions.rectHeight;
-                        var centerV = y + rectHeight / 2;
+                        var centerY = y + rectHeight / 2;
                         // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
                         // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
                         // let labelPositionValue = y + this.panel.textSize / 2;
-                        var labelPositionMetricName = y + rectHeight / 2;
-                        var labelPositionLastValue = labelPositionMetricName;
-                        var labelPositionValue = labelPositionMetricName;
-                        if (_this.mouse.position == null) {
-                            if (_this.panel.writeMetricNames) {
-                                ctx.fillStyle = _this.panel.metricNameColor;
-                                ctx.textAlign = 'left';
-                                ctx.fillText(metric.name, offset, labelPositionMetricName);
-                            }
-                            if (_this.panel.writeLastValue) {
-                                var val = _this._getVal(i, positions.length - 1);
-                                ctx.fillStyle = _this.panel.valueTextColor;
-                                ctx.textAlign = 'right';
-                                ctx.fillText(val, _this._renderDimensions.width - offset, labelPositionLastValue);
-                            }
-                        }
-                        else {
+                        var labelPositionMetricName = centerY;
+                        var labelPositionLastValue = centerY;
+                        var labelPositionValue = centerY;
+                        var hoverTextStart = -1;
+                        var hoverTextEnd = -1;
+                        if (_this.mouse.position) {
                             for (var j = 0; j < positions.length; j++) {
                                 if (positions[j] <= _this.mouse.position.x) {
                                     if (j >= positions.length - 1 || positions[j + 1] >= _this.mouse.position.x) {
                                         var val = _this._getVal(i, j);
                                         ctx.fillStyle = _this.panel.valueTextColor;
                                         ctx.textAlign = 'left';
-                                        ctx.fillText(val, positions[j] + offset, labelPositionValue);
+                                        hoverTextStart = positions[j] + offset;
+                                        ctx.fillText(val, hoverTextStart, labelPositionValue);
+                                        var txtinfo = ctx.measureText(val);
+                                        hoverTextEnd = hoverTextStart + txtinfo.width;
                                         break;
                                     }
                                 }
+                            }
+                        }
+                        if (_this.panel.writeMetricNames) {
+                            ctx.fillStyle = _this.panel.metricNameColor;
+                            ctx.textAlign = 'left';
+                            var txtinfo = ctx.measureText(metric.name);
+                            if (hoverTextStart < 0 || hoverTextStart > txtinfo.width) {
+                                ctx.fillText(metric.name, offset, labelPositionMetricName);
+                            }
+                        }
+                        if (_this.panel.writeLastValue) {
+                            var val = _this._getVal(i, positions.length - 1);
+                            ctx.fillStyle = _this.panel.valueTextColor;
+                            ctx.textAlign = 'right';
+                            var txtinfo = ctx.measureText(val);
+                            var xval = _this._renderDimensions.width - offset - txtinfo.width;
+                            if (xval > hoverTextEnd) {
+                                ctx.fillText(val, _this._renderDimensions.width - offset, labelPositionLastValue);
                             }
                         }
                         if (_this.panel.writeAllValues) {
@@ -712,9 +704,17 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             ctx.textAlign = 'left';
                             for (var j = 0; j < positions.length; j++) {
                                 var val = _this._getVal(i, j);
-                                var width = _this._getWidth(i, j);
-                                //let cval = findLength(val, width);
+                                var nextX = _this._renderDimensions.width;
+                                if (j + 1 !== positions.length) {
+                                    nextX = positions[j + 1];
+                                }
+                                var width = nextX - positions[j];
+                                // This clips the text within the given bounds
+                                ctx.save();
+                                ctx.rect(positions[j], y, width, rectHeight);
+                                ctx.clip();
                                 ctx.fillText(val, positions[j] + offset, labelPositionValue);
+                                ctx.restore();
                             }
                         }
                     });

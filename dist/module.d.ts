@@ -79,7 +79,6 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     _updateSelectionMatrix(): void;
     _updateCanvasSize(): void;
     _getVal(metricIndex: any, rectIndex: any): any;
-    _getWidth(metricIndex: any, rectIndex: any): number;
     _renderRects(): void;
     _renderLabels(): void;
     _renderSelection(): void;
