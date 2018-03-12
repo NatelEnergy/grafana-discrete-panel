@@ -104,7 +104,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         valueTextColor: '#000000',
                         crosshairColor: '#8F070C',
                         backgroundColor: 'rgba(128, 128, 128, 0.1)',
-                        lineColor: 'rgba(128, 128, 128, 1.0)',
+                        lineColor: 'rgba(128, 128, 128, 0.5)',
                         textSize: 24,
                         extendLastValue: true,
                         writeLastValue: true,
@@ -643,6 +643,14 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             }
                             ctx.fillRect(currentX, matrix[i].y, nextX - currentX, _this._renderDimensions.rectHeight);
                             ctx.globalAlpha = globalAlphaTemp;
+                        }
+                        if (i > 0) {
+                            var top_1 = matrix[i].y;
+                            ctx.strokeStyle = _this.panel.lineColor;
+                            ctx.beginPath();
+                            ctx.moveTo(0, top_1);
+                            ctx.lineTo(_this._renderDimensions.width, top_1);
+                            ctx.stroke();
                         }
                     });
                 };

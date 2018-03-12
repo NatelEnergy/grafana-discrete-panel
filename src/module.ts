@@ -86,7 +86,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     valueTextColor: '#000000',
     crosshairColor: '#8F070C',
     backgroundColor: 'rgba(128, 128, 128, 0.1)',
-    lineColor: 'rgba(128, 128, 128, 1.0)',
+    lineColor: 'rgba(128, 128, 128, 0.5)',
     textSize: 24,
     extendLastValue: true,
     writeLastValue: true,
@@ -717,6 +717,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           this._renderDimensions.rectHeight
         );
         ctx.globalAlpha = globalAlphaTemp;
+      }
+
+      if (i > 0) {
+        const top = matrix[i].y;
+        ctx.strokeStyle = this.panel.lineColor;
+        ctx.beginPath();
+        ctx.moveTo(0, top);
+        ctx.lineTo(this._renderDimensions.width, top);
+        ctx.stroke();
       }
     });
   }
