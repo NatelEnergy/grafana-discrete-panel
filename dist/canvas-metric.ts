@@ -57,20 +57,20 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }
     console.log('canvas render', this.mouse);
 
-    var rect = this.wrap.getBoundingClientRect();
+    let rect = this.wrap.getBoundingClientRect();
 
-    var height = Math.max(this.height, 100);
-    var width = rect.width;
+    let height = Math.max(this.height, 100);
+    let width = rect.width;
     this.canvas.width = width;
     this.canvas.height = height;
 
-    var centerV = height / 2;
+    let centerV = height / 2;
 
-    var ctx = this.context;
+    let ctx = this.context;
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
 
-    var time = '';
+    let time = '';
     if (this.mouse.position != null) {
       time = this.dashboard.formatDate(moment(this.mouse.position.ts));
     }
@@ -84,8 +84,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     if (this.mouse.position != null) {
       if (this.mouse.down != null) {
-        var xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
-        var xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
+        let xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
+        let xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
 
         // Fill canvas using 'destination-out' and alpha at 0.05
         ctx.globalCompositeOperation = 'destination-out';
@@ -121,11 +121,11 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   getMousePosition(evt) {
-    var elapsed = this.range.to - this.range.from;
-    var rect = this.canvas.getBoundingClientRect();
-    var x = evt.offsetX; // - rect.left;
-    var ts = this.range.from + elapsed * (x / parseFloat(rect.width));
-    var y = evt.clientY - rect.top;
+    let elapsed = this.range.to - this.range.from;
+    let rect = this.canvas.getBoundingClientRect();
+    let x = evt.offsetX; // - rect.left;
+    let ts = this.range.from + elapsed * (x / parseFloat(rect.width));
+    let y = evt.clientY - rect.top;
 
     return {
       x: x,
@@ -168,7 +168,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         }
 
         this.mouse.position = this.getMousePosition(evt);
-        var info = {
+        let info = {
           pos: {
             pageX: evt.pageX,
             pageY: evt.pageY,
@@ -228,16 +228,16 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'mouseup',
       evt => {
         this.$tooltip.detach();
-        var up = this.getMousePosition(evt);
+        let up = this.getMousePosition(evt);
         if (this.mouse.down != null) {
           if (up.x === this.mouse.down.x && up.y === this.mouse.down.y) {
             this.mouse.position = null;
             this.mouse.down = null;
             this.onMouseClicked(up);
           } else {
-            var min = Math.min(this.mouse.down.ts, up.ts);
-            var max = Math.max(this.mouse.down.ts, up.ts);
-            var range = {from: moment.utc(min), to: moment.utc(max)};
+            let min = Math.min(this.mouse.down.ts, up.ts);
+            let max = Math.max(this.mouse.down.ts, up.ts);
+            let range = {from: moment.utc(min), to: moment.utc(max)};
             this.mouse.position = up;
             this.onMouseSelectedRange(range);
           }
@@ -267,7 +267,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'graph-hover',
       event => {
         // ignore other graph hover events if shared tooltip is disabled
-        var isThis = event.panel.id === this.panel.id;
+        let isThis = event.panel.id === this.panel.id;
         if (!this.dashboard.sharedTooltipModeEnabled() && !isThis) {
           return;
         }
@@ -284,10 +284,10 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
             return;
           }
 
-          var ts = event.pos.x;
-          var rect = this.canvas.getBoundingClientRect();
-          var elapsed = this.range.to - this.range.from;
-          var x = (ts - this.range.from) / elapsed * rect.width;
+          let ts = event.pos.x;
+          let rect = this.canvas.getBoundingClientRect();
+          let elapsed = this.range.to - this.range.from;
+          let x = (ts - this.range.from) / elapsed * rect.width;
 
           this.mouse.position = {
             x: x,
@@ -324,5 +324,226 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     //   elem.off();
     //   elem.remove();
     // });
+  }
+
+  // Utility Functions for time axis
+  //---------------------------------
+
+  time_format(range: number, secPerTick: number): string {
+    let oneDay = 86400000;
+    let oneYear = 31536000000;
+
+    if (secPerTick <= 45) {
+      return '%H:%M:%S';
+    }
+    if (secPerTick <= 7200 || range <= oneDay) {
+      return '%H:%M';
+    }
+    if (secPerTick <= 80000) {
+      return '%m/%d %H:%M';
+    }
+    if (secPerTick <= 2419200 || range <= oneYear) {
+      return '%m/%d';
+    }
+    return '%Y-%m';
+  }
+
+  getTimeResolution(estTimeInterval: number): number {
+    let timeIntInSecs = estTimeInterval / 1000;
+
+    if (timeIntInSecs <= 30) {
+      return 30 * 1000;
+    }
+
+    if (timeIntInSecs <= 60) {
+      return 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 60 * 5) {
+      return 5 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 60 * 10) {
+      return 10 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 60 * 30) {
+      return 30 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 60 * 60) {
+      return 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 60 * 60) {
+      return 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 2 * 60 * 60) {
+      return 2 * 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 6 * 60 * 60) {
+      return 6 * 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 12 * 60 * 60) {
+      return 12 * 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 24 * 60 * 60) {
+      return 24 * 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 2 * 24 * 60 * 60) {
+      return 2 * 24 * 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 7 * 24 * 60 * 60) {
+      return 7 * 24 * 60 * 60 * 1000;
+    }
+
+    if (timeIntInSecs <= 30 * 24 * 60 * 60) {
+      return 30 * 24 * 60 * 60 * 1000;
+    }
+
+    return 6 * 30 * 24 * 60 * 60 * 1000;
+  }
+
+  roundDate(timeStamp, roundee) {
+    timeStamp -= timeStamp % roundee; //subtract amount of time since midnight
+    return timeStamp;
+  }
+
+  formatDate(d, fmt) {
+    let monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    let dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    if (typeof d.strftime == 'function') {
+      return d.strftime(fmt);
+    }
+
+    let r = [];
+    let escape = false;
+    let hours = d.getHours();
+    let isAM = hours < 12;
+
+    if (monthNames == null) {
+      monthNames = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+    }
+
+    if (dayNames == null) {
+      dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    }
+
+    let hours12;
+
+    if (hours > 12) {
+      hours12 = hours - 12;
+    } else if (hours == 0) {
+      hours12 = 12;
+    } else {
+      hours12 = hours;
+    }
+
+    for (let i = 0; i < fmt.length; ++i) {
+      let c = fmt.charAt(i);
+
+      if (escape) {
+        switch (c) {
+          case 'a':
+            c = '' + dayNames[d.getDay()];
+            break;
+          case 'b':
+            c = '' + monthNames[d.getMonth()];
+            break;
+          case 'd':
+            c = this.leftPad(d.getDate(), '');
+            break;
+          case 'e':
+            c = this.leftPad(d.getDate(), ' ');
+            break;
+          case 'h': // For back-compat with 0.7; remove in 1.0
+          case 'H':
+            c = this.leftPad(hours, null);
+            break;
+          case 'I':
+            c = this.leftPad(hours12, null);
+            break;
+          case 'l':
+            c = this.leftPad(hours12, ' ');
+            break;
+          case 'm':
+            c = this.leftPad(d.getMonth() + 1, '');
+            break;
+          case 'M':
+            c = this.leftPad(d.getMinutes(), null);
+            break;
+          // quarters not in Open Group's strftime specification
+          case 'q':
+            c = '' + (Math.floor(d.getMonth() / 3) + 1);
+            break;
+          case 'S':
+            c = this.leftPad(d.getSeconds(), null);
+            break;
+          case 'y':
+            c = this.leftPad(d.getFullYear() % 100, null);
+            break;
+          case 'Y':
+            c = '' + d.getFullYear();
+            break;
+          case 'p':
+            c = isAM ? '' + 'am' : '' + 'pm';
+            break;
+          case 'P':
+            c = isAM ? '' + 'AM' : '' + 'PM';
+            break;
+          case 'w':
+            c = '' + d.getDay();
+            break;
+        }
+        r.push(c);
+        escape = false;
+      } else {
+        if (c == '%') {
+          escape = true;
+        } else {
+          r.push(c);
+        }
+      }
+    }
+
+    return r.join('');
+  }
+
+  leftPad(n, pad) {
+    n = '' + n;
+    pad = '' + (pad == null ? '0' : pad);
+    return n.length == 1 ? pad + n : n;
   }
 }

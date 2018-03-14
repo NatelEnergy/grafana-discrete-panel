@@ -37,7 +37,17 @@
           <label class="gf-form-label width-14">Text Size</label>
           <input type="number" ng-model="ctrl.panel.textSize" class="gf-form-input max-width-5" ng-blur="ctrl.render()" min="1"/>
         </div>
+        <div class="gf-form">
+          <label class="gf-form-label width-14">Text Size Time</label>
+          <input type="number" ng-model="ctrl.panel.textSizeTime" class="gf-form-input max-width-5" ng-blur="ctrl.render()" min="1"/>
+        </div>
  
+        <gf-form-switch class="gf-form"
+          label="Show Time Axis"
+          label-class="gf-form-label width-14"
+          checked="ctrl.panel.showTimeAxis"
+          on-change="ctrl.onConfigChanged()"></gf-form-switch>
+
         <gf-form-switch class="gf-form"
           label="Write Last Value"
           label-class="gf-form-label width-14"

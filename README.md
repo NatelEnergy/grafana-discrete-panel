@@ -40,6 +40,7 @@ yarn pretty
 * Don't detect duplicate colors from metrics
 * Formatting with prettier.js
 * Only hide hover text when it collides
+* Show time axis (copied from novatec-grafana-discrete-panel)
 
 ##### v0.0.6
 

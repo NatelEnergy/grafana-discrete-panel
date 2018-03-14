@@ -24,6 +24,17 @@
 
         <div class="gf-form">
             <span class="gf-form-label width-10">
+                Time Text
+            </span>
+            <input type="text" placeholder="text" ng-model="ctrl.panel.timeTextColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
+            <span class="gf-form-label">
+                <spectrum-picker ng-model="ctrl.panel.timeTextColor" ng-change="ctrl.updateColorInfo()" ></spectrum-picker>
+            </span>
+        </div>
+
+
+        <div class="gf-form">
+            <span class="gf-form-label width-10">
                 Background
             </span>
             <input type="text" placeholder="text" ng-model="ctrl.panel.backgroundColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
