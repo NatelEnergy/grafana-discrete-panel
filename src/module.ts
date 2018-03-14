@@ -569,7 +569,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
     let timeHeight = 0;
     if (this.panel.showTimeAxis) {
-      timeHeight = 10 + this.panel.textSizeTime;
+      timeHeight = 14 + this.panel.textSizeTime;
     }
     const height = (this._renderDimensions.height = rowsHeight + timeHeight);
     const width = (this._renderDimensions.width = rect.width);

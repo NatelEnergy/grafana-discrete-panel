@@ -517,7 +517,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
                     var timeHeight = 0;
                     if (this.panel.showTimeAxis) {
-                        timeHeight = 10 + this.panel.textSizeTime;
+                        timeHeight = 14 + this.panel.textSizeTime;
                     }
                     var height = (this._renderDimensions.height = rowsHeight + timeHeight);
                     var width = (this._renderDimensions.width = rect.width);
