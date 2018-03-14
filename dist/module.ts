@@ -84,14 +84,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     colorMaps: [{text: 'N/A', color: '#CCC'}],
     metricNameColor: '#000000',
     valueTextColor: '#000000',
+    timeTextColor: '#d8d9da',
     crosshairColor: '#8F070C',
     backgroundColor: 'rgba(128,128,128,0.1)',
     lineColor: 'rgba(0,0,0,0.1)',
     textSize: 24,
+    textSizeTime: 12,
     extendLastValue: true,
     writeLastValue: true,
     writeAllValues: false,
     writeMetricNames: false,
+    showTimeAxis: true,
     showLegend: true,
     showLegendNames: true,
     showLegendValues: true,
@@ -104,7 +107,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   data: any = null;
   externalPT = false;
-  isTimeline = false;
+  isTimeline = true;
   isStacked = false;
   hoverPoint: any = null;
   colorMap: any = {};
@@ -120,13 +123,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     // defaults configs
     _.defaultsDeep(this.panel, this.defaults);
+    this.panel.display = 'timeline'; // Only supported version now
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('render', this.onRender.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
+    this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
     this.events.on('data-error', this.onDataError.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
+  }
 
+  onPanelInitialized() {
     this.updateColorInfo();
     this.onConfigChanged();
   }
@@ -172,6 +179,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._updateCanvasSize();
     this._renderRects();
     this._renderLabels();
+    this._renderTimeAxis();
     this._renderSelection();
     this._renderCrosshair();
   }
@@ -371,7 +379,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onConfigChanged(update = false) {
-    //console.log( "Config changed...");
     this.isTimeline = this.panel.display === 'timeline';
     this.isStacked = this.panel.display === 'stacked';
 
@@ -556,12 +563,16 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _updateRenderDimensions() {
     this._renderDimensions = {};
 
-    let rect = (this._renderDimensions.rect = this.wrap.getBoundingClientRect());
-    let rows = (this._renderDimensions.rows = this.data.length);
-    let rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
-    let height = (this._renderDimensions.height = rowHeight * rows);
-    let width = (this._renderDimensions.width = rect.width);
-    let rectHeight = (this._renderDimensions.rectHeight = rowHeight);
+    const rect = (this._renderDimensions.rect = this.wrap.getBoundingClientRect());
+    const rows = (this._renderDimensions.rows = this.data.length);
+    const rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
+    const rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
+    let timeHeight = 0;
+    if (this.panel.showTimeAxis) {
+      timeHeight = 10 + this.panel.textSizeTime;
+    }
+    const height = (this._renderDimensions.height = rowsHeight + timeHeight);
+    const width = (this._renderDimensions.width = rect.width);
 
     let top = 0;
     let elapsed = this.range.to - this.range.from;
@@ -714,7 +725,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           currentX,
           matrix[i].y,
           nextX - currentX,
-          this._renderDimensions.rectHeight
+          this._renderDimensions.rowHeight
         );
         ctx.globalAlpha = globalAlphaTemp;
       }
@@ -737,11 +748,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
 
     const offset = 2;
-    const rectHeight = this._renderDimensions.rectHeight;
+    const rowHeight = this._renderDimensions.rowHeight;
     _.forEach(this.data, (metric, i) => {
       const {y, positions} = this._renderDimensions.matrix[i];
 
-      const centerY = y + rectHeight / 2;
+      const centerY = y + rowHeight / 2;
       // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
       // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
       // let labelPositionValue = y + this.panel.textSize / 2;
@@ -805,7 +816,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
           // This clips the text within the given bounds
           ctx.save();
-          ctx.rect(positions[j], y, width, rectHeight);
+          ctx.rect(positions[j], y, width, rowHeight);
           ctx.clip();
 
           ctx.fillText(val, positions[j] + offset, labelPositionValue);
@@ -839,6 +850,59 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.strokeRect(xmin, 0, xmax - xmin, height);
   }
 
+  _renderTimeAxis() {
+    if (!this.panel.showTimeAxis) {
+      return;
+    }
+
+    const ctx = this.context;
+    const rows = this.data.length;
+    const rowHeight = this.panel.rowHeight;
+    const height = this._renderDimensions.height;
+    const width = this._renderDimensions.width;
+    const top = this._renderDimensions.rowsHeight;
+
+    const headerColumnIndent = 0; // header inset (zero for now)
+
+    ctx.font = this.panel.textSizeTime + 'px "Open Sans", Helvetica, Arial, sans-serif';
+    ctx.fillStyle = this.panel.timeTextColor;
+    ctx.textAlign = 'left';
+    ctx.strokeStyle = this.panel.timeTextColor;
+    ctx.textBaseline = 'top';
+    ctx.setLineDash([7, 5]); // dashes are 5px and spaces are 3px
+    ctx.lineDashOffset = 0;
+
+    let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+    let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+    let minPxInterval = ctx.measureText('12/33 24:59').width * 2;
+    let estNumTicks = width / minPxInterval;
+    let estTimeInterval = (max - min) / estNumTicks;
+    let timeResolution = this.getTimeResolution(estTimeInterval);
+    let pixelStep = timeResolution / (max - min) * width;
+    let nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
+    let xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
+
+    let timeFormat = this.time_format(max - min, timeResolution / 1000);
+
+    while (nextPointInTime < max) {
+      // draw ticks
+      ctx.beginPath();
+      ctx.moveTo(xPos, top + 5);
+      ctx.lineTo(xPos, 0);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // draw time label
+      let date = new Date(nextPointInTime);
+      let dateStr = this.formatDate(date, timeFormat);
+      let xOffset = ctx.measureText(dateStr).width / 2;
+      ctx.fillText(dateStr, xPos - xOffset, top + 10);
+
+      nextPointInTime += timeResolution;
+      xPos += pixelStep;
+    }
+  }
+
   _renderCrosshair() {
     if (this.mouse.down != null) {
       return;
@@ -859,6 +923,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.moveTo(this.mouse.position.x, 0);
     ctx.lineTo(this.mouse.position.x, height);
     ctx.strokeStyle = this.panel.crosshairColor;
+    ctx.setLineDash([]);
     ctx.lineWidth = 1;
     ctx.stroke();
 

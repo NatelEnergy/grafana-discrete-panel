@@ -24,4 +24,9 @@ export declare class CanvasPanelCtrl extends MetricsPanelCtrl {
     onMouseClicked(where: any): void;
     onMouseSelectedRange(range: any): void;
     link(scope: any, elem: any, attrs: any, ctrl: any): void;
+    time_format(range: number, secPerTick: number): string;
+    getTimeResolution(estTimeInterval: number): number;
+    roundDate(timeStamp: any, roundee: any): any;
+    formatDate(d: any, fmt: any): any;
+    leftPad(n: any, pad: any): any;
 }

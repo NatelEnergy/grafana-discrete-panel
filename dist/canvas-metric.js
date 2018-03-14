@@ -257,6 +257,201 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                     //   elem.remove();
                     // });
                 };
+                // Utility Functions for time axis
+                //---------------------------------
+                CanvasPanelCtrl.prototype.time_format = function (range, secPerTick) {
+                    var oneDay = 86400000;
+                    var oneYear = 31536000000;
+                    if (secPerTick <= 45) {
+                        return '%H:%M:%S';
+                    }
+                    if (secPerTick <= 7200 || range <= oneDay) {
+                        return '%H:%M';
+                    }
+                    if (secPerTick <= 80000) {
+                        return '%m/%d %H:%M';
+                    }
+                    if (secPerTick <= 2419200 || range <= oneYear) {
+                        return '%m/%d';
+                    }
+                    return '%Y-%m';
+                };
+                CanvasPanelCtrl.prototype.getTimeResolution = function (estTimeInterval) {
+                    var timeIntInSecs = estTimeInterval / 1000;
+                    if (timeIntInSecs <= 30) {
+                        return 30 * 1000;
+                    }
+                    if (timeIntInSecs <= 60) {
+                        return 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 60 * 5) {
+                        return 5 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 60 * 10) {
+                        return 10 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 60 * 30) {
+                        return 30 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 60 * 60) {
+                        return 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 60 * 60) {
+                        return 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 2 * 60 * 60) {
+                        return 2 * 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 6 * 60 * 60) {
+                        return 6 * 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 12 * 60 * 60) {
+                        return 12 * 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 24 * 60 * 60) {
+                        return 24 * 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 2 * 24 * 60 * 60) {
+                        return 2 * 24 * 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 7 * 24 * 60 * 60) {
+                        return 7 * 24 * 60 * 60 * 1000;
+                    }
+                    if (timeIntInSecs <= 30 * 24 * 60 * 60) {
+                        return 30 * 24 * 60 * 60 * 1000;
+                    }
+                    return 6 * 30 * 24 * 60 * 60 * 1000;
+                };
+                CanvasPanelCtrl.prototype.roundDate = function (timeStamp, roundee) {
+                    timeStamp -= timeStamp % roundee; //subtract amount of time since midnight
+                    return timeStamp;
+                };
+                CanvasPanelCtrl.prototype.formatDate = function (d, fmt) {
+                    var monthNames = [
+                        'Jan',
+                        'Feb',
+                        'Mar',
+                        'Apr',
+                        'May',
+                        'Jun',
+                        'Jul',
+                        'Aug',
+                        'Sep',
+                        'Oct',
+                        'Nov',
+                        'Dec',
+                    ];
+                    var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    if (typeof d.strftime == 'function') {
+                        return d.strftime(fmt);
+                    }
+                    var r = [];
+                    var escape = false;
+                    var hours = d.getHours();
+                    var isAM = hours < 12;
+                    if (monthNames == null) {
+                        monthNames = [
+                            'Jan',
+                            'Feb',
+                            'Mar',
+                            'Apr',
+                            'May',
+                            'Jun',
+                            'Jul',
+                            'Aug',
+                            'Sep',
+                            'Oct',
+                            'Nov',
+                            'Dec',
+                        ];
+                    }
+                    if (dayNames == null) {
+                        dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    }
+                    var hours12;
+                    if (hours > 12) {
+                        hours12 = hours - 12;
+                    }
+                    else if (hours == 0) {
+                        hours12 = 12;
+                    }
+                    else {
+                        hours12 = hours;
+                    }
+                    for (var i = 0; i < fmt.length; ++i) {
+                        var c = fmt.charAt(i);
+                        if (escape) {
+                            switch (c) {
+                                case 'a':
+                                    c = '' + dayNames[d.getDay()];
+                                    break;
+                                case 'b':
+                                    c = '' + monthNames[d.getMonth()];
+                                    break;
+                                case 'd':
+                                    c = this.leftPad(d.getDate(), '');
+                                    break;
+                                case 'e':
+                                    c = this.leftPad(d.getDate(), ' ');
+                                    break;
+                                case 'h': // For back-compat with 0.7; remove in 1.0
+                                case 'H':
+                                    c = this.leftPad(hours, null);
+                                    break;
+                                case 'I':
+                                    c = this.leftPad(hours12, null);
+                                    break;
+                                case 'l':
+                                    c = this.leftPad(hours12, ' ');
+                                    break;
+                                case 'm':
+                                    c = this.leftPad(d.getMonth() + 1, '');
+                                    break;
+                                case 'M':
+                                    c = this.leftPad(d.getMinutes(), null);
+                                    break;
+                                // quarters not in Open Group's strftime specification
+                                case 'q':
+                                    c = '' + (Math.floor(d.getMonth() / 3) + 1);
+                                    break;
+                                case 'S':
+                                    c = this.leftPad(d.getSeconds(), null);
+                                    break;
+                                case 'y':
+                                    c = this.leftPad(d.getFullYear() % 100, null);
+                                    break;
+                                case 'Y':
+                                    c = '' + d.getFullYear();
+                                    break;
+                                case 'p':
+                                    c = isAM ? '' + 'am' : '' + 'pm';
+                                    break;
+                                case 'P':
+                                    c = isAM ? '' + 'AM' : '' + 'PM';
+                                    break;
+                                case 'w':
+                                    c = '' + d.getDay();
+                                    break;
+                            }
+                            r.push(c);
+                            escape = false;
+                        }
+                        else {
+                            if (c == '%') {
+                                escape = true;
+                            }
+                            else {
+                                r.push(c);
+                            }
+                        }
+                    }
+                    return r.join('');
+                };
+                CanvasPanelCtrl.prototype.leftPad = function (n, pad) {
+                    n = '' + n;
+                    pad = '' + (pad == null ? '0' : pad);
+                    return n.length == 1 ? pad + n : n;
+                };
                 return CanvasPanelCtrl;
             })(sdk_1.MetricsPanelCtrl);
             exports_1("CanvasPanelCtrl", CanvasPanelCtrl);

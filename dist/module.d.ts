@@ -22,14 +22,17 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
         }[];
         metricNameColor: string;
         valueTextColor: string;
+        timeTextColor: string;
         crosshairColor: string;
         backgroundColor: string;
         lineColor: string;
         textSize: number;
+        textSizeTime: number;
         extendLastValue: boolean;
         writeLastValue: boolean;
         writeAllValues: boolean;
         writeMetricNames: boolean;
+        showTimeAxis: boolean;
         showLegend: boolean;
         showLegendNames: boolean;
         showLegendValues: boolean;
@@ -51,6 +54,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     _renderDimensions: any;
     _selectionMatrix: Array<Array<String>>;
     constructor($scope: any, $injector: any);
+    onPanelInitialized(): void;
     onDataError(err: any): void;
     onInitEditMode(): void;
     onRender(): void;
@@ -82,6 +86,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     _renderRects(): void;
     _renderLabels(): void;
     _renderSelection(): void;
+    _renderTimeAxis(): void;
     _renderCrosshair(): void;
 }
 export { DiscretePanelCtrl as PanelCtrl };

@@ -102,14 +102,17 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         colorMaps: [{ text: 'N/A', color: '#CCC' }],
                         metricNameColor: '#000000',
                         valueTextColor: '#000000',
+                        timeTextColor: '#d8d9da',
                         crosshairColor: '#8F070C',
                         backgroundColor: 'rgba(128,128,128,0.1)',
                         lineColor: 'rgba(0,0,0,0.1)',
                         textSize: 24,
+                        textSizeTime: 12,
                         extendLastValue: true,
                         writeLastValue: true,
                         writeAllValues: false,
                         writeMetricNames: false,
+                        showTimeAxis: true,
                         showLegend: true,
                         showLegendNames: true,
                         showLegendValues: true,
@@ -121,7 +124,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     };
                     this.data = null;
                     this.externalPT = false;
-                    this.isTimeline = false;
+                    this.isTimeline = true;
                     this.isStacked = false;
                     this.hoverPoint = null;
                     this.colorMap = {};
@@ -132,14 +135,18 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this._selectionMatrix = [];
                     // defaults configs
                     lodash_1.default.defaultsDeep(this.panel, this.defaults);
+                    this.panel.display = 'timeline'; // Only supported version now
                     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
                     this.events.on('render', this.onRender.bind(this));
                     this.events.on('data-received', this.onDataReceived.bind(this));
+                    this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
                     this.events.on('data-error', this.onDataError.bind(this));
                     this.events.on('refresh', this.onRefresh.bind(this));
+                }
+                DiscretePanelCtrl.prototype.onPanelInitialized = function () {
                     this.updateColorInfo();
                     this.onConfigChanged();
-                }
+                };
                 DiscretePanelCtrl.prototype.onDataError = function (err) {
                     console.log('onDataError', err);
                 };
@@ -161,6 +168,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this._updateCanvasSize();
                     this._renderRects();
                     this._renderLabels();
+                    this._renderTimeAxis();
                     this._renderSelection();
                     this._renderCrosshair();
                 };
@@ -337,7 +345,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 };
                 DiscretePanelCtrl.prototype.onConfigChanged = function (update) {
                     if (update === void 0) { update = false; }
-                    //console.log( "Config changed...");
                     this.isTimeline = this.panel.display === 'timeline';
                     this.isStacked = this.panel.display === 'stacked';
                     this.formatter = null;
@@ -507,9 +514,13 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var rect = (this._renderDimensions.rect = this.wrap.getBoundingClientRect());
                     var rows = (this._renderDimensions.rows = this.data.length);
                     var rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
-                    var height = (this._renderDimensions.height = rowHeight * rows);
+                    var rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
+                    var timeHeight = 0;
+                    if (this.panel.showTimeAxis) {
+                        timeHeight = 10 + this.panel.textSizeTime;
+                    }
+                    var height = (this._renderDimensions.height = rowsHeight + timeHeight);
                     var width = (this._renderDimensions.width = rect.width);
-                    var rectHeight = (this._renderDimensions.rectHeight = rowHeight);
                     var top = 0;
                     var elapsed = this.range.to - this.range.from;
                     this._renderDimensions.matrix = [];
@@ -641,7 +652,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             if (!_this._selectionMatrix[i][j]) {
                                 ctx.globalAlpha = 0.3;
                             }
-                            ctx.fillRect(currentX, matrix[i].y, nextX - currentX, _this._renderDimensions.rectHeight);
+                            ctx.fillRect(currentX, matrix[i].y, nextX - currentX, _this._renderDimensions.rowHeight);
                             ctx.globalAlpha = globalAlphaTemp;
                         }
                         if (i > 0) {
@@ -661,10 +672,10 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     ctx.textBaseline = 'middle';
                     ctx.font = this.panel.textSize + 'px "Open Sans", Helvetica, Arial, sans-serif';
                     var offset = 2;
-                    var rectHeight = this._renderDimensions.rectHeight;
+                    var rowHeight = this._renderDimensions.rowHeight;
                     lodash_1.default.forEach(this.data, function (metric, i) {
                         var _a = _this._renderDimensions.matrix[i], y = _a.y, positions = _a.positions;
-                        var centerY = y + rectHeight / 2;
+                        var centerY = y + rowHeight / 2;
                         // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
                         // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
                         // let labelPositionValue = y + this.panel.textSize / 2;
@@ -719,7 +730,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                 var width = nextX - positions[j];
                                 // This clips the text within the given bounds
                                 ctx.save();
-                                ctx.rect(positions[j], y, width, rectHeight);
+                                ctx.rect(positions[j], y, width, rowHeight);
                                 ctx.clip();
                                 ctx.fillText(val, positions[j] + offset, labelPositionValue);
                                 ctx.restore();
@@ -747,6 +758,50 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     ctx.fillRect(xmin, 0, xmax - xmin, height);
                     ctx.strokeRect(xmin, 0, xmax - xmin, height);
                 };
+                DiscretePanelCtrl.prototype._renderTimeAxis = function () {
+                    if (!this.panel.showTimeAxis) {
+                        return;
+                    }
+                    var ctx = this.context;
+                    var rows = this.data.length;
+                    var rowHeight = this.panel.rowHeight;
+                    var height = this._renderDimensions.height;
+                    var width = this._renderDimensions.width;
+                    var top = this._renderDimensions.rowsHeight;
+                    var headerColumnIndent = 0; // header inset (zero for now)
+                    ctx.font = this.panel.textSizeTime + 'px "Open Sans", Helvetica, Arial, sans-serif';
+                    ctx.fillStyle = this.panel.timeTextColor;
+                    ctx.textAlign = 'left';
+                    ctx.strokeStyle = this.panel.timeTextColor;
+                    ctx.textBaseline = 'top';
+                    ctx.setLineDash([7, 5]); // dashes are 5px and spaces are 3px
+                    ctx.lineDashOffset = 0;
+                    var min = lodash_1.default.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+                    var max = lodash_1.default.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+                    var minPxInterval = ctx.measureText('12/33 24:59').width * 2;
+                    var estNumTicks = width / minPxInterval;
+                    var estTimeInterval = (max - min) / estNumTicks;
+                    var timeResolution = this.getTimeResolution(estTimeInterval);
+                    var pixelStep = timeResolution / (max - min) * width;
+                    var nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
+                    var xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
+                    var timeFormat = this.time_format(max - min, timeResolution / 1000);
+                    while (nextPointInTime < max) {
+                        // draw ticks
+                        ctx.beginPath();
+                        ctx.moveTo(xPos, top + 5);
+                        ctx.lineTo(xPos, 0);
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        // draw time label
+                        var date = new Date(nextPointInTime);
+                        var dateStr = this.formatDate(date, timeFormat);
+                        var xOffset = ctx.measureText(dateStr).width / 2;
+                        ctx.fillText(dateStr, xPos - xOffset, top + 10);
+                        nextPointInTime += timeResolution;
+                        xPos += pixelStep;
+                    }
+                };
                 DiscretePanelCtrl.prototype._renderCrosshair = function () {
                     if (this.mouse.down != null) {
                         return;
@@ -765,6 +820,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     ctx.moveTo(this.mouse.position.x, 0);
                     ctx.lineTo(this.mouse.position.x, height);
                     ctx.strokeStyle = this.panel.crosshairColor;
+                    ctx.setLineDash([]);
                     ctx.lineWidth = 1;
                     ctx.stroke();
                     // Draw a Circle around the point if showing a tooltip
