@@ -515,7 +515,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var rows = (this._renderDimensions.rows = this.data.length);
                     var rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
                     var rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
-                    var timeHeight = (this.panel.showTimeAxis) ? (14 + this.panel.textSizeTime) : 0;
+                    var timeHeight = this.panel.showTimeAxis ? 14 + this.panel.textSizeTime : 0;
                     var height = (this._renderDimensions.height = rowsHeight + timeHeight);
                     var width = (this._renderDimensions.width = rect.width);
                     var top = 0;
@@ -691,18 +691,21 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                         hoverTextStart = positions[j] + offset;
                                         ctx.fillText(val, hoverTextStart, labelPositionValue);
                                         var txtinfo = ctx.measureText(val);
-                                        hoverTextEnd = hoverTextStart + txtinfo.width;
+                                        hoverTextEnd = hoverTextStart + txtinfo.width + 4;
                                         break;
                                     }
                                 }
                             }
                         }
+                        var minTextSpot = 0;
+                        var maxTextSpot = _this._renderDimensions.width;
                         if (_this.panel.writeMetricNames) {
                             ctx.fillStyle = _this.panel.metricNameColor;
                             ctx.textAlign = 'left';
                             var txtinfo = ctx.measureText(metric.name);
                             if (hoverTextStart < 0 || hoverTextStart > txtinfo.width) {
                                 ctx.fillText(metric.name, offset, labelPositionMetricName);
+                                minTextSpot = offset + ctx.measureText(metric.name).width + 2;
                             }
                         }
                         if (_this.panel.writeLastValue) {
@@ -713,6 +716,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             var xval = _this._renderDimensions.width - offset - txtinfo.width;
                             if (xval > hoverTextEnd) {
                                 ctx.fillText(val, _this._renderDimensions.width - offset, labelPositionLastValue);
+                                maxTextSpot = _this._renderDimensions.width - ctx.measureText(val).width - 10;
                             }
                         }
                         if (_this.panel.writeAllValues) {
@@ -724,13 +728,18 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                 if (j + 1 !== positions.length) {
                                     nextX = positions[j + 1];
                                 }
-                                var width = nextX - positions[j];
-                                // This clips the text within the given bounds
-                                ctx.save();
-                                ctx.rect(positions[j], y, width, rowHeight);
-                                ctx.clip();
-                                ctx.fillText(val, positions[j] + offset, labelPositionValue);
-                                ctx.restore();
+                                var x = positions[j];
+                                if (x > minTextSpot) {
+                                    var width = nextX - x;
+                                    if (maxTextSpot > (x + width)) {
+                                        // This clips the text within the given bounds
+                                        ctx.save();
+                                        ctx.rect(x, y, width, rowHeight);
+                                        ctx.clip();
+                                        ctx.fillText(val, x + offset, labelPositionValue);
+                                        ctx.restore();
+                                    }
+                                }
                             }
                         }
                     });

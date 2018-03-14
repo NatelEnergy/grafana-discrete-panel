@@ -41,6 +41,7 @@ yarn pretty
 * Formatting with prettier.js
 * Only hide hover text when it collides
 * Show time axis (copied from novatec-grafana-discrete-panel)
+* Improved text collision behavior
 
 ##### v0.0.6
 

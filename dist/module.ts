@@ -567,7 +567,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const rows = (this._renderDimensions.rows = this.data.length);
     const rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
     const rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
-    const timeHeight = (this.panel.showTimeAxis) ? (14 + this.panel.textSizeTime) : 0;
+    const timeHeight = this.panel.showTimeAxis ? 14 + this.panel.textSizeTime : 0;
     const height = (this._renderDimensions.height = rowsHeight + timeHeight);
     const width = (this._renderDimensions.width = rect.width);
 
@@ -770,19 +770,22 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
               hoverTextStart = positions[j] + offset;
               ctx.fillText(val, hoverTextStart, labelPositionValue);
               const txtinfo = ctx.measureText(val);
-              hoverTextEnd = hoverTextStart + txtinfo.width;
+              hoverTextEnd = hoverTextStart + txtinfo.width + 4;
               break;
             }
           }
         }
       }
 
+      let minTextSpot = 0;
+      let maxTextSpot = this._renderDimensions.width;
       if (this.panel.writeMetricNames) {
         ctx.fillStyle = this.panel.metricNameColor;
         ctx.textAlign = 'left';
         const txtinfo = ctx.measureText(metric.name);
         if (hoverTextStart < 0 || hoverTextStart > txtinfo.width) {
           ctx.fillText(metric.name, offset, labelPositionMetricName);
+          minTextSpot = offset + ctx.measureText(metric.name).width + 2;
         }
       }
       if (this.panel.writeLastValue) {
@@ -797,6 +800,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
             this._renderDimensions.width - offset,
             labelPositionLastValue
           );
+          maxTextSpot = this._renderDimensions.width - ctx.measureText(val).width - 10;
         }
       }
 
@@ -809,15 +813,20 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           if (j + 1 !== positions.length) {
             nextX = positions[j + 1];
           }
-          const width = nextX - positions[j];
 
-          // This clips the text within the given bounds
-          ctx.save();
-          ctx.rect(positions[j], y, width, rowHeight);
-          ctx.clip();
+          const x = positions[j]
+          if(x > minTextSpot) {
+            const width = nextX - x;
+            if( maxTextSpot > (x+width) ) {
+              // This clips the text within the given bounds
+              ctx.save();
+              ctx.rect(x, y, width, rowHeight);
+              ctx.clip();
 
-          ctx.fillText(val, positions[j] + offset, labelPositionValue);
-          ctx.restore();
+              ctx.fillText(val, x + offset, labelPositionValue);
+              ctx.restore();
+            }
+          }
         }
       }
     });
