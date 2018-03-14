@@ -731,7 +731,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                 var x = positions[j];
                                 if (x > minTextSpot) {
                                     var width = nextX - x;
-                                    if (maxTextSpot > (x + width)) {
+                                    if (maxTextSpot > x + width) {
                                         // This clips the text within the given bounds
                                         ctx.save();
                                         ctx.rect(x, y, width, rowHeight);

@@ -814,10 +814,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
             nextX = positions[j + 1];
           }
 
-          const x = positions[j]
-          if(x > minTextSpot) {
+          const x = positions[j];
+          if (x > minTextSpot) {
             const width = nextX - x;
-            if( maxTextSpot > (x+width) ) {
+            if (maxTextSpot > x + width) {
               // This clips the text within the given bounds
               ctx.save();
               ctx.rect(x, y, width, rowHeight);
