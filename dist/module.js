@@ -142,7 +142,11 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
                     this.events.on('data-error', this.onDataError.bind(this));
                     this.events.on('refresh', this.onRefresh.bind(this));
+                    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
                 }
+                DiscretePanelCtrl.prototype.onDataSnapshotLoad = function (snapshotData) {
+                    this.onDataReceived(snapshotData);
+                };
                 DiscretePanelCtrl.prototype.onPanelInitialized = function () {
                     this.updateColorInfo();
                     this.onConfigChanged();
@@ -286,9 +290,27 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         }
                     });
                     this.data = data;
+                    //anthony start
+                    /*
+                    if (this.dashboard.snapshot && this.locations) {
+                        this.panel.snapshotLocationData = this.locations;
+                      }
+                    */
+                    //anthony end
                     this.onRender();
                     //console.log( 'data', dataList, this.data);
                 };
+                //anthony 
+                /*
+                loadLocationDataFromFile(reload) {
+                  if (this.map && !reload) return;
+                
+                  if (this.panel.snapshotLocationData) {
+                    this.locations = this.panel.snapshotLocationData;
+                    return;
+                  }
+                */
+                //anthonyend
                 DiscretePanelCtrl.prototype.removeColorMap = function (map) {
                     var index = lodash_1.default.indexOf(this.panel.colorMaps, map);
                     this.panel.colorMaps.splice(index, 1);
