@@ -318,7 +318,6 @@ onDataSnapshotLoad(snapshotData) {
       }
     });
     this.data = data;
-
     this.onRender();
 }
 
