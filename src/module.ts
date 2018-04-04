@@ -319,30 +319,8 @@ onDataSnapshotLoad(snapshotData) {
     });
     this.data = data;
 
-//anthony start
-/*
-if (this.dashboard.snapshot && this.locations) {
-    this.panel.snapshotLocationData = this.locations;
-  }
-*/
-//anthony end
     this.onRender();
-
-    //console.log( 'data', dataList, this.data);
-  }
-
-
-//anthony 
-/*
-loadLocationDataFromFile(reload) {
-  if (this.map && !reload) return;
-
-  if (this.panel.snapshotLocationData) {
-    this.locations = this.panel.snapshotLocationData;
-    return;
-  }
-*/
-//anthonyend
+}
 
   removeColorMap(map) {
     let index = _.indexOf(this.panel.colorMaps, map);
