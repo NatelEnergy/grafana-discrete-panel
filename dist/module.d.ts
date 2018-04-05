@@ -54,6 +54,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     _renderDimensions: any;
     _selectionMatrix: Array<Array<String>>;
     constructor($scope: any, $injector: any);
+    onDataSnapshotLoad(snapshotData: any): void;
     onPanelInitialized(): void;
     onDataError(err: any): void;
     onInitEditMode(): void;
