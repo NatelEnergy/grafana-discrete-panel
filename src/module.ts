@@ -131,12 +131,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
     this.events.on('data-error', this.onDataError.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
-this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
   }
 
-onDataSnapshotLoad(snapshotData) {
-  this.onDataReceived(snapshotData);
-}
+  onDataSnapshotLoad(snapshotData) {
+    this.onDataReceived(snapshotData);
+  }
 
   onPanelInitialized() {
     this.updateColorInfo();
@@ -319,7 +319,7 @@ onDataSnapshotLoad(snapshotData) {
     });
     this.data = data;
     this.onRender();
-}
+  }
 
   removeColorMap(map) {
     let index = _.indexOf(this.panel.colorMaps, map);
