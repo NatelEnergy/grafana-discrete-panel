@@ -7,10 +7,25 @@ import {DistinctPoints} from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
+import './jquery-ui';
 import moment from 'moment';
 import kbn from 'app/core/utils/kbn';
 
 import appEvents from 'app/core/app_events';
+import 'plugins/natel-discrete-panel/css/jquery-ui-overcast.css!';
+
+//copied from core
+class AnnotationEvent {
+  dashboardId: number;
+  panelId: number;
+  userId: number;
+  time: any;
+  timeEnd: any;
+  isRegion: boolean;
+  text: string;
+  type: string;
+  tags: Array<string>; //changed from core
+}
 
 const grafanaColors = [
   '#7EB26D',
@@ -76,6 +91,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   static templateUrl = 'partials/module.html';
   static scrollable = true;
 
+  annotations: any = [];
+  annotationsPromise: any;
+
   defaults = {
     display: 'timeline', // or 'stacked'
     rowHeight: 50,
@@ -118,7 +136,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _renderDimensions: any = {};
   _selectionMatrix: Array<Array<String>> = [];
 
-  constructor($scope, $injector) {
+  constructor($scope, $injector, private annotationsSrv) {
     super($scope, $injector);
 
     // defaults configs
@@ -131,6 +149,31 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
     this.events.on('data-error', this.onDataError.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
+    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+
+    $('<link/>', {
+      rel: 'stylesheet',
+      type: 'text/css',
+      href: 'public/plugins/natel-discrete-panel/css/jquery-ui-overcast.css',
+    }).appendTo('head');
+  }
+
+  issueQueries(datasource) {
+    this.annotationsPromise = this.annotationsSrv.getAnnotations({
+      dashboard: this.dashboard,
+      panel: this.panel,
+      range: this.range,
+    });
+    return super.issueQueries(datasource);
+  }
+
+  onDataSnapshotLoad(snapshotData) {
+    this.annotationsPromise = this.annotationsSrv.getAnnotations({
+      dashboard: this.dashboard,
+      panel: this.panel,
+      range: this.range,
+    });
+    this.onDataReceived(snapshotData);
   }
 
   onPanelInitialized() {
@@ -139,6 +182,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onDataError(err) {
+    this.annotations = [];
     console.log('onDataError', err);
   }
 
@@ -179,6 +223,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._updateCanvasSize();
     this._renderRects();
     this._renderTimeAxis();
+    this._renderAnnotationAxis();
     this._renderLabels();
     this._renderSelection();
     this._renderCrosshair();
@@ -284,8 +329,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
 
-    //    console.log('GOT', dataList);
-
     let data = [];
     _.forEach(dataList, metric => {
       if ('table' === metric.type) {
@@ -312,11 +355,21 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         data.push(res);
       }
     });
+
+    this.annotationsPromise.then(
+      result => {
+        this.loading = false;
+        this.annotations = result.annotations;
+        this.render();
+      },
+      () => {
+        this.loading = false;
+        this.render();
+      }
+    );
+
     this.data = data;
-
     this.onRender();
-
-    //console.log( 'data', dataList, this.data);
   }
 
   removeColorMap(map) {
@@ -443,6 +496,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   //------------------
 
   showTooltip(evt, point, isExternal) {
+    $('#annot_view_id').remove();
+    let annotation_to_display;
+
     let from = point.start;
     let to = point.start + point.ms;
     let time = point.ms;
@@ -456,14 +512,41 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     let body = '<div class="graph-tooltip-time">' + val + '</div>';
-
     body += '<center>';
-    body += this.dashboard.formatDate(moment(from)) + '<br/>';
-    body += 'to<br/>';
-    body += this.dashboard.formatDate(moment(to)) + '<br/><br/>';
-    body += moment.duration(time).humanize() + '<br/>';
-    body += '</center>';
 
+    let annot_found = false;
+    if (evt.pos.panelRelY > 0.7) {
+      for (var i = 0; i < this.annotations.length; i++) {
+        let x_position = Math.round(evt.pos.x);
+        if (this.annotations[i].isRegion == true) {
+          if (
+            x_position > this.annotations[i].time &&
+            x_position < this.annotations[i].timeEnd
+          ) {
+            annot_found = true;
+            annotation_to_display = this.annotations[i];
+          }
+        } else {
+          //single annotation with no region
+          if (
+            this.annotations[i].time >= x_position - 3000 &&
+            this.annotations[i].time <= x_position + 3000
+          ) {
+            annot_found = true;
+            annotation_to_display = this.annotations[i];
+          }
+        }
+      }
+    }
+
+    if (annot_found == false) {
+      body += this.dashboard.formatDate(moment(from)) + '<br/>';
+      body += 'to<br/>';
+      body += this.dashboard.formatDate(moment(to)) + '<br/><br/>';
+      body += moment.duration(time).humanize() + '<br/>';
+    }
+
+    body += '</center>';
     let pageX = 0;
     let pageY = 0;
     if (isExternal) {
@@ -484,7 +567,193 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       pageY = evt.evt.pageY;
     }
 
-    this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
+    if (annot_found == false) {
+      this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
+    } else {
+      //annotation to display
+      if (annotation_to_display.annotation === undefined) {
+        this.$tooltip.detach();
+        this.showAnnotationInfo(annotation_to_display, pageX + 5, pageY + 5);
+      } else {
+        body += this.dateFormat(annotation_to_display.time);
+        this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
+      }
+    }
+  }
+
+  dateFormat(timeStamp) {
+    let alertDate = new Date(timeStamp);
+    return (
+      alertDate.getDate() +
+      '-' +
+      (alertDate.getMonth() + 1) +
+      '-' +
+      alertDate.getFullYear() +
+      ' ' +
+      alertDate.getHours() +
+      ':' +
+      alertDate.getMinutes()
+    );
+  }
+
+  showAnnotationInfo(annotation, x, y) {
+    let range;
+    let isRange = false;
+    let evt;
+    if (annotation.isRegion) {
+      isRange = true;
+      range = {from: moment.utc(annotation.time), to: moment.utc(annotation.timeEnd)};
+    } else {
+      range = {from: moment.utc(annotation.time)};
+    }
+
+    $(
+      '<button id="annot_view_id">' +
+        annotation.text +
+        '<br />' +
+        annotation.tags.toString() +
+        ' <br /></button>'
+    )
+      .css('left', x)
+      .css('top', y)
+      .appendTo('body')
+      .button({text: 'text', icons: {primary: 'ui-icon-pencil'}})
+      .data('localdata', this)
+      .click(function() {
+        $(this)
+          .data('localdata')
+          .showTooltipAnnotation(isRange, range, annotation, x, y);
+      });
+  }
+
+  showTooltipAnnotation(isRange, range, annotation, x, y) {
+    let titleStr = 'Add annotation ';
+    let description = '';
+    let tag = '';
+
+    if (annotation !== undefined) {
+      description = annotation.text;
+      tag = annotation.tags.toString();
+    }
+
+    titleStr += this.dateFormat(range.from.toString());
+
+    let buttons = {
+      Save: function() {
+        let annot_description = $('#annot_description').val();
+        let annot_tag = $('#annot_tag').val();
+
+        let event = new AnnotationEvent();
+        event.panelId = $(this).data('localdata').panel.id;
+        event.userId = $(this).data(
+          'localdata'
+        ).annotationsSrv.$rootScope.contextSrv.user.id;
+        event.dashboardId = $(this).data('localdata').dashboard.id;
+        event.time = Date.parse($(this).data('range').from);
+
+        if ($(this).data('isRange') == true) {
+          event.timeEnd = Date.parse($(this).data('range').to);
+          event.isRegion = true;
+        } else {
+          event.isRegion = false;
+        }
+
+        event.text = annot_description;
+        let tags = [annot_tag]; //TODO allow more than one tag
+
+        event.tags = tags;
+
+        if ($(this).data('annotation') !== undefined) {
+          let annotation = $(this).data('annotation');
+          annotation.text = annot_description;
+          annotation.tags = tags;
+
+          $(this)
+            .data('localdata')
+            .annotationsSrv.updateAnnotationEvent(annotation)
+            .then(() => {
+              $(this)
+                .data('localdata')
+                .refresh();
+              $(this).dialog('close');
+            })
+            .catch(err => {
+              $(this)
+                .data('localdata')
+                .refresh();
+              $(this).dialog('close');
+            });
+        } else {
+          $(this)
+            .data('localdata')
+            .annotationsSrv.saveAnnotationEvent(event)
+            .then(() => {
+              $(this)
+                .data('localdata')
+                .refresh();
+              $(this).dialog('close');
+            })
+            .catch(err => {
+              $(this)
+                .data('localdata')
+                .refresh();
+            });
+        }
+      },
+      Cancel: function() {
+        $(this).dialog('close');
+      },
+    };
+
+    if (annotation !== undefined) {
+      buttons['Delete'] = function() {
+        $(this)
+          .data('localdata')
+          .annotationsSrv.deleteAnnotationEvent($(this).data('annotation'))
+          .then(() => {
+            $(this)
+              .data('localdata')
+              .refresh();
+            $(this).dialog('close');
+          })
+          .catch(err => {
+            console.log(err);
+            $(this)
+              .data('localdata')
+              .refresh();
+            $(this).dialog('close');
+          });
+      };
+    }
+
+    $(
+      '<form style="width:350;height:250;" id="annot_form_id"><table><tr><td>Description:</td><td><textarea rows="2" id="annot_description" style="z-index:10000;background-color:#ffffff;color:#000000;" form="annot_form_id">' +
+        description +
+        '</textarea></td></tr><tr><td>Tag:</td><td><input type="text" id="annot_tag" form="annot_form_id"  style="z-index:10000;border:1px;background-color:#ffffff;color:#000000;" value=' +
+        tag +
+        '></td></tr></form>'
+    )
+      .appendTo('body')
+      .data('localdata', this)
+      .data('isRange', isRange)
+      .data('range', range)
+      .data('annotation', annotation)
+      .dialog({
+        modal: true,
+        width: 350,
+        height: 250,
+        title: titleStr,
+        buttons: buttons,
+      });
+  }
+
+  tryEpochToMoment(timestamp) {
+    if (timestamp && _.isNumber(timestamp)) {
+      let epoch = Number(timestamp);
+      return moment(epoch);
+    } else {
+      return timestamp;
+    }
   }
 
   onGraphHover(evt, showTT, isExternal) {
@@ -548,6 +817,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onMouseSelectedRange(range) {
     this.timeSrv.setTime(range);
+    this.clear();
+  }
+
+  onMouseSelectedRangeAnnotation(evt, isRange, range, x, y) {
+    this.clear();
+    this.showTooltipAnnotation(isRange, range, undefined, x, y);
     this.clear();
   }
 
@@ -750,9 +1025,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       const {y, positions} = this._renderDimensions.matrix[i];
 
       const centerY = y + rowHeight / 2;
-      // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
-      // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
-      // let labelPositionValue = y + this.panel.textSize / 2;
       let labelPositionMetricName = centerY;
       let labelPositionLastValue = centerY;
       let labelPositionValue = centerY;
@@ -890,6 +1162,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     let timeFormat = this.time_format(max - min, timeResolution / 1000);
 
+    let isUTC = false;
+    if (this.dashboard.timezone == 'utc') {
+      isUTC = true;
+    }
+
     while (nextPointInTime < max) {
       // draw ticks
       ctx.beginPath();
@@ -900,12 +1177,147 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
       // draw time label
       let date = new Date(nextPointInTime);
-      let dateStr = this.formatDate(date, timeFormat);
+      let dateStr = this.formatDate(date, timeFormat, isUTC);
       let xOffset = ctx.measureText(dateStr).width / 2;
       ctx.fillText(dateStr, xPos - xOffset, top + 10);
 
       nextPointInTime += timeResolution;
       xPos += pixelStep;
+    }
+  }
+
+  _renderAnnotationAxis() {
+    if (!this.panel.showTimeAxis) {
+      return;
+    }
+
+    const ctx = this.context;
+    const rows = this.data.length;
+    const rowHeight = this.panel.rowHeight;
+    const height = this._renderDimensions.height;
+    const width = this._renderDimensions.width;
+    const top = this._renderDimensions.rowsHeight;
+
+    const headerColumnIndent = 0; // header inset (zero for now)
+
+    ctx.font = this.panel.textSizeTime + 'px "Open Sans", Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#7FE9FF';
+    ctx.textAlign = 'left';
+    ctx.strokeStyle = '#7FE9FF';
+
+    ctx.textBaseline = 'top';
+    ctx.setLineDash([3, 3]);
+    ctx.lineDashOffset = 0;
+
+    let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+    let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+    let minPxInterval = ctx.measureText('12/33 24:59').width * 2;
+    let estNumTicks = width / minPxInterval;
+    let estTimeInterval = (max - min) / estNumTicks;
+    let timeResolution = this.getTimeResolution(estTimeInterval);
+    let pixelStep = timeResolution / (max - min) * width;
+    let nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
+    let xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
+
+    let timeFormat = this.time_format(max - min, timeResolution / 1000);
+
+    for (var i = 0; i < this.annotations.length; i++) {
+      ctx.setLineDash([3, 3]);
+
+      let isAlert = false;
+      if (this.annotations[i].annotation === undefined) {
+        // grafana annotation
+        ctx.fillStyle = '#7FE9FF';
+        ctx.strokeStyle = '#7FE9FF';
+      } else {
+        isAlert = true;
+        ctx.fillStyle = '#EA0F3B'; //red
+        ctx.strokeStyle = '#EA0F3B';
+      }
+
+      nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
+      this._drawVertical(
+        ctx,
+        this.annotations[i].time,
+        min,
+        max,
+        nextPointInTime,
+        headerColumnIndent,
+        top,
+        width,
+        isAlert
+      );
+
+      //do the  TO rangeMap
+      if (this.annotations[i].isRegion == true) {
+        nextPointInTime = this.roundDate(max, timeResolution) + timeResolution;
+        this._drawVertical(
+          ctx,
+          this.annotations[i].timeEnd,
+          min,
+          max,
+          nextPointInTime,
+          headerColumnIndent,
+          top,
+          width,
+          isAlert
+        );
+
+        //draw horizontal line at bottom
+        let xPosStart =
+          headerColumnIndent + (this.annotations[i].time - min) / (max - min) * width;
+        let xPosEnd =
+          headerColumnIndent + (this.annotations[i].timeEnd - min) / (max - min) * width;
+        // draw ticks
+        ctx.beginPath();
+
+        ctx.moveTo(xPosStart, top + 5);
+        ctx.lineTo(xPosEnd, top + 5);
+
+        ctx.lineWidth = 4;
+        ctx.setLineDash([]);
+        ctx.stroke();
+        //end horizontal
+
+        //do transparency
+        if (isAlert == false) {
+          ctx.save();
+          ctx.fillStyle = '#7FE9FF';
+          ctx.globalAlpha = 0.2;
+          ctx.fillRect(xPosStart, 0, xPosEnd - xPosStart, rowHeight);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+  }
+
+  _drawVertical(
+    ctx,
+    timeVal,
+    min,
+    max,
+    nextPointInTime,
+    headerColumnIndent,
+    top,
+    width,
+    isAlert
+  ) {
+    let xPos = headerColumnIndent + (timeVal - min) / (max - min) * width;
+    // draw ticks
+    ctx.beginPath();
+    ctx.moveTo(xPos, top + 5);
+    ctx.lineTo(xPos, 0);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // draw time label
+    let date = new Date(nextPointInTime);
+
+    if (isAlert == true) {
+      let dateStr = '\u25B2';
+      let xOffset = ctx.measureText(dateStr).width / 2;
+      ctx.fillText(dateStr, xPos - xOffset, top + 10);
     }
   }
 

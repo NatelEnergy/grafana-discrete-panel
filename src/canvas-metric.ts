@@ -40,12 +40,10 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   onPanelInitalized() {
-    //console.log("onPanelInitalized()");
     this.render();
   }
 
   onRefresh() {
-    //console.log("onRefresh()");
     this.render();
   }
 
@@ -149,6 +147,10 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     console.log('CANVAS Range', range);
   }
 
+  onMouseSelectedRangeAnnotation(evt, isRange, range, x, y) {
+    console.log('CANVAS Range add annotation', range, x, y);
+  }
+
   link(scope, elem, attrs, ctrl) {
     this.wrap = elem.find('.canvas-spot')[0];
     this.canvas = document.createElement('canvas');
@@ -233,13 +235,23 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           if (up.x === this.mouse.down.x && up.y === this.mouse.down.y) {
             this.mouse.position = null;
             this.mouse.down = null;
-            this.onMouseClicked(up);
+            if (evt.metaKey == true) {
+              let range = {from: moment.utc(up.ts)};
+              this.onMouseSelectedRangeAnnotation(evt, false, range, up.x, up.y);
+            } else {
+              this.onMouseClicked(up);
+            }
           } else {
             let min = Math.min(this.mouse.down.ts, up.ts);
             let max = Math.max(this.mouse.down.ts, up.ts);
             let range = {from: moment.utc(min), to: moment.utc(max)};
             this.mouse.position = up;
-            this.onMouseSelectedRange(range);
+
+            if (evt.metaKey == true) {
+              this.onMouseSelectedRangeAnnotation(evt, true, range, up.x, up.y);
+            } else {
+              this.onMouseSelectedRange(range);
+            }
           }
         }
         this.mouse.down = null;
@@ -415,7 +427,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     return timeStamp;
   }
 
-  formatDate(d, fmt) {
+  formatDate(d, fmt, isUTC) {
     let monthNames = [
       'Jan',
       'Feb',
@@ -438,6 +450,11 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     let r = [];
     let escape = false;
     let hours = d.getHours();
+
+    if (isUTC) {
+      hours = d.getUTCHours();
+    }
+
     let isAM = hours < 12;
 
     if (monthNames == null) {
@@ -477,16 +494,32 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       if (escape) {
         switch (c) {
           case 'a':
-            c = '' + dayNames[d.getDay()];
+            if (isUTC) {
+              c = '' + dayNames[d.getUTCDay()];
+            } else {
+              c = '' + dayNames[d.getDay()];
+            }
             break;
           case 'b':
-            c = '' + monthNames[d.getMonth()];
+            if (isUTC) {
+              c = '' + monthNames[d.getUTCMonth()];
+            } else {
+              c = '' + monthNames[d.getMonth()];
+            }
             break;
           case 'd':
-            c = this.leftPad(d.getDate(), '');
+            if (isUTC) {
+              c = this.leftPad(d.getUTCDate(), '');
+            } else {
+              c = this.leftPad(d.getDate(), '');
+            }
             break;
           case 'e':
-            c = this.leftPad(d.getDate(), ' ');
+            if (isUTC) {
+              c = this.leftPad(d.getUTCDate(), ' ');
+            } else {
+              c = this.leftPad(d.getDate(), '');
+            }
             break;
           case 'h': // For back-compat with 0.7; remove in 1.0
           case 'H':
@@ -499,23 +532,47 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
             c = this.leftPad(hours12, ' ');
             break;
           case 'm':
-            c = this.leftPad(d.getMonth() + 1, '');
+            if (isUTC) {
+              c = this.leftPad(d.getUTCMonth() + 1, '');
+            } else {
+              c = this.leftPad(d.getMonth() + 1, '');
+            }
             break;
           case 'M':
-            c = this.leftPad(d.getMinutes(), null);
+            if (isUTC) {
+              c = this.leftPad(d.getUTCMinutes(), null);
+            } else {
+              c = this.leftPad(d.getMinutes(), null);
+            }
             break;
           // quarters not in Open Group's strftime specification
           case 'q':
-            c = '' + (Math.floor(d.getMonth() / 3) + 1);
+            if (isUTC) {
+              c = '' + (Math.floor(d.getUTCMonth() / 3) + 1);
+            } else {
+              c = '' + (Math.floor(d.getMonth() / 3) + 1);
+            }
             break;
           case 'S':
-            c = this.leftPad(d.getSeconds(), null);
+            if (isUTC) {
+              c = this.leftPad(d.getUTCSeconds(), null);
+            } else {
+              c = this.leftPad(d.getSeconds(), null);
+            }
             break;
           case 'y':
-            c = this.leftPad(d.getFullYear() % 100, null);
+            if (isUTC) {
+              c = this.leftPad(d.getUTCFullYear() % 100, null);
+            } else {
+              c = this.leftPad(d.getFullYear() % 100, null);
+            }
             break;
           case 'Y':
-            c = '' + d.getFullYear();
+            if (isUTC) {
+              c = '' + d.getUTCFullYear();
+            } else {
+              c = '' + d.getFullYear();
+            }
             break;
           case 'p':
             c = isAM ? '' + 'am' : '' + 'pm';
@@ -524,7 +581,11 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
             c = isAM ? '' + 'AM' : '' + 'PM';
             break;
           case 'w':
-            c = '' + d.getDay();
+            if (isUTC) {
+              c = '' + d.getUTCDay();
+            } else {
+              c = '' + d.getDay();
+            }
             break;
         }
         r.push(c);

@@ -43,11 +43,9 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                     }
                 }
                 CanvasPanelCtrl.prototype.onPanelInitalized = function () {
-                    //console.log("onPanelInitalized()");
                     this.render();
                 };
                 CanvasPanelCtrl.prototype.onRefresh = function () {
-                    //console.log("onRefresh()");
                     this.render();
                 };
                 // Typically you will override this
@@ -134,6 +132,9 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                 CanvasPanelCtrl.prototype.onMouseSelectedRange = function (range) {
                     console.log('CANVAS Range', range);
                 };
+                CanvasPanelCtrl.prototype.onMouseSelectedRangeAnnotation = function (evt, isRange, range, x, y) {
+                    console.log('CANVAS Range add annotation', range, x, y);
+                };
                 CanvasPanelCtrl.prototype.link = function (scope, elem, attrs, ctrl) {
                     var _this = this;
                     this.wrap = elem.find('.canvas-spot')[0];
@@ -193,14 +194,25 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                             if (up.x === _this.mouse.down.x && up.y === _this.mouse.down.y) {
                                 _this.mouse.position = null;
                                 _this.mouse.down = null;
-                                _this.onMouseClicked(up);
+                                if (evt.metaKey == true) {
+                                    var range = { from: moment_1.default.utc(up.ts) };
+                                    _this.onMouseSelectedRangeAnnotation(evt, false, range, up.x, up.y);
+                                }
+                                else {
+                                    _this.onMouseClicked(up);
+                                }
                             }
                             else {
                                 var min = Math.min(_this.mouse.down.ts, up.ts);
                                 var max = Math.max(_this.mouse.down.ts, up.ts);
                                 var range = { from: moment_1.default.utc(min), to: moment_1.default.utc(max) };
                                 _this.mouse.position = up;
-                                _this.onMouseSelectedRange(range);
+                                if (evt.metaKey == true) {
+                                    _this.onMouseSelectedRangeAnnotation(evt, true, range, up.x, up.y);
+                                }
+                                else {
+                                    _this.onMouseSelectedRange(range);
+                                }
                             }
                         }
                         _this.mouse.down = null;
@@ -326,7 +338,7 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                     timeStamp -= timeStamp % roundee; //subtract amount of time since midnight
                     return timeStamp;
                 };
-                CanvasPanelCtrl.prototype.formatDate = function (d, fmt) {
+                CanvasPanelCtrl.prototype.formatDate = function (d, fmt, isUTC) {
                     var monthNames = [
                         'Jan',
                         'Feb',
@@ -348,6 +360,9 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                     var r = [];
                     var escape = false;
                     var hours = d.getHours();
+                    if (isUTC) {
+                        hours = d.getUTCHours();
+                    }
                     var isAM = hours < 12;
                     if (monthNames == null) {
                         monthNames = [
@@ -383,16 +398,36 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                         if (escape) {
                             switch (c) {
                                 case 'a':
-                                    c = '' + dayNames[d.getDay()];
+                                    if (isUTC) {
+                                        c = '' + dayNames[d.getUTCDay()];
+                                    }
+                                    else {
+                                        c = '' + dayNames[d.getDay()];
+                                    }
                                     break;
                                 case 'b':
-                                    c = '' + monthNames[d.getMonth()];
+                                    if (isUTC) {
+                                        c = '' + monthNames[d.getUTCMonth()];
+                                    }
+                                    else {
+                                        c = '' + monthNames[d.getMonth()];
+                                    }
                                     break;
                                 case 'd':
-                                    c = this.leftPad(d.getDate(), '');
+                                    if (isUTC) {
+                                        c = this.leftPad(d.getUTCDate(), '');
+                                    }
+                                    else {
+                                        c = this.leftPad(d.getDate(), '');
+                                    }
                                     break;
                                 case 'e':
-                                    c = this.leftPad(d.getDate(), ' ');
+                                    if (isUTC) {
+                                        c = this.leftPad(d.getUTCDate(), ' ');
+                                    }
+                                    else {
+                                        c = this.leftPad(d.getDate(), '');
+                                    }
                                     break;
                                 case 'h': // For back-compat with 0.7; remove in 1.0
                                 case 'H':
@@ -405,23 +440,53 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                                     c = this.leftPad(hours12, ' ');
                                     break;
                                 case 'm':
-                                    c = this.leftPad(d.getMonth() + 1, '');
+                                    if (isUTC) {
+                                        c = this.leftPad(d.getUTCMonth() + 1, '');
+                                    }
+                                    else {
+                                        c = this.leftPad(d.getMonth() + 1, '');
+                                    }
                                     break;
                                 case 'M':
-                                    c = this.leftPad(d.getMinutes(), null);
+                                    if (isUTC) {
+                                        c = this.leftPad(d.getUTCMinutes(), null);
+                                    }
+                                    else {
+                                        c = this.leftPad(d.getMinutes(), null);
+                                    }
                                     break;
                                 // quarters not in Open Group's strftime specification
                                 case 'q':
-                                    c = '' + (Math.floor(d.getMonth() / 3) + 1);
+                                    if (isUTC) {
+                                        c = '' + (Math.floor(d.getUTCMonth() / 3) + 1);
+                                    }
+                                    else {
+                                        c = '' + (Math.floor(d.getMonth() / 3) + 1);
+                                    }
                                     break;
                                 case 'S':
-                                    c = this.leftPad(d.getSeconds(), null);
+                                    if (isUTC) {
+                                        c = this.leftPad(d.getUTCSeconds(), null);
+                                    }
+                                    else {
+                                        c = this.leftPad(d.getSeconds(), null);
+                                    }
                                     break;
                                 case 'y':
-                                    c = this.leftPad(d.getFullYear() % 100, null);
+                                    if (isUTC) {
+                                        c = this.leftPad(d.getUTCFullYear() % 100, null);
+                                    }
+                                    else {
+                                        c = this.leftPad(d.getFullYear() % 100, null);
+                                    }
                                     break;
                                 case 'Y':
-                                    c = '' + d.getFullYear();
+                                    if (isUTC) {
+                                        c = '' + d.getUTCFullYear();
+                                    }
+                                    else {
+                                        c = '' + d.getFullYear();
+                                    }
                                     break;
                                 case 'p':
                                     c = isAM ? '' + 'am' : '' + 'pm';
@@ -430,7 +495,12 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                                     c = isAM ? '' + 'AM' : '' + 'PM';
                                     break;
                                 case 'w':
-                                    c = '' + d.getDay();
+                                    if (isUTC) {
+                                        c = '' + d.getUTCDay();
+                                    }
+                                    else {
+                                        c = '' + d.getDay();
+                                    }
                                     break;
                             }
                             r.push(c);

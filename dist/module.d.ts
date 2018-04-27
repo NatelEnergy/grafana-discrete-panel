@@ -1,8 +1,11 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import { CanvasPanelCtrl } from './canvas-metric';
 declare class DiscretePanelCtrl extends CanvasPanelCtrl {
+    private annotationsSrv;
     static templateUrl: string;
     static scrollable: boolean;
+    annotations: any;
+    annotationsPromise: any;
     defaults: {
         display: string;
         rowHeight: number;
@@ -53,7 +56,9 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     formatter: any;
     _renderDimensions: any;
     _selectionMatrix: Array<Array<String>>;
-    constructor($scope: any, $injector: any);
+    constructor($scope: any, $injector: any, annotationsSrv: any);
+    issueQueries(datasource: any): void;
+    onDataSnapshotLoad(snapshotData: any): void;
     onPanelInitialized(): void;
     onDataError(err: any): void;
     onInitEditMode(): void;
@@ -75,9 +80,14 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     onConfigChanged(update?: boolean): void;
     getLegendDisplay(info: any, metric: any): any;
     showTooltip(evt: any, point: any, isExternal: any): void;
+    dateFormat(timeStamp: any): string;
+    showAnnotationInfo(annotation: any, x: any, y: any): void;
+    showTooltipAnnotation(isRange: any, range: any, annotation: any, x: any, y: any): void;
+    tryEpochToMoment(timestamp: any): any;
     onGraphHover(evt: any, showTT: any, isExternal: any): void;
     onMouseClicked(where: any): void;
     onMouseSelectedRange(range: any): void;
+    onMouseSelectedRangeAnnotation(evt: any, isRange: any, range: any, x: any, y: any): void;
     clear(): void;
     _updateRenderDimensions(): void;
     _updateSelectionMatrix(): void;
@@ -87,6 +97,8 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     _renderLabels(): void;
     _renderSelection(): void;
     _renderTimeAxis(): void;
+    _renderAnnotationAxis(): void;
+    _drawVertical(ctx: any, timeVal: any, min: any, max: any, nextPointInTime: any, headerColumnIndent: any, top: any, width: any, isAlert: any): void;
     _renderCrosshair(): void;
 }
 export { DiscretePanelCtrl as PanelCtrl };

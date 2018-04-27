@@ -23,10 +23,11 @@ export declare class CanvasPanelCtrl extends MetricsPanelCtrl {
     onGraphHover(evt: any, showTT: any, isExternal: any): void;
     onMouseClicked(where: any): void;
     onMouseSelectedRange(range: any): void;
+    onMouseSelectedRangeAnnotation(evt: any, isRange: any, range: any, x: any, y: any): void;
     link(scope: any, elem: any, attrs: any, ctrl: any): void;
     time_format(range: number, secPerTick: number): string;
     getTimeResolution(estTimeInterval: number): number;
     roundDate(timeStamp: any, roundee: any): any;
-    formatDate(d: any, fmt: any): any;
+    formatDate(d: any, fmt: any, isUTC: any): any;
     leftPad(n: any, pad: any): any;
 }

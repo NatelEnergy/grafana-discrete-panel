@@ -1,12 +1,12 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'moment', 'app/core/utils/kbn', 'app/core/app_events'], function(exports_1) {
+System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', './jquery-ui', 'moment', 'app/core/utils/kbn', 'app/core/app_events', 'plugins/natel-discrete-panel/css/jquery-ui-overcast.css!'], function(exports_1) {
     var __extends = (this && this.__extends) || function (d, b) {
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
     var canvas_metric_1, distinct_points_1, lodash_1, jquery_1, moment_1, kbn_1, app_events_1;
-    var grafanaColors, DiscretePanelCtrl;
+    var AnnotationEvent, grafanaColors, DiscretePanelCtrl;
     return {
         setters:[
             function (canvas_metric_1_1) {
@@ -21,6 +21,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
             function (jquery_1_1) {
                 jquery_1 = jquery_1_1;
             },
+            function (_1) {},
             function (moment_1_1) {
                 moment_1 = moment_1_1;
             },
@@ -29,8 +30,15 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
             },
             function (app_events_1_1) {
                 app_events_1 = app_events_1_1;
-            }],
+            },
+            function (_2) {}],
         execute: function() {
+            //copied from core
+            AnnotationEvent = (function () {
+                function AnnotationEvent() {
+                }
+                return AnnotationEvent;
+            })();
             grafanaColors = [
                 '#7EB26D',
                 '#EAB839',
@@ -92,8 +100,10 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
             //(https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
             DiscretePanelCtrl = (function (_super) {
                 __extends(DiscretePanelCtrl, _super);
-                function DiscretePanelCtrl($scope, $injector) {
+                function DiscretePanelCtrl($scope, $injector, annotationsSrv) {
                     _super.call(this, $scope, $injector);
+                    this.annotationsSrv = annotationsSrv;
+                    this.annotations = [];
                     this.defaults = {
                         display: 'timeline',
                         rowHeight: 50,
@@ -142,12 +152,36 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
                     this.events.on('data-error', this.onDataError.bind(this));
                     this.events.on('refresh', this.onRefresh.bind(this));
+                    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+                    jquery_1.default("<link/>", {
+                        rel: "stylesheet",
+                        type: "text/css",
+                        href: "public/plugins/natel-discrete-panel/css/jquery-ui-overcast.css"
+                    }).appendTo("head");
                 }
+                ;
+                DiscretePanelCtrl.prototype.issueQueries = function (datasource) {
+                    this.annotationsPromise = this.annotationsSrv.getAnnotations({
+                        dashboard: this.dashboard,
+                        panel: this.panel,
+                        range: this.range,
+                    });
+                    return _super.prototype.issueQueries.call(this, datasource);
+                };
+                DiscretePanelCtrl.prototype.onDataSnapshotLoad = function (snapshotData) {
+                    this.annotationsPromise = this.annotationsSrv.getAnnotations({
+                        dashboard: this.dashboard,
+                        panel: this.panel,
+                        range: this.range,
+                    });
+                    this.onDataReceived(snapshotData);
+                };
                 DiscretePanelCtrl.prototype.onPanelInitialized = function () {
                     this.updateColorInfo();
                     this.onConfigChanged();
                 };
                 DiscretePanelCtrl.prototype.onDataError = function (err) {
+                    this.annotations = [];
                     console.log('onDataError', err);
                 };
                 DiscretePanelCtrl.prototype.onInitEditMode = function () {
@@ -168,6 +202,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this._updateCanvasSize();
                     this._renderRects();
                     this._renderTimeAxis();
+                    this._renderAnnotationAxis();
                     this._renderLabels();
                     this._renderSelection();
                     this._renderCrosshair();
@@ -258,7 +293,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 DiscretePanelCtrl.prototype.onDataReceived = function (dataList) {
                     var _this = this;
                     jquery_1.default(this.canvas).css('cursor', 'pointer');
-                    //    console.log('GOT', dataList);
                     var data = [];
                     lodash_1.default.forEach(dataList, function (metric) {
                         if ('table' === metric.type) {
@@ -285,9 +319,16 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                             data.push(res);
                         }
                     });
+                    this.annotationsPromise.then(function (result) {
+                        _this.loading = false;
+                        _this.annotations = result.annotations;
+                        _this.render();
+                    }, function () {
+                        _this.loading = false;
+                        _this.render();
+                    });
                     this.data = data;
                     this.onRender();
-                    //console.log( 'data', dataList, this.data);
                 };
                 DiscretePanelCtrl.prototype.removeColorMap = function (map) {
                     var index = lodash_1.default.indexOf(this.panel.colorMaps, map);
@@ -402,6 +443,8 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 // Mouse Events
                 //------------------
                 DiscretePanelCtrl.prototype.showTooltip = function (evt, point, isExternal) {
+                    jquery_1.default("#annot_view_id").remove();
+                    var annotation_to_display;
                     var from = point.start;
                     var to = point.start + point.ms;
                     var time = point.ms;
@@ -414,10 +457,31 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     }
                     var body = '<div class="graph-tooltip-time">' + val + '</div>';
                     body += '<center>';
-                    body += this.dashboard.formatDate(moment_1.default(from)) + '<br/>';
-                    body += 'to<br/>';
-                    body += this.dashboard.formatDate(moment_1.default(to)) + '<br/><br/>';
-                    body += moment_1.default.duration(time).humanize() + '<br/>';
+                    var annot_found = false;
+                    if (evt.pos.panelRelY > 0.7) {
+                        for (var i = 0; i < this.annotations.length; i++) {
+                            var x_position = Math.round(evt.pos.x);
+                            if (this.annotations[i].isRegion == true) {
+                                if ((x_position > this.annotations[i].time) && (x_position < this.annotations[i].timeEnd)) {
+                                    annot_found = true;
+                                    annotation_to_display = this.annotations[i];
+                                }
+                            }
+                            else {
+                                //single annotation with no region
+                                if ((this.annotations[i].time >= (x_position - 3000)) && (this.annotations[i].time <= (x_position + 3000))) {
+                                    annot_found = true;
+                                    annotation_to_display = this.annotations[i];
+                                }
+                            }
+                        }
+                    }
+                    if (annot_found == false) {
+                        body += this.dashboard.formatDate(moment_1.default(from)) + '<br/>';
+                        body += 'to<br/>';
+                        body += this.dashboard.formatDate(moment_1.default(to)) + '<br/><br/>';
+                        body += moment_1.default.duration(time).humanize() + '<br/>';
+                    }
                     body += '</center>';
                     var pageX = 0;
                     var pageY = 0;
@@ -438,7 +502,141 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         pageX = evt.evt.pageX;
                         pageY = evt.evt.pageY;
                     }
-                    this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
+                    if (annot_found == false) {
+                        this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
+                    }
+                    else {
+                        if (annotation_to_display.annotation === undefined) {
+                            this.$tooltip.detach();
+                            this.showAnnotationInfo(annotation_to_display, pageX + 5, pageY + 5);
+                        }
+                        else {
+                            body += this.dateFormat(annotation_to_display.time);
+                            this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
+                        }
+                    }
+                };
+                DiscretePanelCtrl.prototype.dateFormat = function (timeStamp) {
+                    var alertDate = new Date(timeStamp);
+                    return alertDate.getDate() + "-" + (alertDate.getMonth() + 1) + "-" + alertDate.getFullYear() + " " +
+                        alertDate.getHours() + ":" + alertDate.getMinutes();
+                };
+                DiscretePanelCtrl.prototype.showAnnotationInfo = function (annotation, x, y) {
+                    var range;
+                    var isRange = false;
+                    var evt;
+                    if (annotation.isRegion) {
+                        isRange = true;
+                        range = { from: moment_1.default.utc(annotation.time), to: moment_1.default.utc(annotation.timeEnd) };
+                    }
+                    else {
+                        range = { from: moment_1.default.utc(annotation.time) };
+                    }
+                    jquery_1.default('<button id="annot_view_id">' + annotation.text + '<br />' + annotation.tags.toString() + ' <br /></button>').css('left', x).css('top', y).appendTo("body")
+                        .button({ text: "text", icons: { primary: "ui-icon-pencil" } })
+                        .data('localdata', this)
+                        .click(function () {
+                        jquery_1.default(this).data('localdata').showTooltipAnnotation(isRange, range, annotation, x, y);
+                    });
+                };
+                DiscretePanelCtrl.prototype.showTooltipAnnotation = function (isRange, range, annotation, x, y) {
+                    var titleStr = "Add annotation ";
+                    var description = "";
+                    var tag = "";
+                    if (annotation !== undefined) {
+                        description = annotation.text;
+                        tag = annotation.tags.toString();
+                    }
+                    titleStr += this.dateFormat(range.from.toString());
+                    var buttons = {
+                        'Save': function () {
+                            var _this = this;
+                            var annot_description = jquery_1.default("#annot_description").val();
+                            var annot_tag = jquery_1.default("#annot_tag").val();
+                            var event = new AnnotationEvent();
+                            event.panelId = jquery_1.default(this).data('localdata').panel.id;
+                            event.userId = jquery_1.default(this).data('localdata').annotationsSrv.$rootScope.contextSrv.user.id;
+                            event.dashboardId = jquery_1.default(this).data('localdata').dashboard.id;
+                            event.time = Date.parse(jquery_1.default(this).data('range').from);
+                            if (jquery_1.default(this).data('isRange') == true) {
+                                event.timeEnd = Date.parse(jquery_1.default(this).data('range').to);
+                                event.isRegion = true;
+                            }
+                            else {
+                                event.isRegion = false;
+                            }
+                            event.text = annot_description;
+                            var tags = [annot_tag]; //TODO allow more than one tag
+                            event.tags = tags;
+                            if (jquery_1.default(this).data('annotation') !== undefined) {
+                                var annotation_1 = jquery_1.default(this).data('annotation');
+                                annotation_1.text = annot_description;
+                                annotation_1.tags = tags;
+                                jquery_1.default(this).data('localdata').annotationsSrv
+                                    .updateAnnotationEvent(annotation_1)
+                                    .then(function () {
+                                    jquery_1.default(_this).data('localdata').refresh();
+                                    jquery_1.default(_this).dialog('close');
+                                })
+                                    .catch(function (err) {
+                                    jquery_1.default(_this).data('localdata').refresh();
+                                    jquery_1.default(_this).dialog('close');
+                                });
+                            }
+                            else {
+                                jquery_1.default(this).data('localdata').annotationsSrv
+                                    .saveAnnotationEvent(event)
+                                    .then(function () {
+                                    jquery_1.default(_this).data('localdata').refresh();
+                                    jquery_1.default(_this).dialog('close');
+                                })
+                                    .catch(function (err) {
+                                    jquery_1.default(_this).data('localdata').refresh();
+                                });
+                            }
+                        },
+                        'Cancel': function () {
+                            jquery_1.default(this).dialog('close');
+                        }
+                    };
+                    if (annotation !== undefined) {
+                        buttons['Delete'] = function () {
+                            var _this = this;
+                            jquery_1.default(this).data('localdata').annotationsSrv
+                                .deleteAnnotationEvent(jquery_1.default(this).data('annotation'))
+                                .then(function () {
+                                jquery_1.default(_this).data('localdata').refresh();
+                                jquery_1.default(_this).dialog('close');
+                            })
+                                .catch(function (err) {
+                                console.log(err);
+                                jquery_1.default(_this).data('localdata').refresh();
+                                jquery_1.default(_this).dialog('close');
+                            });
+                        };
+                    }
+                    jquery_1.default('<form style="width:350;height:250;" id="annot_form_id"><table><tr><td>Description:</td><td><textarea rows="2" id="annot_description" style="z-index:10000;background-color:#ffffff;color:#000000;" form="annot_form_id">' + description + '</textarea></td></tr><tr><td>Tag:</td><td><input type="text" id="annot_tag" form="annot_form_id"  style="z-index:10000;border:1px;background-color:#ffffff;color:#000000;" value=' + tag + '></td></tr></form>')
+                        .appendTo("body")
+                        .data('localdata', this)
+                        .data('isRange', isRange)
+                        .data('range', range)
+                        .data('annotation', annotation)
+                        .dialog({
+                        modal: true,
+                        width: 350,
+                        height: 250,
+                        title: titleStr,
+                        buttons: buttons
+                    });
+                };
+                DiscretePanelCtrl.prototype.tryEpochToMoment = function (timestamp) {
+                    if (timestamp && lodash_1.default.isNumber(timestamp)) {
+                        var epoch = Number(timestamp);
+                        return moment_1.default(epoch);
+                    }
+                    else {
+                        return timestamp;
+                    }
                 };
                 DiscretePanelCtrl.prototype.onGraphHover = function (evt, showTT, isExternal) {
                     this.externalPT = false;
@@ -498,6 +696,11 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 };
                 DiscretePanelCtrl.prototype.onMouseSelectedRange = function (range) {
                     this.timeSrv.setTime(range);
+                    this.clear();
+                };
+                DiscretePanelCtrl.prototype.onMouseSelectedRangeAnnotation = function (evt, isRange, range, x, y) {
+                    this.clear();
+                    this.showTooltipAnnotation(isRange, range, undefined, x, y);
                     this.clear();
                 };
                 DiscretePanelCtrl.prototype.clear = function () {
@@ -673,9 +876,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     lodash_1.default.forEach(this.data, function (metric, i) {
                         var _a = _this._renderDimensions.matrix[i], y = _a.y, positions = _a.positions;
                         var centerY = y + rowHeight / 2;
-                        // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
-                        // let labelPositionLastValue = y + rectHeight - this.panel.textSize / 2;
-                        // let labelPositionValue = y + this.panel.textSize / 2;
                         var labelPositionMetricName = centerY;
                         var labelPositionLastValue = centerY;
                         var labelPositionValue = centerY;
@@ -792,6 +992,10 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
                     var xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
                     var timeFormat = this.time_format(max - min, timeResolution / 1000);
+                    var isUTC = false;
+                    if (this.dashboard.timezone == "utc") {
+                        isUTC = true;
+                    }
                     while (nextPointInTime < max) {
                         // draw ticks
                         ctx.beginPath();
@@ -801,11 +1005,97 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         ctx.stroke();
                         // draw time label
                         var date = new Date(nextPointInTime);
-                        var dateStr = this.formatDate(date, timeFormat);
+                        var dateStr = this.formatDate(date, timeFormat, isUTC);
                         var xOffset = ctx.measureText(dateStr).width / 2;
                         ctx.fillText(dateStr, xPos - xOffset, top + 10);
                         nextPointInTime += timeResolution;
                         xPos += pixelStep;
+                    }
+                };
+                DiscretePanelCtrl.prototype._renderAnnotationAxis = function () {
+                    if (!this.panel.showTimeAxis) {
+                        return;
+                    }
+                    var ctx = this.context;
+                    var rows = this.data.length;
+                    var rowHeight = this.panel.rowHeight;
+                    var height = this._renderDimensions.height;
+                    var width = this._renderDimensions.width;
+                    var top = this._renderDimensions.rowsHeight;
+                    var headerColumnIndent = 0; // header inset (zero for now)
+                    ctx.font = this.panel.textSizeTime + 'px "Open Sans", Helvetica, Arial, sans-serif';
+                    ctx.fillStyle = '#7FE9FF';
+                    ctx.textAlign = 'left';
+                    ctx.strokeStyle = '#7FE9FF';
+                    ctx.textBaseline = 'top';
+                    ctx.setLineDash([3, 3]);
+                    ctx.lineDashOffset = 0;
+                    var min = lodash_1.default.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+                    var max = lodash_1.default.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+                    var minPxInterval = ctx.measureText('12/33 24:59').width * 2;
+                    var estNumTicks = width / minPxInterval;
+                    var estTimeInterval = (max - min) / estNumTicks;
+                    var timeResolution = this.getTimeResolution(estTimeInterval);
+                    var pixelStep = timeResolution / (max - min) * width;
+                    var nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
+                    var xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
+                    var timeFormat = this.time_format(max - min, timeResolution / 1000);
+                    for (var i = 0; i < this.annotations.length; i++) {
+                        ctx.setLineDash([3, 3]);
+                        var isAlert = false;
+                        if (this.annotations[i].annotation === undefined) {
+                            // grafana annotation
+                            ctx.fillStyle = '#7FE9FF';
+                            ctx.strokeStyle = '#7FE9FF';
+                        }
+                        else {
+                            isAlert = true;
+                            ctx.fillStyle = '#EA0F3B'; //red
+                            ctx.strokeStyle = '#EA0F3B';
+                        }
+                        nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
+                        this._drawVertical(ctx, this.annotations[i].time, min, max, nextPointInTime, headerColumnIndent, top, width, isAlert);
+                        //do the  TO rangeMap
+                        if (this.annotations[i].isRegion == true) {
+                            nextPointInTime = this.roundDate(max, timeResolution) + timeResolution;
+                            this._drawVertical(ctx, this.annotations[i].timeEnd, min, max, nextPointInTime, headerColumnIndent, top, width, isAlert);
+                            //draw horizontal line at bottom
+                            var xPosStart = headerColumnIndent + (this.annotations[i].time - min) / (max - min) * width;
+                            var xPosEnd = headerColumnIndent + (this.annotations[i].timeEnd - min) / (max - min) * width;
+                            // draw ticks
+                            ctx.beginPath();
+                            ctx.moveTo(xPosStart, top + 5);
+                            ctx.lineTo(xPosEnd, top + 5);
+                            ctx.lineWidth = 4;
+                            ctx.setLineDash([]);
+                            ctx.stroke();
+                            //end horizontal
+                            //do transparency
+                            if (isAlert == false) {
+                                ctx.save();
+                                ctx.fillStyle = '#7FE9FF';
+                                ctx.globalAlpha = 0.2;
+                                ctx.fillRect(xPosStart, 0, xPosEnd - xPosStart, rowHeight);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                        }
+                    }
+                };
+                DiscretePanelCtrl.prototype._drawVertical = function (ctx, timeVal, min, max, nextPointInTime, headerColumnIndent, top, width, isAlert) {
+                    var xPos = headerColumnIndent + (timeVal - min) / (max - min) * width;
+                    // draw ticks
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, top + 5);
+                    ctx.lineTo(xPos, 0);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    // draw time label
+                    var date = new Date(nextPointInTime);
+                    if (isAlert == true) {
+                        var dateStr = "\u25B2";
+                        var xOffset = ctx.measureText(dateStr).width / 2;
+                        ctx.fillText(dateStr, xPos - xOffset, top + 10);
                     }
                 };
                 DiscretePanelCtrl.prototype._renderCrosshair = function () {

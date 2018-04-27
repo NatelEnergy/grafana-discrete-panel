@@ -1,6 +1,6 @@
 {
   "name": "natel-discrete-panel",
-  "version": "0.0.8-pre",
+  "version": "0.0.9-pre",
   "description": "Discrete Events in Grafana",
   "scripts": {
     "build": "grunt",
@@ -27,12 +27,13 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "q": "^1.5.0",
-    "systemjs": "^0.19.47"
+    "systemjs": "^0.19.47",
+    "jquery-ui": "^1.12.1"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.74",
     "grafana-sdk-mocks": "github:grafana/grafana-sdk-mocks",
-    "grunt": "^1.0.1",
+    "grunt": "^1.0.2",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
@@ -51,6 +52,7 @@
     "prettier": "1.11.1",
     "pretty-quick": "^1.4.1",
     "sinon": "^3.2.1",
-    "systemjs-plugin-css": "^0.1.35"
+    "systemjs-plugin-css": "^0.1.35",
+    "typescript": "^2.8.1"
   }
 }

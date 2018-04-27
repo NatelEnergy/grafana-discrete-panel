@@ -31,10 +31,9 @@ yarn pretty
 
 #### Changelog
 
-
 ##### v0.0.8 (not released yet)
-* TODO... annotations
 
+* TODO... annotations
 
 ##### v0.0.7
 
