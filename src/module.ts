@@ -1248,7 +1248,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         isAlert
       );
 
-      //do the  TO rangeMap
+      //do the TO rangeMap
       if (this.annotations[i].isRegion == true) {
         nextPointInTime = this.roundDate(max, timeResolution) + timeResolution;
         this._drawVertical(
