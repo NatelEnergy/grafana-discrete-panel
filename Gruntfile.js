@@ -10,8 +10,14 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     clean: ['dist'],
-
     copy: {
+      dist_vendor_js: {
+        expand: true,
+        //cwd: 'node_modules/jquery-ui/external/jquery-1.12.4/',
+        cwd: 'vendor/jquery-ui-1.12.4/',
+        src: ['**/*.js'],
+        dest: 'dist',
+      },
       dist_js: {
         expand: true,
         cwd: 'src',
@@ -115,6 +121,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [
     'clean',
     'copy:dist_js',
+    'copy:dist_vendor_js',
     'typescript:build',
     'copy:dist_html',
     'copy:dist_css',

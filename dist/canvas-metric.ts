@@ -151,8 +151,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     console.log('CANVAS Range add annotation', range, x, y);
   }
 
-
-
   link(scope, elem, attrs, ctrl) {
     this.wrap = elem.find('.canvas-spot')[0];
     this.canvas = document.createElement('canvas');
@@ -237,23 +235,23 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           if (up.x === this.mouse.down.x && up.y === this.mouse.down.y) {
             this.mouse.position = null;
             this.mouse.down = null;
-            if ( evt.metaKey == true) {
+            if (evt.metaKey == true) {
               let range = {from: moment.utc(up.ts)};
               this.onMouseSelectedRangeAnnotation(evt, false, range, up.x, up.y);
             } else {
-            this.onMouseClicked(up);
-          }
+              this.onMouseClicked(up);
+            }
           } else {
             let min = Math.min(this.mouse.down.ts, up.ts);
             let max = Math.max(this.mouse.down.ts, up.ts);
             let range = {from: moment.utc(min), to: moment.utc(max)};
             this.mouse.position = up;
 
-            if ( evt.metaKey == true) {
+            if (evt.metaKey == true) {
               this.onMouseSelectedRangeAnnotation(evt, true, range, up.x, up.y);
             } else {
-            this.onMouseSelectedRange(range);
-          }
+              this.onMouseSelectedRange(range);
+            }
           }
         }
         this.mouse.down = null;
@@ -453,9 +451,9 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     let escape = false;
     let hours = d.getHours();
 
-if ( isUTC ) {
-  hours = d.getUTCHours();
-}
+    if (isUTC) {
+      hours = d.getUTCHours();
+    }
 
     let isAM = hours < 12;
 
@@ -496,32 +494,32 @@ if ( isUTC ) {
       if (escape) {
         switch (c) {
           case 'a':
-          if ( isUTC ) {
-            c = '' + dayNames[d.getUTCDay()];
-          } else {
+            if (isUTC) {
+              c = '' + dayNames[d.getUTCDay()];
+            } else {
               c = '' + dayNames[d.getDay()];
-          }
+            }
             break;
           case 'b':
-          if ( isUTC ) {
-            c = '' + monthNames[d.getUTCMonth()];
-          } else {
-            c = '' + monthNames[d.getMonth()];
-          }
+            if (isUTC) {
+              c = '' + monthNames[d.getUTCMonth()];
+            } else {
+              c = '' + monthNames[d.getMonth()];
+            }
             break;
           case 'd':
-          if ( isUTC ) {
-            c = this.leftPad(d.getUTCDate(), '');
-          } else {
-            c = this.leftPad(d.getDate(), '');
-          }
+            if (isUTC) {
+              c = this.leftPad(d.getUTCDate(), '');
+            } else {
+              c = this.leftPad(d.getDate(), '');
+            }
             break;
           case 'e':
-          if ( isUTC ) {
-            c = this.leftPad(d.getUTCDate(), ' ');
-          } else {
-            c = this.leftPad(d.getDate(), '');
-          }
+            if (isUTC) {
+              c = this.leftPad(d.getUTCDate(), ' ');
+            } else {
+              c = this.leftPad(d.getDate(), '');
+            }
             break;
           case 'h': // For back-compat with 0.7; remove in 1.0
           case 'H':
@@ -534,46 +532,46 @@ if ( isUTC ) {
             c = this.leftPad(hours12, ' ');
             break;
           case 'm':
-            if ( isUTC ) {
-            c = this.leftPad(d.getUTCMonth() + 1, '');
+            if (isUTC) {
+              c = this.leftPad(d.getUTCMonth() + 1, '');
             } else {
               c = this.leftPad(d.getMonth() + 1, '');
             }
             break;
           case 'M':
-            if ( isUTC ) {
-            c = this.leftPad(d.getUTCMinutes(), null);
+            if (isUTC) {
+              c = this.leftPad(d.getUTCMinutes(), null);
             } else {
               c = this.leftPad(d.getMinutes(), null);
             }
             break;
           // quarters not in Open Group's strftime specification
           case 'q':
-            if ( isUTC ) {
-            c = '' + (Math.floor(d.getUTCMonth() / 3) + 1);
+            if (isUTC) {
+              c = '' + (Math.floor(d.getUTCMonth() / 3) + 1);
             } else {
               c = '' + (Math.floor(d.getMonth() / 3) + 1);
             }
             break;
           case 'S':
-            if ( isUTC ) {
-            c = this.leftPad(d.getUTCSeconds(), null);
+            if (isUTC) {
+              c = this.leftPad(d.getUTCSeconds(), null);
             } else {
-                c = this.leftPad(d.getSeconds(), null);
+              c = this.leftPad(d.getSeconds(), null);
             }
             break;
           case 'y':
-            if ( isUTC ) {
-            c = this.leftPad(d.getUTCFullYear() % 100, null);
+            if (isUTC) {
+              c = this.leftPad(d.getUTCFullYear() % 100, null);
             } else {
-                c = this.leftPad(d.getFullYear() % 100, null);
+              c = this.leftPad(d.getFullYear() % 100, null);
             }
             break;
           case 'Y':
-            if ( isUTC ) {
-            c = '' + d.getUTCFullYear();
+            if (isUTC) {
+              c = '' + d.getUTCFullYear();
             } else {
-                c = '' + d.getFullYear();
+              c = '' + d.getFullYear();
             }
             break;
           case 'p':
@@ -583,11 +581,11 @@ if ( isUTC ) {
             c = isAM ? '' + 'AM' : '' + 'PM';
             break;
           case 'w':
-          if ( isUTC ) {
-            c = '' + d.getUTCDay();
-          } else {
-            c = '' + d.getDay();
-          }
+            if (isUTC) {
+              c = '' + d.getUTCDay();
+            } else {
+              c = '' + d.getDay();
+            }
             break;
         }
         r.push(c);

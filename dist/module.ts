@@ -2,8 +2,8 @@
 
 import config from 'app/core/config';
 
-import { CanvasPanelCtrl } from './canvas-metric';
-import { DistinctPoints } from './distinct-points';
+import {CanvasPanelCtrl} from './canvas-metric';
+import {DistinctPoints} from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -26,7 +26,6 @@ class AnnotationEvent {
   type: string;
   tags: Array<string>; //changed from core
 }
-
 
 const grafanaColors = [
   '#7EB26D',
@@ -98,9 +97,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   defaults = {
     display: 'timeline', // or 'stacked'
     rowHeight: 50,
-    valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
-    rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
-    colorMaps: [{ text: 'N/A', color: '#CCC' }],
+    valueMaps: [{value: 'null', op: '=', text: 'N/A'}],
+    rangeMaps: [{from: 'null', to: 'null', text: 'N/A'}],
+    colorMaps: [{text: 'N/A', color: '#CCC'}],
     metricNameColor: '#000000',
     valueTextColor: '#000000',
     timeTextColor: '#d8d9da',
@@ -152,13 +151,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.events.on('refresh', this.onRefresh.bind(this));
     this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
 
-    $("<link/>", {
-      rel: "stylesheet",
-      type: "text/css",
-      href: "public/plugins/natel-discrete-panel/css/jquery-ui-overcast.css"
-    }).appendTo("head");
-  };
-
+    $('<link/>', {
+      rel: 'stylesheet',
+      type: 'text/css',
+      href: 'public/plugins/natel-discrete-panel/css/jquery-ui-overcast.css',
+    }).appendTo('head');
+  }
 
   issueQueries(datasource) {
     this.annotationsPromise = this.annotationsSrv.getAnnotations({
@@ -168,7 +166,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     });
     return super.issueQueries(datasource);
   }
-
 
   onDataSnapshotLoad(snapshotData) {
     this.annotationsPromise = this.annotationsSrv.getAnnotations({
@@ -226,7 +223,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._updateCanvasSize();
     this._renderRects();
     this._renderTimeAxis();
-    this._renderAnnotationAxis()
+    this._renderAnnotationAxis();
     this._renderLabels();
     this._renderSelection();
     this._renderCrosshair();
@@ -401,7 +398,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if (metric.legendInfo) {
           _.forEach(metric.legendInfo, info => {
             if (!_.has(this.colorMap, info.val)) {
-              let v = { text: info.val, color: this.getColor(info.val) };
+              let v = {text: info.val, color: this.getColor(info.val)};
               this.panel.colorMaps.push(v);
               this.colorMap[info.val] = v;
             }
@@ -409,7 +406,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         }
       });
     } else {
-      this.panel.colorMaps.push({ text: '???', color: this.randomColor() });
+      this.panel.colorMaps.push({text: '???', color: this.randomColor()});
     }
     this.updateColorInfo();
   }
@@ -421,7 +418,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addValueMap() {
-    this.panel.valueMaps.push({ value: '', op: '=', text: '' });
+    this.panel.valueMaps.push({value: '', op: '=', text: ''});
   }
 
   removeRangeMap(rangeMap) {
@@ -431,7 +428,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addRangeMap() {
-    this.panel.rangeMaps.push({ from: '', to: '', text: '' });
+    this.panel.rangeMaps.push({from: '', to: '', text: ''});
   }
 
   onConfigChanged(update = false) {
@@ -499,7 +496,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   //------------------
 
   showTooltip(evt, point, isExternal) {
-    $("#annot_view_id").remove();
+    $('#annot_view_id').remove();
     let annotation_to_display;
 
     let from = point.start;
@@ -522,13 +519,19 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       for (var i = 0; i < this.annotations.length; i++) {
         let x_position = Math.round(evt.pos.x);
         if (this.annotations[i].isRegion == true) {
-          if ((x_position > this.annotations[i].time) && (x_position < this.annotations[i].timeEnd)) {
+          if (
+            x_position > this.annotations[i].time &&
+            x_position < this.annotations[i].timeEnd
+          ) {
             annot_found = true;
             annotation_to_display = this.annotations[i];
           }
         } else {
           //single annotation with no region
-          if ((this.annotations[i].time >= (x_position - 3000)) && (this.annotations[i].time <= (x_position + 3000))) {
+          if (
+            this.annotations[i].time >= x_position - 3000 &&
+            this.annotations[i].time <= x_position + 3000
+          ) {
             annot_found = true;
             annotation_to_display = this.annotations[i];
           }
@@ -566,7 +569,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     if (annot_found == false) {
       this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
-    } else { //annotation to display
+    } else {
+      //annotation to display
       if (annotation_to_display.annotation === undefined) {
         this.$tooltip.detach();
         this.showAnnotationInfo(annotation_to_display, pageX + 5, pageY + 5);
@@ -577,13 +581,20 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
-
   dateFormat(timeStamp) {
     let alertDate = new Date(timeStamp);
-    return alertDate.getDate() + "-" + (alertDate.getMonth() + 1) + "-" + alertDate.getFullYear() + " " +
-      alertDate.getHours() + ":" + alertDate.getMinutes();
+    return (
+      alertDate.getDate() +
+      '-' +
+      (alertDate.getMonth() + 1) +
+      '-' +
+      alertDate.getFullYear() +
+      ' ' +
+      alertDate.getHours() +
+      ':' +
+      alertDate.getMinutes()
+    );
   }
-
 
   showAnnotationInfo(annotation, x, y) {
     let range;
@@ -591,25 +602,34 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let evt;
     if (annotation.isRegion) {
       isRange = true;
-      range = { from: moment.utc(annotation.time), to: moment.utc(annotation.timeEnd) };
+      range = {from: moment.utc(annotation.time), to: moment.utc(annotation.timeEnd)};
     } else {
-      range = { from: moment.utc(annotation.time) };
+      range = {from: moment.utc(annotation.time)};
     }
 
-    $('<button id="annot_view_id">' + annotation.text + '<br />' + annotation.tags.toString() + ' <br /></button>').css('left', x).css('top', y).appendTo("body")
-      .button({ text: "text", icons: { primary: "ui-icon-pencil" } })
+    $(
+      '<button id="annot_view_id">' +
+        annotation.text +
+        '<br />' +
+        annotation.tags.toString() +
+        ' <br /></button>'
+    )
+      .css('left', x)
+      .css('top', y)
+      .appendTo('body')
+      .button({text: 'text', icons: {primary: 'ui-icon-pencil'}})
       .data('localdata', this)
       .click(function() {
-
-        $(this).data('localdata').showTooltipAnnotation(isRange, range, annotation, x, y);
+        $(this)
+          .data('localdata')
+          .showTooltipAnnotation(isRange, range, annotation, x, y);
       });
   }
 
-
   showTooltipAnnotation(isRange, range, annotation, x, y) {
-    let titleStr = "Add annotation ";
-    let description = "";
-    let tag = "";
+    let titleStr = 'Add annotation ';
+    let description = '';
+    let tag = '';
 
     if (annotation !== undefined) {
       description = annotation.text;
@@ -619,13 +639,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     titleStr += this.dateFormat(range.from.toString());
 
     let buttons = {
-      'Save': function() {
-        let annot_description = $("#annot_description").val();
-        let annot_tag = $("#annot_tag").val();
+      Save: function() {
+        let annot_description = $('#annot_description').val();
+        let annot_tag = $('#annot_tag').val();
 
         let event = new AnnotationEvent();
         event.panelId = $(this).data('localdata').panel.id;
-        event.userId = $(this).data('localdata').annotationsSrv.$rootScope.contextSrv.user.id;
+        event.userId = $(this).data(
+          'localdata'
+        ).annotationsSrv.$rootScope.contextSrv.user.id;
         event.dashboardId = $(this).data('localdata').dashboard.id;
         event.time = Date.parse($(this).data('range').from);
 
@@ -646,51 +668,72 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           annotation.text = annot_description;
           annotation.tags = tags;
 
-          $(this).data('localdata').annotationsSrv
-            .updateAnnotationEvent(annotation)
+          $(this)
+            .data('localdata')
+            .annotationsSrv.updateAnnotationEvent(annotation)
             .then(() => {
-              $(this).data('localdata').refresh();
+              $(this)
+                .data('localdata')
+                .refresh();
               $(this).dialog('close');
             })
-            .catch((err) => {
-              $(this).data('localdata').refresh();
+            .catch(err => {
+              $(this)
+                .data('localdata')
+                .refresh();
               $(this).dialog('close');
             });
         } else {
-          $(this).data('localdata').annotationsSrv
-            .saveAnnotationEvent(event)
+          $(this)
+            .data('localdata')
+            .annotationsSrv.saveAnnotationEvent(event)
             .then(() => {
-              $(this).data('localdata').refresh();
+              $(this)
+                .data('localdata')
+                .refresh();
               $(this).dialog('close');
             })
-            .catch((err) => {
-              $(this).data('localdata').refresh();
+            .catch(err => {
+              $(this)
+                .data('localdata')
+                .refresh();
             });
         }
       },
-      'Cancel': function() {
+      Cancel: function() {
         $(this).dialog('close');
-      }
+      },
     };
 
     if (annotation !== undefined) {
       buttons['Delete'] = function() {
-        $(this).data('localdata').annotationsSrv
-          .deleteAnnotationEvent($(this).data('annotation'))
+        $(this)
+          .data('localdata')
+          .annotationsSrv.deleteAnnotationEvent($(this).data('annotation'))
           .then(() => {
-            $(this).data('localdata').refresh();
+            $(this)
+              .data('localdata')
+              .refresh();
             $(this).dialog('close');
           })
-          .catch((err) => {
+          .catch(err => {
             console.log(err);
-            $(this).data('localdata').refresh();
+            $(this)
+              .data('localdata')
+              .refresh();
             $(this).dialog('close');
           });
-      }
+      };
     }
 
-    $('<form style="width:350;height:250;" id="annot_form_id"><table><tr><td>Description:</td><td><textarea rows="2" id="annot_description" style="z-index:10000;background-color:#ffffff;color:#000000;" form="annot_form_id">' + description + '</textarea></td></tr><tr><td>Tag:</td><td><input type="text" id="annot_tag" form="annot_form_id"  style="z-index:10000;border:1px;background-color:#ffffff;color:#000000;" value=' + tag + '></td></tr></form>')
-      .appendTo("body")
+    $(
+      '<form style="width:350;height:250;" id="annot_form_id"><table><tr><td>Description:</td><td><textarea rows="2" id="annot_description" style="z-index:10000;background-color:#ffffff;color:#000000;" form="annot_form_id">' +
+        description +
+        '</textarea></td></tr><tr><td>Tag:</td><td><input type="text" id="annot_tag" form="annot_form_id"  style="z-index:10000;border:1px;background-color:#ffffff;color:#000000;" value=' +
+        tag +
+        '></td></tr></form>'
+    )
+      .appendTo('body')
       .data('localdata', this)
       .data('isRange', isRange)
       .data('range', range)
@@ -700,7 +743,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         width: 350,
         height: 250,
         title: titleStr,
-        buttons: buttons
+        buttons: buttons,
       });
   }
 
@@ -712,7 +755,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       return timestamp;
     }
   }
-
 
   onGraphHover(evt, showTT, isExternal) {
     this.externalPT = false;
@@ -767,7 +809,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onMouseClicked(where) {
     let pt = this.hoverPoint;
     if (pt && pt.start) {
-      let range = { from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms) };
+      let range = {from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms)};
       this.timeSrv.setTime(range);
       this.clear();
     }
@@ -783,7 +825,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.showTooltipAnnotation(isRange, range, undefined, x, y);
     this.clear();
   }
-
 
   clear() {
     this.mouse.position = null;
@@ -981,7 +1022,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const offset = 2;
     const rowHeight = this._renderDimensions.rowHeight;
     _.forEach(this.data, (metric, i) => {
-      const { y, positions } = this._renderDimensions.matrix[i];
+      const {y, positions} = this._renderDimensions.matrix[i];
 
       const centerY = y + rowHeight / 2;
       let labelPositionMetricName = centerY;
@@ -1122,7 +1163,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let timeFormat = this.time_format(max - min, timeResolution / 1000);
 
     let isUTC = false;
-    if (this.dashboard.timezone == "utc" ) {
+    if (this.dashboard.timezone == 'utc') {
       isUTC = true;
     }
 
@@ -1144,7 +1185,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       xPos += pixelStep;
     }
   }
-
 
   _renderAnnotationAxis() {
     if (!this.panel.showTimeAxis) {
@@ -1196,17 +1236,38 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
 
       nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
-      this._drawVertical(ctx, this.annotations[i].time, min, max, nextPointInTime, headerColumnIndent, top, width, isAlert)
+      this._drawVertical(
+        ctx,
+        this.annotations[i].time,
+        min,
+        max,
+        nextPointInTime,
+        headerColumnIndent,
+        top,
+        width,
+        isAlert
+      );
 
-      //do the  TO rangeMap
+      //do the TO rangeMap
       if (this.annotations[i].isRegion == true) {
         nextPointInTime = this.roundDate(max, timeResolution) + timeResolution;
-        this._drawVertical(ctx, this.annotations[i].timeEnd, min, max, nextPointInTime, headerColumnIndent, top, width, isAlert);
-
+        this._drawVertical(
+          ctx,
+          this.annotations[i].timeEnd,
+          min,
+          max,
+          nextPointInTime,
+          headerColumnIndent,
+          top,
+          width,
+          isAlert
+        );
 
         //draw horizontal line at bottom
-        let xPosStart = headerColumnIndent + (this.annotations[i].time - min) / (max - min) * width;
-        let xPosEnd = headerColumnIndent + (this.annotations[i].timeEnd - min) / (max - min) * width;
+        let xPosStart =
+          headerColumnIndent + (this.annotations[i].time - min) / (max - min) * width;
+        let xPosEnd =
+          headerColumnIndent + (this.annotations[i].timeEnd - min) / (max - min) * width;
         // draw ticks
         ctx.beginPath();
 
@@ -1231,8 +1292,17 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
-
-  _drawVertical(ctx, timeVal, min, max, nextPointInTime, headerColumnIndent, top, width, isAlert) {
+  _drawVertical(
+    ctx,
+    timeVal,
+    min,
+    max,
+    nextPointInTime,
+    headerColumnIndent,
+    top,
+    width,
+    isAlert
+  ) {
     let xPos = headerColumnIndent + (timeVal - min) / (max - min) * width;
     // draw ticks
     ctx.beginPath();
@@ -1245,13 +1315,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let date = new Date(nextPointInTime);
 
     if (isAlert == true) {
-      let dateStr = "\u25B2";
+      let dateStr = '\u25B2';
       let xOffset = ctx.measureText(dateStr).width / 2;
       ctx.fillText(dateStr, xPos - xOffset, top + 10);
     }
-
   }
-
 
   _renderCrosshair() {
     if (this.mouse.down != null) {
@@ -1288,4 +1356,4 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 }
 
-export { DiscretePanelCtrl as PanelCtrl };
+export {DiscretePanelCtrl as PanelCtrl};
