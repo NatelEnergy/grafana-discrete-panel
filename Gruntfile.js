@@ -13,7 +13,6 @@ module.exports = function(grunt) {
     copy: {
       dist_vendor_js: {
         expand: true,
-        //cwd: 'node_modules/jquery-ui/external/jquery-1.12.4/',
         cwd: 'vendor/jquery-ui-1.12.4/',
         src: ['**/*.js'],
         dest: 'dist',
@@ -39,11 +38,15 @@ module.exports = function(grunt) {
         dest: 'dist/css/',
       },
       dist_css_images: {
-        expand: true,
-        flatten: true,
-        cwd: 'src/css/images',
-        src: ['**/*.png'],
-        dest: 'dist/css/images/',
+        files: [
+          {
+            expand: true,
+            //      flatten: true,
+            cwd: 'src/css/images',
+            src: ['**/*.png'],
+            dest: 'dist/css/images/',
+          },
+        ],
       },
       dist_img: {
         expand: true,

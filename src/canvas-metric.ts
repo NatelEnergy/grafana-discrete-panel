@@ -235,7 +235,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           if (up.x === this.mouse.down.x && up.y === this.mouse.down.y) {
             this.mouse.position = null;
             this.mouse.down = null;
-            if (evt.metaKey == true) {
+            if (evt.metaKey == true || evt.ctrlKey == true) {
               let range = {from: moment.utc(up.ts)};
               this.onMouseSelectedRangeAnnotation(evt, false, range, up.x, up.y);
             } else {
@@ -247,7 +247,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
             let range = {from: moment.utc(min), to: moment.utc(max)};
             this.mouse.position = up;
 
-            if (evt.metaKey == true) {
+            if (evt.metaKey == true || evt.ctrlKey == true) {
               this.onMouseSelectedRangeAnnotation(evt, true, range, up.x, up.y);
             } else {
               this.onMouseSelectedRange(range);

@@ -194,7 +194,7 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                             if (up.x === _this.mouse.down.x && up.y === _this.mouse.down.y) {
                                 _this.mouse.position = null;
                                 _this.mouse.down = null;
-                                if (evt.metaKey == true) {
+                                if ((evt.metaKey == true) || (evt.ctrlKey == true)) {
                                     var range = { from: moment_1.default.utc(up.ts) };
                                     _this.onMouseSelectedRangeAnnotation(evt, false, range, up.x, up.y);
                                 }
@@ -207,7 +207,7 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                                 var max = Math.max(_this.mouse.down.ts, up.ts);
                                 var range = { from: moment_1.default.utc(min), to: moment_1.default.utc(max) };
                                 _this.mouse.position = up;
-                                if (evt.metaKey == true) {
+                                if ((evt.metaKey == true) || (evt.ctrlKey == true)) {
                                     _this.onMouseSelectedRangeAnnotation(evt, true, range, up.x, up.y);
                                 }
                                 else {

@@ -648,9 +648,12 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', './
                             });
                         };
                     }
-                    jquery_1.default('<form style="width:350;height:250;" id="annot_form_id"><table><tr><td>Description:</td><td><textarea rows="2" id="annot_description" style="z-index:10000;background-color:#ffffff;color:#000000;" form="annot_form_id">' +
+                    //$('body').remove("#annot_form_id");
+                    jquery_1.default('#annot_form_id').remove();
+                    //$('#annot_form_id').empty();
+                    jquery_1.default('<form style="width:350;height:250;" id="annot_form_id"><table><tr><td>Description:</td><td><textarea rows="2" id="annot_description" autocomplete="off" style="z-index:10000;background-color:#ffffff;color:#000000;" form="annot_form_id">' +
                         description +
-                        '</textarea></td></tr><tr><td>Tag:</td><td><input type="text" id="annot_tag" form="annot_form_id"  style="z-index:10000;border:1px;background-color:#ffffff;color:#000000;" value=' +
+                        '</textarea></td></tr><tr><td>Tag:</td><td><input type="text" id="annot_tag" form="annot_form_id" autocomplete="off"  style="z-index:10000;border:1px;background-color:#ffffff;color:#000000;" value=' +
                         tag +
                         '></td></tr></form>')
                         .appendTo('body')
