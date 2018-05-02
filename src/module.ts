@@ -187,6 +187,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._renderLabels();
     this._renderSelection();
     this._renderCrosshair();
+
+    this.renderingCompleted();
   }
 
   showLegandTooltip(pos, info) {

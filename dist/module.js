@@ -175,6 +175,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this._renderLabels();
                     this._renderSelection();
                     this._renderCrosshair();
+                    this.renderingCompleted();
                 };
                 DiscretePanelCtrl.prototype.showLegandTooltip = function (pos, info) {
                     var body = '<div class="graph-tooltip-time">' + info.val + '</div>';
@@ -290,27 +291,8 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         }
                     });
                     this.data = data;
-                    //anthony start
-                    /*
-                    if (this.dashboard.snapshot && this.locations) {
-                        this.panel.snapshotLocationData = this.locations;
-                      }
-                    */
-                    //anthony end
                     this.onRender();
-                    //console.log( 'data', dataList, this.data);
                 };
-                //anthony 
-                /*
-                loadLocationDataFromFile(reload) {
-                  if (this.map && !reload) return;
-                
-                  if (this.panel.snapshotLocationData) {
-                    this.locations = this.panel.snapshotLocationData;
-                    return;
-                  }
-                */
-                //anthonyend
                 DiscretePanelCtrl.prototype.removeColorMap = function (map) {
                     var index = lodash_1.default.indexOf(this.panel.colorMaps, map);
                     this.panel.colorMaps.splice(index, 1);

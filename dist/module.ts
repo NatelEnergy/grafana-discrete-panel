@@ -131,12 +131,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
     this.events.on('data-error', this.onDataError.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
-this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
   }
 
-onDataSnapshotLoad(snapshotData) {
-  this.onDataReceived(snapshotData);
-}
+  onDataSnapshotLoad(snapshotData) {
+    this.onDataReceived(snapshotData);
+  }
 
   onPanelInitialized() {
     this.updateColorInfo();
@@ -187,6 +187,8 @@ onDataSnapshotLoad(snapshotData) {
     this._renderLabels();
     this._renderSelection();
     this._renderCrosshair();
+
+    this.renderingCompleted();
   }
 
   showLegandTooltip(pos, info) {
@@ -318,31 +320,8 @@ onDataSnapshotLoad(snapshotData) {
       }
     });
     this.data = data;
-
-//anthony start
-/*
-if (this.dashboard.snapshot && this.locations) {
-    this.panel.snapshotLocationData = this.locations;
-  }
-*/
-//anthony end
     this.onRender();
-
-    //console.log( 'data', dataList, this.data);
   }
-
-
-//anthony 
-/*
-loadLocationDataFromFile(reload) {
-  if (this.map && !reload) return;
-
-  if (this.panel.snapshotLocationData) {
-    this.locations = this.panel.snapshotLocationData;
-    return;
-  }
-*/
-//anthonyend
 
   removeColorMap(map) {
     let index = _.indexOf(this.panel.colorMaps, map);

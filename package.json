@@ -10,13 +10,7 @@
   },
   "author": "ryantxu",
   "license": "MIT",
-  "keywords": [
-    "discrete",
-    "canvas",
-    "grafana",
-    "plugin",
-    "panel"
-  ],
+  "keywords": ["discrete", "canvas", "grafana", "plugin", "panel"],
   "repository": {
     "type": "git",
     "url": "https://github.com/NatelEnergy/grafana-discrete-panel.git"
@@ -58,6 +52,6 @@
     "pretty-quick": "^1.4.1",
     "sinon": "^3.2.1",
     "systemjs-plugin-css": "^0.1.35",
-    "typescript": "^2.8.1"
+    "typescript": "^2.8.3"
   }
 }
