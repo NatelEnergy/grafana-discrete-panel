@@ -40,6 +40,7 @@ yarn pretty
 ##### v0.0.8 (not released yet)
 
 * Support Snapshots (thanks @londonanthonyoleary)
+* Direct link rendered image now works.
 
 ##### v0.0.7
 
