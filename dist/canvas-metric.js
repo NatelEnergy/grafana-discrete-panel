@@ -349,25 +349,6 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                     var escape = false;
                     var hours = d.getHours();
                     var isAM = hours < 12;
-                    if (monthNames == null) {
-                        monthNames = [
-                            'Jan',
-                            'Feb',
-                            'Mar',
-                            'Apr',
-                            'May',
-                            'Jun',
-                            'Jul',
-                            'Aug',
-                            'Sep',
-                            'Oct',
-                            'Nov',
-                            'Dec',
-                        ];
-                    }
-                    if (dayNames == null) {
-                        dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                    }
                     var hours12;
                     if (hours > 12) {
                         hours12 = hours - 12;

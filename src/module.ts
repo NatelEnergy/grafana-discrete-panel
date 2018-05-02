@@ -893,6 +893,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
 
     let timeFormat = this.time_format(max - min, timeResolution / 1000);
+    let displayOffset = 0;
+    if (this.dashboard.timezone == 'utc') {
+      displayOffset = new Date().getTimezoneOffset() * 60000;
+    }
 
     while (nextPointInTime < max) {
       // draw ticks
@@ -903,9 +907,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       ctx.stroke();
 
       // draw time label
-      let date = new Date(nextPointInTime);
-      let dateStr = this.formatDate(date, timeFormat);
-      let xOffset = ctx.measureText(dateStr).width / 2;
+      const date = new Date(nextPointInTime + displayOffset);
+      const dateStr = this.formatDate(date, timeFormat);
+      const xOffset = ctx.measureText(dateStr).width / 2;
       ctx.fillText(dateStr, xPos - xOffset, top + 10);
 
       nextPointInTime += timeResolution;

@@ -41,6 +41,8 @@ yarn pretty
 
 * Support Snapshots (thanks @londonanthonyoleary)
 * Direct link rendered image now works.
+* Support UTC date display
+
 
 ##### v0.0.7
 

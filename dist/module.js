@@ -796,6 +796,10 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
                     var xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
                     var timeFormat = this.time_format(max - min, timeResolution / 1000);
+                    var displayOffset = 0;
+                    if (this.dashboard.timezone == 'utc') {
+                        displayOffset = (new Date().getTimezoneOffset() * 60000);
+                    }
                     while (nextPointInTime < max) {
                         // draw ticks
                         ctx.beginPath();
@@ -804,7 +808,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         ctx.lineWidth = 1;
                         ctx.stroke();
                         // draw time label
-                        var date = new Date(nextPointInTime);
+                        var date = new Date(nextPointInTime + displayOffset);
                         var dateStr = this.formatDate(date, timeFormat);
                         var xOffset = ctx.measureText(dateStr).width / 2;
                         ctx.fillText(dateStr, xPos - xOffset, top + 10);

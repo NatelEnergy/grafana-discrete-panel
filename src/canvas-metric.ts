@@ -416,7 +416,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   formatDate(d, fmt) {
-    let monthNames = [
+    const monthNames = [
       'Jan',
       'Feb',
       'Mar',
@@ -430,7 +430,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'Nov',
       'Dec',
     ];
-    let dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     if (typeof d.strftime == 'function') {
       return d.strftime(fmt);
     }
@@ -439,28 +439,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     let escape = false;
     let hours = d.getHours();
     let isAM = hours < 12;
-
-    if (monthNames == null) {
-      monthNames = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ];
-    }
-
-    if (dayNames == null) {
-      dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    }
-
     let hours12;
 
     if (hours > 12) {
