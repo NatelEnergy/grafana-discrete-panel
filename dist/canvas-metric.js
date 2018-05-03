@@ -127,12 +127,12 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                 CanvasPanelCtrl.prototype.onGraphHover = function (evt, showTT, isExternal) {
                     console.log('HOVER', evt, showTT, isExternal);
                 };
-                CanvasPanelCtrl.prototype.onMouseClicked = function (where) {
-                    console.log('CANVAS CLICKED', where);
+                CanvasPanelCtrl.prototype.onMouseClicked = function (where, event) {
+                    console.log('CANVAS CLICKED', where, event);
                     this.render();
                 };
-                CanvasPanelCtrl.prototype.onMouseSelectedRange = function (range) {
-                    console.log('CANVAS Range', range);
+                CanvasPanelCtrl.prototype.onMouseSelectedRange = function (range, event) {
+                    console.log('CANVAS Range', range, event);
                 };
                 CanvasPanelCtrl.prototype.link = function (scope, elem, attrs, ctrl) {
                     var _this = this;
@@ -193,14 +193,14 @@ System.register(['app/plugins/sdk', 'moment', 'jquery', 'app/core/app_events'], 
                             if (up.x === _this.mouse.down.x && up.y === _this.mouse.down.y) {
                                 _this.mouse.position = null;
                                 _this.mouse.down = null;
-                                _this.onMouseClicked(up);
+                                _this.onMouseClicked(up, evt);
                             }
                             else {
                                 var min = Math.min(_this.mouse.down.ts, up.ts);
                                 var max = Math.max(_this.mouse.down.ts, up.ts);
                                 var range = { from: moment_1.default.utc(min), to: moment_1.default.utc(max) };
                                 _this.mouse.position = up;
-                                _this.onMouseSelectedRange(range);
+                                _this.onMouseSelectedRange(range, evt);
                             }
                         }
                         _this.mouse.down = null;

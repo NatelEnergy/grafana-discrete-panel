@@ -140,13 +140,13 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     console.log('HOVER', evt, showTT, isExternal);
   }
 
-  onMouseClicked(where) {
-    console.log('CANVAS CLICKED', where);
+  onMouseClicked(where, event) {
+    console.log('CANVAS CLICKED', where, event);
     this.render();
   }
 
-  onMouseSelectedRange(range) {
-    console.log('CANVAS Range', range);
+  onMouseSelectedRange(range, event) {
+    console.log('CANVAS Range', range, event);
   }
 
   link(scope, elem, attrs, ctrl) {
@@ -233,13 +233,13 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           if (up.x === this.mouse.down.x && up.y === this.mouse.down.y) {
             this.mouse.position = null;
             this.mouse.down = null;
-            this.onMouseClicked(up);
+            this.onMouseClicked(up, evt);
           } else {
             let min = Math.min(this.mouse.down.ts, up.ts);
             let max = Math.max(this.mouse.down.ts, up.ts);
             let range = {from: moment.utc(min), to: moment.utc(max)};
             this.mouse.position = up;
-            this.onMouseSelectedRange(range);
+            this.onMouseSelectedRange(range, evt);
           }
         }
         this.mouse.down = null;

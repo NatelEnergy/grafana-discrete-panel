@@ -43,6 +43,8 @@ yarn pretty
 * Direct link rendered image now works.
 * Support UTC date display
 * Fix display issue with 5.1
+* Basic Annotation Support
+
 
 ##### v0.0.7
 

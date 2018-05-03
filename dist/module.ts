@@ -188,12 +188,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._renderRects();
     this._renderTimeAxis();
     this._renderLabels();
+    this._renderAnnotations();
     this._renderSelection();
     this._renderCrosshair();
-
-    if(this.annotations) {
-      console.log( 'TODO, annotations', this.annotations );
-    }
 
     this.renderingCompleted();
   }
@@ -327,28 +324,29 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.data = data;
 
     // Annotations Query
-    this.annotationsSrv.getAnnotations({
-      dashboard: this.dashboard,
-      panel: { id:4 }, //this.panel,
-      range: this.range,
-    }).then(
-      result => {
-        this.loading = false;
-        if(result.annotations && result.annotations.length>0) {
-          this.annotations = result.annotations;
-        }
-        else {
+    this.annotationsSrv
+      .getAnnotations({
+        dashboard: this.dashboard,
+        panel: {id: 4}, //this.panel,
+        range: this.range,
+      })
+      .then(
+        result => {
+          this.loading = false;
+          if (result.annotations && result.annotations.length > 0) {
+            this.annotations = result.annotations;
+          } else {
+            this.annotations = null;
+          }
+          this.onRender();
+        },
+        () => {
+          this.loading = false;
           this.annotations = null;
+          this.onRender();
+          console.log('ERRR', this);
         }
-        this.onRender();    
-      },
-      () => {
-        this.loading = false;
-        this.annotations = null;
-        this.onRender();    
-        console.log("ERRR", this);
-      }
-    );
+      );
   }
 
   removeColorMap(map) {
@@ -480,6 +478,28 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let time = point.ms;
     let val = point.val;
 
+    if (this.annotations && !isExternal && this._renderDimensions) {
+      if (evt.pos.y > this._renderDimensions.rowsHeight - 5) {
+        let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+        let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+        let width = this._renderDimensions.width;
+
+        const anno = _.find(this.annotations, a => {
+          if (a.isRegion) {
+            return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
+          }
+          const anno_x = (a.time - min) / (max - min) * width;
+          const mouse_x = evt.evt.offsetX;
+          return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
+        });
+        if (anno) {
+          console.log('TODO, use directive to annotation', anno);
+          this.$tooltip.html(anno.text).place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
+          return;
+        }
+      }
+    }
+
     if (this.mouse.down != null) {
       from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
       to = Math.max(this.mouse.down.ts, this.mouse.position.ts);
@@ -569,7 +589,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
-  onMouseClicked(where) {
+  onMouseClicked(where, event) {
+    if (event.metaKey == true || event.ctrlKey == true) {
+      console.log('TODO? Create Annotation?', where, event);
+      return;
+    }
+
     let pt = this.hoverPoint;
     if (pt && pt.start) {
       let range = {from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms)};
@@ -578,7 +603,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
-  onMouseSelectedRange(range) {
+  onMouseSelectedRange(range, event) {
+    if (event.metaKey == true || event.ctrlKey == true) {
+      console.log('TODO? Create range annotation?', range, event);
+      return;
+    }
     this.timeSrv.setTime(range);
     this.clear();
   }
@@ -976,6 +1005,127 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       ctx.fillStyle = this.panel.crosshairColor;
       ctx.fill();
       ctx.lineWidth = 1;
+    }
+  }
+
+  _renderAnnotations() {
+    if (!this.panel.showTimeAxis) {
+      return;
+    }
+    if (!this.annotations) {
+      return;
+    }
+
+    const ctx = this.context;
+    const rows = this.data.length;
+    const rowHeight = this.panel.rowHeight;
+    const height = this._renderDimensions.height;
+    const width = this._renderDimensions.width;
+    const top = this._renderDimensions.rowsHeight;
+
+    const headerColumnIndent = 0; // header inset (zero for now)
+    ctx.font = this.panel.textSizeTime + 'px "Open Sans", Helvetica, Arial, sans-serif';
+    ctx.fillStyle = '#7FE9FF';
+    ctx.textAlign = 'left';
+    ctx.strokeStyle = '#7FE9FF';
+
+    ctx.textBaseline = 'top';
+    ctx.setLineDash([3, 3]);
+    ctx.lineDashOffset = 0;
+    ctx.lineWidth = 2;
+
+    let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+    let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+    let xPos = headerColumnIndent;
+
+    _.forEach(this.annotations, anno => {
+      ctx.setLineDash([3, 3]);
+
+      let isAlert = false;
+      if (anno.source.iconColor) {
+        ctx.fillStyle = anno.source.iconColor;
+        ctx.strokeStyle = anno.source.iconColor;
+      } else if (anno.annotation === undefined) {
+        // grafana annotation
+        ctx.fillStyle = '#7FE9FF';
+        ctx.strokeStyle = '#7FE9FF';
+      } else {
+        isAlert = true;
+        ctx.fillStyle = '#EA0F3B'; //red
+        ctx.strokeStyle = '#EA0F3B';
+      }
+
+      this._drawVertical(
+        ctx,
+        anno.time,
+        min,
+        max,
+        headerColumnIndent,
+        top,
+        width,
+        isAlert
+      );
+
+      //do the TO rangeMap
+      if (anno.isRegion) {
+        this._drawVertical(
+          ctx,
+          anno.timeEnd,
+          min,
+          max,
+          headerColumnIndent,
+          top,
+          width,
+          isAlert
+        );
+
+        //draw horizontal line at bottom
+        let xPosStart = headerColumnIndent + (anno.time - min) / (max - min) * width;
+        let xPosEnd = headerColumnIndent + (anno.timeEnd - min) / (max - min) * width;
+
+        // draw ticks
+        ctx.beginPath();
+        ctx.moveTo(xPosStart, top + 5);
+        ctx.lineTo(xPosEnd, top + 5);
+
+        ctx.lineWidth = 4;
+        ctx.setLineDash([]);
+        ctx.stroke();
+        //end horizontal
+        //do transparency
+        if (isAlert == false) {
+          ctx.save();
+          ctx.fillStyle = '#7FE9FF';
+          ctx.globalAlpha = 0.2;
+          ctx.fillRect(xPosStart, 0, xPosEnd - xPosStart, rowHeight);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    });
+  }
+
+  _drawVertical(ctx, timeVal, min, max, headerColumnIndent, top, width, isAlert) {
+    let xPos = headerColumnIndent + (timeVal - min) / (max - min) * width;
+
+    // draw ticks
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(xPos, top + 5);
+    ctx.lineTo(xPos, 0);
+    ctx.stroke();
+
+    // draw triangle
+    ctx.moveTo(xPos + 0, top);
+    ctx.lineTo(xPos - 5, top + 7);
+    ctx.lineTo(xPos + 5, top + 7);
+    ctx.fill();
+
+    // draw alert label
+    if (isAlert == true) {
+      let dateStr = '\u25B2';
+      let xOffset = ctx.measureText(dateStr).width / 2;
+      ctx.fillText(dateStr, xPos - xOffset, top + 10);
     }
   }
 }

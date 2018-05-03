@@ -79,8 +79,8 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     getLegendDisplay(info: any, metric: any): any;
     showTooltip(evt: any, point: any, isExternal: any): void;
     onGraphHover(evt: any, showTT: any, isExternal: any): void;
-    onMouseClicked(where: any): void;
-    onMouseSelectedRange(range: any): void;
+    onMouseClicked(where: any, event: any): void;
+    onMouseSelectedRange(range: any, event: any): void;
     clear(): void;
     _updateRenderDimensions(): void;
     _updateSelectionMatrix(): void;
@@ -91,5 +91,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     _renderSelection(): void;
     _renderTimeAxis(): void;
     _renderCrosshair(): void;
+    _renderAnnotations(): void;
+    _drawVertical(ctx: any, timeVal: any, min: any, max: any, headerColumnIndent: any, top: any, width: any, isAlert: any): void;
 }
 export { DiscretePanelCtrl as PanelCtrl };
