@@ -42,7 +42,7 @@ yarn pretty
 * Support Snapshots (thanks @londonanthonyoleary)
 * Direct link rendered image now works.
 * Support UTC date display
-
+* Fix display issue with 5.1
 
 ##### v0.0.7
 

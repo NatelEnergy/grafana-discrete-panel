@@ -105,6 +105,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     units: 'short',
   };
 
+  annotations: any = [];
   data: any = null;
   externalPT = false;
   isTimeline = true;
@@ -118,7 +119,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _renderDimensions: any = {};
   _selectionMatrix: Array<Array<String>> = [];
 
-  constructor($scope, $injector) {
+  constructor($scope, $injector, public annotationsSrv) {
     super($scope, $injector);
 
     // defaults configs
@@ -127,15 +128,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('render', this.onRender.bind(this));
-    this.events.on('data-received', this.onDataReceived.bind(this));
     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
-    this.events.on('data-error', this.onDataError.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
-    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
-  }
 
-  onDataSnapshotLoad(snapshotData) {
-    this.onDataReceived(snapshotData);
+    this.events.on('data-received', this.onDataReceived.bind(this));
+    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+    this.events.on('data-error', this.onDataError.bind(this));
   }
 
   onPanelInitialized() {
@@ -143,7 +141,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.onConfigChanged();
   }
 
+  onDataSnapshotLoad(snapshotData) {
+    this.onDataReceived(snapshotData);
+  }
+
   onDataError(err) {
+    this.annotations = [];
     console.log('onDataError', err);
   }
 
@@ -187,6 +190,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._renderLabels();
     this._renderSelection();
     this._renderCrosshair();
+
+    if(this.annotations) {
+      console.log( 'TODO, annotations', this.annotations );
+    }
 
     this.renderingCompleted();
   }
@@ -291,8 +298,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
 
-    //    console.log('GOT', dataList);
-
     let data = [];
     _.forEach(dataList, metric => {
       if ('table' === metric.type) {
@@ -320,7 +325,30 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
     });
     this.data = data;
-    this.onRender();
+
+    // Annotations Query
+    this.annotationsSrv.getAnnotations({
+      dashboard: this.dashboard,
+      panel: { id:4 }, //this.panel,
+      range: this.range,
+    }).then(
+      result => {
+        this.loading = false;
+        if(result.annotations && result.annotations.length>0) {
+          this.annotations = result.annotations;
+        }
+        else {
+          this.annotations = null;
+        }
+        this.onRender();    
+      },
+      () => {
+        this.loading = false;
+        this.annotations = null;
+        this.onRender();    
+        console.log("ERRR", this);
+      }
+    );
   }
 
   removeColorMap(map) {
@@ -895,7 +923,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let timeFormat = this.time_format(max - min, timeResolution / 1000);
     let displayOffset = 0;
     if (this.dashboard.timezone == 'utc') {
-      displayOffset = (new Date().getTimezoneOffset() * 60000);
+      displayOffset = new Date().getTimezoneOffset() * 60000;
     }
 
     while (nextPointInTime < max) {

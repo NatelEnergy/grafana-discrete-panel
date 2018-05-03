@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import { CanvasPanelCtrl } from './canvas-metric';
 declare class DiscretePanelCtrl extends CanvasPanelCtrl {
+    annotationsSrv: any;
     static templateUrl: string;
     static scrollable: boolean;
     defaults: {
@@ -42,6 +43,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
         legendSortBy: string;
         units: string;
     };
+    annotations: any;
     data: any;
     externalPT: boolean;
     isTimeline: boolean;
@@ -53,9 +55,9 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     formatter: any;
     _renderDimensions: any;
     _selectionMatrix: Array<Array<String>>;
-    constructor($scope: any, $injector: any);
-    onDataSnapshotLoad(snapshotData: any): void;
+    constructor($scope: any, $injector: any, annotationsSrv: any);
     onPanelInitialized(): void;
+    onDataSnapshotLoad(snapshotData: any): void;
     onDataError(err: any): void;
     onInitEditMode(): void;
     onRender(): void;

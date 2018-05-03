@@ -92,8 +92,9 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
             //(https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
             DiscretePanelCtrl = (function (_super) {
                 __extends(DiscretePanelCtrl, _super);
-                function DiscretePanelCtrl($scope, $injector) {
+                function DiscretePanelCtrl($scope, $injector, annotationsSrv) {
                     _super.call(this, $scope, $injector);
+                    this.annotationsSrv = annotationsSrv;
                     this.defaults = {
                         display: 'timeline',
                         rowHeight: 50,
@@ -122,6 +123,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         legendSortBy: '-ms',
                         units: 'short',
                     };
+                    this.annotations = [];
                     this.data = null;
                     this.externalPT = false;
                     this.isTimeline = true;
@@ -138,20 +140,21 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.panel.display = 'timeline'; // Only supported version now
                     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
                     this.events.on('render', this.onRender.bind(this));
-                    this.events.on('data-received', this.onDataReceived.bind(this));
                     this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
-                    this.events.on('data-error', this.onDataError.bind(this));
                     this.events.on('refresh', this.onRefresh.bind(this));
+                    this.events.on('data-received', this.onDataReceived.bind(this));
                     this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+                    this.events.on('data-error', this.onDataError.bind(this));
                 }
-                DiscretePanelCtrl.prototype.onDataSnapshotLoad = function (snapshotData) {
-                    this.onDataReceived(snapshotData);
-                };
                 DiscretePanelCtrl.prototype.onPanelInitialized = function () {
                     this.updateColorInfo();
                     this.onConfigChanged();
                 };
+                DiscretePanelCtrl.prototype.onDataSnapshotLoad = function (snapshotData) {
+                    this.onDataReceived(snapshotData);
+                };
                 DiscretePanelCtrl.prototype.onDataError = function (err) {
+                    this.annotations = [];
                     console.log('onDataError', err);
                 };
                 DiscretePanelCtrl.prototype.onInitEditMode = function () {
@@ -175,6 +178,9 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this._renderLabels();
                     this._renderSelection();
                     this._renderCrosshair();
+                    if (this.annotations) {
+                        console.log('TODO, annotations', this.annotations);
+                    }
                     this.renderingCompleted();
                 };
                 DiscretePanelCtrl.prototype.showLegandTooltip = function (pos, info) {
@@ -263,7 +269,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                 DiscretePanelCtrl.prototype.onDataReceived = function (dataList) {
                     var _this = this;
                     jquery_1.default(this.canvas).css('cursor', 'pointer');
-                    //    console.log('GOT', dataList);
                     var data = [];
                     lodash_1.default.forEach(dataList, function (metric) {
                         if ('table' === metric.type) {
@@ -291,7 +296,26 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         }
                     });
                     this.data = data;
-                    this.onRender();
+                    // Annotations Query
+                    this.annotationsSrv.getAnnotations({
+                        dashboard: this.dashboard,
+                        panel: { id: 4 },
+                        range: this.range,
+                    }).then(function (result) {
+                        _this.loading = false;
+                        if (result.annotations && result.annotations.length > 0) {
+                            _this.annotations = result.annotations;
+                        }
+                        else {
+                            _this.annotations = null;
+                        }
+                        _this.onRender();
+                    }, function () {
+                        _this.loading = false;
+                        _this.annotations = null;
+                        _this.onRender();
+                        console.log("ERRR", _this);
+                    });
                 };
                 DiscretePanelCtrl.prototype.removeColorMap = function (map) {
                     var index = lodash_1.default.indexOf(this.panel.colorMaps, map);
@@ -798,7 +822,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var timeFormat = this.time_format(max - min, timeResolution / 1000);
                     var displayOffset = 0;
                     if (this.dashboard.timezone == 'utc') {
-                        displayOffset = (new Date().getTimezoneOffset() * 60000);
+                        displayOffset = new Date().getTimezoneOffset() * 60000;
                     }
                     while (nextPointInTime < max) {
                         // draw ticks

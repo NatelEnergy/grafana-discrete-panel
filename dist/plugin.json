@@ -28,7 +28,7 @@
       { "name": "Legend",           "path": "img/screenshot-options-2.png" }
     ],
     "version": "0.0.8-pre",
-    "updated": "2018-05-02"
+    "updated": "2018-05-03"
   },
 
   "dependencies": {
