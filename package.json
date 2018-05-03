@@ -48,7 +48,7 @@
     "karma-systemjs": "^0.16.0",
     "load-grunt-tasks": "^3.5.2",
     "plugin-typescript": "^7.1.0",
-    "prettier": "1.11.1",
+    "prettier": "1.12.1",
     "pretty-quick": "^1.4.1",
     "sinon": "^3.2.1",
     "systemjs-plugin-css": "^0.1.35",

@@ -298,7 +298,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     this.annotationsSrv
                         .getAnnotations({
                         dashboard: this.dashboard,
-                        panel: { id: 4 },
+                        panel: this.panel,
                         range: this.range,
                     })
                         .then(function (result) {
@@ -448,7 +448,8 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                 return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
                             });
                             if (anno) {
-                                console.log('TODO, use directive to annotation', anno);
+                                console.log('TODO, use <annotation-tooltip>', anno);
+                                // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
                                 this.$tooltip.html(anno.text).place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
                                 return;
                             }

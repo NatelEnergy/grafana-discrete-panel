@@ -45,7 +45,6 @@ yarn pretty
 * Fix display issue with 5.1
 * Basic Annotation Support
 
-
 ##### v0.0.7
 
 * Switch to typescript

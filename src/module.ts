@@ -1,6 +1,7 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
 import config from 'app/core/config';
+import angular from 'angular';
 
 import {CanvasPanelCtrl} from './canvas-metric';
 import {DistinctPoints} from './distinct-points';
@@ -327,7 +328,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.annotationsSrv
       .getAnnotations({
         dashboard: this.dashboard,
-        panel: {id: 4}, //this.panel,
+        panel: this.panel, // {id: 4},
         range: this.range,
       })
       .then(
@@ -493,7 +494,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
         });
         if (anno) {
-          console.log('TODO, use directive to annotation', anno);
+          console.log('TODO, use <annotation-tooltip>', anno);
+          // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
           this.$tooltip.html(anno.text).place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
           return;
         }
