@@ -328,7 +328,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.annotationsSrv
       .getAnnotations({
         dashboard: this.dashboard,
-        panel: this.panel, // {id: 4}, 
+        panel: this.panel, // {id: 4}, //
         range: this.range,
       })
       .then(
@@ -479,29 +479,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let time = point.ms;
     let val = point.val;
 
-    if (this.annotations && !isExternal && this._renderDimensions) {
-      if (evt.pos.y > this._renderDimensions.rowsHeight - 5) {
-        let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
-        let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
-        let width = this._renderDimensions.width;
-
-        const anno = _.find(this.annotations, a => {
-          if (a.isRegion) {
-            return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
-          }
-          const anno_x = (a.time - min) / (max - min) * width;
-          const mouse_x = evt.evt.offsetX;
-          return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
-        });
-        if (anno) {
-          console.log('TODO, use <annotation-tooltip>', anno);
-          // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
-          this.$tooltip.html(anno.text).place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
-          return;
-        }
-      }
-    }
-
     if (this.mouse.down != null) {
       from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
       to = Math.max(this.mouse.down.ts, this.mouse.position.ts);
@@ -562,6 +539,31 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           hover = this.data[j].changes[i];
         }
         this.hoverPoint = hover;
+
+        if (this.annotations && !isExternal && this._renderDimensions) {
+          if (evt.pos.y > this._renderDimensions.rowsHeight - 5) {
+            let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+            let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+            let width = this._renderDimensions.width;
+
+            const anno = _.find(this.annotations, a => {
+              if (a.isRegion) {
+                return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
+              }
+              const anno_x = (a.time - min) / (max - min) * width;
+              const mouse_x = evt.evt.offsetX;
+              return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
+            });
+            if (anno) {
+              console.log('TODO, hover <annotation-tooltip>', anno);
+              // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
+              this.$tooltip
+                .html(anno.text)
+                .place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
+              return;
+            }
+          }
+        }
 
         if (showTT) {
           this.externalPT = isExternal;

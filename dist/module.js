@@ -434,27 +434,6 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     var to = point.start + point.ms;
                     var time = point.ms;
                     var val = point.val;
-                    if (this.annotations && !isExternal && this._renderDimensions) {
-                        if (evt.pos.y > this._renderDimensions.rowsHeight - 5) {
-                            var min = lodash_1.default.isUndefined(this.range.from) ? null : this.range.from.valueOf();
-                            var max = lodash_1.default.isUndefined(this.range.to) ? null : this.range.to.valueOf();
-                            var width = this._renderDimensions.width;
-                            var anno = lodash_1.default.find(this.annotations, function (a) {
-                                if (a.isRegion) {
-                                    return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
-                                }
-                                var anno_x = (a.time - min) / (max - min) * width;
-                                var mouse_x = evt.evt.offsetX;
-                                return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
-                            });
-                            if (anno) {
-                                console.log('TODO, use <annotation-tooltip>', anno);
-                                // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
-                                this.$tooltip.html(anno.text).place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
-                                return;
-                            }
-                        }
-                    }
                     if (this.mouse.down != null) {
                         from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
                         to = Math.max(this.mouse.down.ts, this.mouse.position.ts);
@@ -509,6 +488,29 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                 hover = this.data[j].changes[i];
                             }
                             this.hoverPoint = hover;
+                            if (this.annotations && !isExternal && this._renderDimensions) {
+                                if (evt.pos.y > this._renderDimensions.rowsHeight - 5) {
+                                    var min = lodash_1.default.isUndefined(this.range.from) ? null : this.range.from.valueOf();
+                                    var max = lodash_1.default.isUndefined(this.range.to) ? null : this.range.to.valueOf();
+                                    var width = this._renderDimensions.width;
+                                    var anno = lodash_1.default.find(this.annotations, function (a) {
+                                        if (a.isRegion) {
+                                            return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
+                                        }
+                                        var anno_x = (a.time - min) / (max - min) * width;
+                                        var mouse_x = evt.evt.offsetX;
+                                        return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
+                                    });
+                                    if (anno) {
+                                        console.log('TODO, hover <annotation-tooltip>', anno);
+                                        // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
+                                        this.$tooltip
+                                            .html(anno.text)
+                                            .place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
+                                        return;
+                                    }
+                                }
+                            }
                             if (showTT) {
                                 this.externalPT = isExternal;
                                 this.showTooltip(evt, hover, isExternal);
