@@ -36,6 +36,7 @@ grunt
 * Direct link rendered image now works.
 * Support UTC date display
 * Fix display issue with 5.1
+* Merge distinct values in legend unless showing the name
 * Basic Annotation Support
 
 ##### v0.0.7

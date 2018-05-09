@@ -1,12 +1,31 @@
 System.register(['lodash'], function(exports_1) {
     var lodash_1;
-    var DistinctPoints;
+    var PointInfo, LegendValue, DistinctPoints;
     return {
         setters:[
             function (lodash_1_1) {
                 lodash_1 = lodash_1_1;
             }],
         execute: function() {
+            PointInfo = (function () {
+                function PointInfo(val, start) {
+                    this.ms = 0; // elapsed time
+                    this.val = val;
+                    this.start = start;
+                }
+                return PointInfo;
+            })();
+            exports_1("PointInfo", PointInfo);
+            LegendValue = (function () {
+                function LegendValue(val) {
+                    this.ms = 0; // elapsed time
+                    this.count = 0;
+                    this.per = 0;
+                    this.val = val;
+                }
+                return LegendValue;
+            })();
+            exports_1("LegendValue", LegendValue);
             DistinctPoints = (function () {
                 function DistinctPoints(name) {
                     this.name = name;
@@ -29,7 +48,7 @@ System.register(['lodash'], function(exports_1) {
                         };
                         this.changes.push(this.last);
                     }
-                    else if (ts === this.last.ts) {
+                    else if (ts === this.last.start) {
                         console.log('skip point with duplicate timestamp', ts, val);
                         return;
                     }
@@ -70,7 +89,7 @@ System.register(['lodash'], function(exports_1) {
                     // Add a point beyond the controls
                     if (this.last.start < ctrl.range.to) {
                         var until = ctrl.range.to + 1;
-                        // var now = Date.now();
+                        // let now = Date.now();
                         // if(this.last.start < now && ctrl.range.to > now) {
                         //   until = now;
                         // }
@@ -82,13 +101,7 @@ System.register(['lodash'], function(exports_1) {
                         });
                     }
                     this.transitionCount = 0;
-                    var valToInfo = {};
-                    var lastTS = 0;
-                    var legendCount = 0;
-                    var maxLegendSize = ctrl.panel.legendMaxValues;
-                    if (!maxLegendSize) {
-                        maxLegendSize = 20;
-                    }
+                    var distinct = new Map();
                     var last = this.changes[0];
                     for (var i = 1; i < this.changes.length; i++) {
                         var pt = this.changes[i];
@@ -105,21 +118,20 @@ System.register(['lodash'], function(exports_1) {
                         }
                         last.ms = e - s;
                         if (last.ms > 0) {
-                            if (lodash_1.default.has(valToInfo, last.val)) {
-                                var v = valToInfo[last.val];
+                            if (distinct.has(last.val)) {
+                                var v = distinct.get(last.val);
                                 v.ms += last.ms;
                                 v.count++;
                             }
                             else {
-                                valToInfo[last.val] = { val: last.val, ms: last.ms, count: 1 };
-                                legendCount++;
+                                distinct.set(last.val, { val: last.val, ms: last.ms, count: 1, per: 0 });
                             }
                         }
                         last = pt;
                     }
                     var elapsed = ctrl.range.to - ctrl.range.from;
                     this.elapsed = elapsed;
-                    lodash_1.default.forEach(valToInfo, function (value) {
+                    distinct.forEach(function (value, key) {
                         value.per = value.ms / elapsed;
                         _this.legendInfo.push(value);
                     });
@@ -127,7 +139,36 @@ System.register(['lodash'], function(exports_1) {
                     if (!ctrl.isTimeline) {
                         this.legendInfo = lodash_1.default.orderBy(this.legendInfo, ['ms'], ['desc']);
                     }
-                    //console.log( "FINISH", this );
+                    console.log("FINISH", distinct, this);
+                };
+                DistinctPoints.combineLegend = function (data, ctrl) {
+                    if (data.length == 1) {
+                        return data[0];
+                    }
+                    var merged = new DistinctPoints('merged');
+                    var elapsed = 0;
+                    var distinct = new Map();
+                    lodash_1.default.forEach(data, function (m) {
+                        merged.transitionCount += m.transitionCount;
+                        elapsed += m.elapsed;
+                        lodash_1.default.forEach(m.legendInfo, function (leg) {
+                            if (distinct.has(leg.val)) {
+                                var v = distinct.get(leg.val);
+                                v.ms += leg.ms;
+                                v.count += leg.count;
+                            }
+                            else {
+                                distinct.set(leg.val, { val: leg.val, ms: leg.ms, count: leg.count, per: 0 });
+                            }
+                        });
+                    });
+                    merged.elapsed = elapsed;
+                    distinct.forEach(function (value, key) {
+                        value.per = value.ms / elapsed;
+                        merged.legendInfo.push(value);
+                    });
+                    merged.distinctValuesCount = lodash_1.default.size(merged.legendInfo);
+                    return merged;
                 };
                 return DistinctPoints;
             })();

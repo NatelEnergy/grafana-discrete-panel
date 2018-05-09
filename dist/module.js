@@ -125,14 +125,15 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     };
                     this.annotations = [];
                     this.data = null;
+                    this.legend = null;
                     this.externalPT = false;
                     this.isTimeline = true;
                     this.isStacked = false;
                     this.hoverPoint = null;
                     this.colorMap = {};
-                    this._colorsPaleteCash = null;
                     this.unitFormats = null; // only used for editor
                     this.formatter = null;
+                    this._colorsPaleteCash = null;
                     this._renderDimensions = {};
                     this._selectionMatrix = [];
                     // defaults configs
@@ -294,6 +295,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         }
                     });
                     this.data = data;
+                    this.updateLegendMetrics();
                     // Annotations Query
                     this.annotationsSrv
                         .getAnnotations({
@@ -316,6 +318,19 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         _this.onRender();
                         console.log('ERRR', _this);
                     });
+                };
+                DiscretePanelCtrl.prototype.updateLegendMetrics = function (notify) {
+                    if (!this.data || !this.panel.showLegend || this.panel.showLegendNames || this.data.length <= 1) {
+                        this.legend = this.data;
+                    }
+                    else {
+                        this.legend = [
+                            distinct_points_1.DistinctPoints.combineLegend(this.data, this)
+                        ];
+                    }
+                    if (notify) {
+                        this.onConfigChanged();
+                    }
                 };
                 DiscretePanelCtrl.prototype.removeColorMap = function (map) {
                     var index = lodash_1.default.indexOf(this.panel.colorMaps, map);
@@ -520,12 +535,12 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         else if (!isExternal) {
                             if (this.isStacked) {
                                 hover = this.data[j].legendInfo[0];
-                                for (var i = 0; i < this.data[j].legendInfo.length; i++) {
-                                    if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
-                                        break;
-                                    }
-                                    hover = this.data[j].legendInfo[i];
-                                }
+                                // for (let i = 0; i < this.data[j].legendInfo.length; i++) {
+                                //   if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
+                                //     break;
+                                //   }
+                                //   hover = this.data[j].legendInfo[i];
+                                // }
                                 this.hoverPoint = hover;
                                 this.onRender(); // refresh the view
                                 if (showTT) {

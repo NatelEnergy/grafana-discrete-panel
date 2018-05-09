@@ -4,7 +4,7 @@ import config from 'app/core/config';
 import angular from 'angular';
 
 import {CanvasPanelCtrl} from './canvas-metric';
-import {DistinctPoints} from './distinct-points';
+import {DistinctPoints, LegendValue} from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -107,16 +107,18 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   };
 
   annotations: any = [];
-  data: any = null;
+  data: DistinctPoints[] = null;
+  legend: DistinctPoints[] = null;
+
   externalPT = false;
   isTimeline = true;
   isStacked = false;
   hoverPoint: any = null;
   colorMap: any = {};
-  _colorsPaleteCash: any = null;
   unitFormats: any = null; // only used for editor
   formatter: any = null;
 
+  _colorsPaleteCash: any = null;
   _renderDimensions: any = {};
   _selectionMatrix: Array<Array<String>> = [];
 
@@ -216,7 +218,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.$tooltip.detach();
   }
 
-  formatValue(val) {
+  formatValue(val): string {
     if (_.isNumber(val)) {
       if (this.panel.rangeMaps) {
         for (let i = 0; i < this.panel.rangeMaps.length; i++) {
@@ -296,7 +298,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
 
-    let data = [];
+    let data: DistinctPoints[] = [];
     _.forEach(dataList, metric => {
       if ('table' === metric.type) {
         if ('time' !== metric.columns[0].type) {
@@ -323,6 +325,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
     });
     this.data = data;
+    this.updateLegendMetrics();
 
     // Annotations Query
     this.annotationsSrv
@@ -348,6 +351,23 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           console.log('ERRR', this);
         }
       );
+  }
+
+  updateLegendMetrics(notify?: boolean) {
+    if (
+      !this.data ||
+      !this.panel.showLegend ||
+      this.panel.showLegendNames ||
+      this.data.length <= 1
+    ) {
+      this.legend = this.data;
+    } else {
+      this.legend = [DistinctPoints.combineLegend(this.data, this)];
+    }
+
+    if (notify) {
+      this.onConfigChanged();
+    }
   }
 
   removeColorMap(map) {
@@ -573,12 +593,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       } else if (!isExternal) {
         if (this.isStacked) {
           hover = this.data[j].legendInfo[0];
-          for (let i = 0; i < this.data[j].legendInfo.length; i++) {
-            if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
-              break;
-            }
-            hover = this.data[j].legendInfo[i];
-          }
+          // for (let i = 0; i < this.data[j].legendInfo.length; i++) {
+          //   if (this.data[j].legendInfo[i].x > this.mouse.position.x) {
+          //     break;
+          //   }
+          //   hover = this.data[j].legendInfo[i];
+          // }
           this.hoverPoint = hover;
           this.onRender(); // refresh the view
 

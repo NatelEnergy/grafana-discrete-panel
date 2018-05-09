@@ -2,7 +2,7 @@
     <div class="canvas-spot" style="width:100%;"></div>
 
     <div ng-show="ctrl.panel.showLegend">
-        <div ng-repeat="metric in ctrl.data">
+        <div ng-repeat="metric in ctrl.legend">
             <span ng-show="ctrl.panel.showLegendNames">{{ metric.name }}: </span>
             <div ng-show="ctrl.panel.showLegendValues"
                 ng-repeat="info in metric.legendInfo | orderBy:ctrl.panel.legendSortBy | limitTo:ctrl.panel.legendMaxValues"

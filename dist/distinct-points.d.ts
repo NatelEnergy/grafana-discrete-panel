@@ -1,8 +1,21 @@
+export declare class PointInfo {
+    val: string;
+    start: number;
+    ms: number;
+    constructor(val: string, start: number);
+}
+export declare class LegendValue {
+    val: string;
+    ms: number;
+    count: number;
+    per: number;
+    constructor(val: any);
+}
 export declare class DistinctPoints {
     name: any;
-    changes: Array<any>;
-    legendInfo: Array<any>;
-    last: any;
+    changes: Array<PointInfo>;
+    legendInfo: Array<LegendValue>;
+    last: PointInfo;
     asc: boolean;
     transitionCount: number;
     distinctValuesCount: number;
@@ -10,4 +23,5 @@ export declare class DistinctPoints {
     constructor(name: any);
     add(ts: number, val: any): void;
     finish(ctrl: any): void;
+    static combineLegend(data: DistinctPoints[], ctrl: any): DistinctPoints;
 }

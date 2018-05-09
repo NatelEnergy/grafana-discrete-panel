@@ -1,5 +1,6 @@
 /// <reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 import { CanvasPanelCtrl } from './canvas-metric';
+import { DistinctPoints } from './distinct-points';
 declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     annotationsSrv: any;
     static templateUrl: string;
@@ -44,15 +45,16 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
         units: string;
     };
     annotations: any;
-    data: any;
+    data: DistinctPoints[];
+    legend: DistinctPoints[];
     externalPT: boolean;
     isTimeline: boolean;
     isStacked: boolean;
     hoverPoint: any;
     colorMap: any;
-    _colorsPaleteCash: any;
     unitFormats: any;
     formatter: any;
+    _colorsPaleteCash: any;
     _renderDimensions: any;
     _selectionMatrix: Array<Array<String>>;
     constructor($scope: any, $injector: any, annotationsSrv: any);
@@ -63,11 +65,12 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     onRender(): void;
     showLegandTooltip(pos: any, info: any): void;
     clearTT(): void;
-    formatValue(val: any): any;
+    formatValue(val: any): string;
     getColor(val: any): any;
     randomColor(): string;
     applyPanelTimeOverrides(): void;
     onDataReceived(dataList: any): void;
+    updateLegendMetrics(notify?: boolean): void;
     removeColorMap(map: any): void;
     updateColorInfo(): void;
     addColorMap(what: any): void;
