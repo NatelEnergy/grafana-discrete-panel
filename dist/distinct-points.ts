@@ -101,7 +101,7 @@ export class DistinctPoints {
 
     this.transitionCount = 0;
     let distinct = new Map<string, LegendValue>();
-    let last:PointInfo = this.changes[0];
+    let last: PointInfo = this.changes[0];
     for (let i = 1; i < this.changes.length; i++) {
       let pt = this.changes[i];
 
@@ -124,7 +124,7 @@ export class DistinctPoints {
           v.ms += last.ms;
           v.count++;
         } else {
-          distinct.set(last.val, {val: last.val, ms: last.ms, count:1, per:0});
+          distinct.set(last.val, {val: last.val, ms: last.ms, count: 1, per: 0});
         }
       }
       last = pt;
@@ -142,30 +142,29 @@ export class DistinctPoints {
     if (!ctrl.isTimeline) {
       this.legendInfo = _.orderBy(this.legendInfo, ['ms'], ['desc']);
     }
-    console.log( "FINISH", distinct, this );
+    //console.log('FINISH', distinct, this);
   }
 
-  static combineLegend(data: DistinctPoints[], ctrl:any): DistinctPoints
-  {
-    if(data.length==1) {
+  static combineLegend(data: DistinctPoints[], ctrl: any): DistinctPoints {
+    if (data.length == 1) {
       return data[0];
     }
 
-    let merged:DistinctPoints = new DistinctPoints('merged');
+    let merged: DistinctPoints = new DistinctPoints('merged');
     let elapsed = 0;
     let distinct = new Map<string, LegendValue>();
-    _.forEach(data, (m:DistinctPoints) => {
+    _.forEach(data, (m: DistinctPoints) => {
       merged.transitionCount += m.transitionCount;
       elapsed += m.elapsed;
 
-      _.forEach(m.legendInfo, (leg:LegendValue)=> {
+      _.forEach(m.legendInfo, (leg: LegendValue) => {
         if (distinct.has(leg.val)) {
           let v = distinct.get(leg.val);
           v.ms += leg.ms;
           v.count += leg.count;
           // per gets recalculated at the end
         } else {
-          distinct.set(leg.val, {val: leg.val, ms: leg.ms, count:leg.count, per:0});
+          distinct.set(leg.val, {val: leg.val, ms: leg.ms, count: leg.count, per: 0});
         }
       });
     });

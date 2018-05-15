@@ -142,7 +142,7 @@ export class DistinctPoints {
     if (!ctrl.isTimeline) {
       this.legendInfo = _.orderBy(this.legendInfo, ['ms'], ['desc']);
     }
-    console.log('FINISH', distinct, this);
+    //console.log('FINISH', distinct, this);
   }
 
   static combineLegend(data: DistinctPoints[], ctrl: any): DistinctPoints {
