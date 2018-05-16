@@ -139,7 +139,6 @@ System.register(['lodash'], function(exports_1) {
                     if (!ctrl.isTimeline) {
                         this.legendInfo = lodash_1.default.orderBy(this.legendInfo, ['ms'], ['desc']);
                     }
-                    console.log("FINISH", distinct, this);
                 };
                 DistinctPoints.combineLegend = function (data, ctrl) {
                     if (data.length == 1) {
