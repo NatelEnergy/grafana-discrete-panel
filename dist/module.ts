@@ -218,7 +218,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.$tooltip.detach();
   }
 
-  formatValue(val):string {
+  formatValue(val): string {
     if (_.isNumber(val)) {
       if (this.panel.rangeMaps) {
         for (let i = 0; i < this.panel.rangeMaps.length; i++) {
@@ -353,18 +353,19 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       );
   }
 
-  updateLegendMetrics(notify?: boolean)
-  {
-    if(!this.data || !this.panel.showLegend || this.panel.showLegendNames || this.data.length<=1) {
+  updateLegendMetrics(notify?: boolean) {
+    if (
+      !this.data ||
+      !this.panel.showLegend ||
+      this.panel.showLegendNames ||
+      this.data.length <= 1
+    ) {
       this.legend = this.data;
-    }
-    else {
-      this.legend = [
-        DistinctPoints.combineLegend( this.data, this )
-      ];
+    } else {
+      this.legend = [DistinctPoints.combineLegend(this.data, this)];
     }
 
-    if(notify) {
+    if (notify) {
       this.onConfigChanged();
     }
   }
