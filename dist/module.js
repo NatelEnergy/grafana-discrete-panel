@@ -320,14 +320,13 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                     });
                 };
                 DiscretePanelCtrl.prototype.updateLegendMetrics = function (notify) {
-                    if (!this.data ||
-                        !this.panel.showLegend ||
-                        this.panel.showLegendNames ||
-                        this.data.length <= 1) {
+                    if (!this.data || !this.panel.showLegend || this.panel.showLegendNames || this.data.length <= 1) {
                         this.legend = this.data;
                     }
                     else {
-                        this.legend = [distinct_points_1.DistinctPoints.combineLegend(this.data, this)];
+                        this.legend = [
+                            distinct_points_1.DistinctPoints.combineLegend(this.data, this)
+                        ];
                     }
                     if (notify) {
                         this.onConfigChanged();
