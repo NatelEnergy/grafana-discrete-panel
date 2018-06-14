@@ -17,7 +17,7 @@ export class LegendValue {
   count: number = 0;
   per: number = 0;
 
-  constructor(val: any) {
+  constructor(val: string) {
     this.val = val;
   }
 }
@@ -35,7 +35,7 @@ export class DistinctPoints {
 
   // ts numeric ms,
   // val is the normalized value
-  add(ts: number, val: any) {
+  add(ts: number, val: string) {
     if (this.last == null) {
       this.last = {
         val: val,

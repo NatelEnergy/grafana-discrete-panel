@@ -9,7 +9,7 @@ export declare class LegendValue {
     ms: number;
     count: number;
     per: number;
-    constructor(val: any);
+    constructor(val: string);
 }
 export declare class DistinctPoints {
     name: any;
@@ -21,7 +21,7 @@ export declare class DistinctPoints {
     distinctValuesCount: number;
     elapsed: number;
     constructor(name: any);
-    add(ts: number, val: any): void;
+    add(ts: number, val: string): void;
     finish(ctrl: any): void;
     static combineLegend(data: DistinctPoints[], ctrl: any): DistinctPoints;
 }

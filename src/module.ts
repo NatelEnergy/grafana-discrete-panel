@@ -232,8 +232,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           }
         }
       }
+
+      // Convert it to a string first
       if (this.formatter) {
-        return this.formatter(val, this.panel.decimals);
+        val = this.formatter(val, this.panel.decimals);
       }
     }
 

@@ -211,8 +211,9 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                                 }
                             }
                         }
+                        // Convert it to a string first
                         if (this.formatter) {
-                            return this.formatter(val, this.panel.decimals);
+                            val = this.formatter(val, this.panel.decimals);
                         }
                     }
                     var isNull = lodash_1.default.isNil(val);
