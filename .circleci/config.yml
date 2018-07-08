@@ -17,6 +17,6 @@ jobs:
           command: 'npm install --pure-lockfile --no-progress'
       - run:
           name: build
-          command: 'grunt'
+          command: 'yarn build'
       - store_artifacts:
           path: dist
