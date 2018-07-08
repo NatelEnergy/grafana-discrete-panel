@@ -22,8 +22,8 @@ choice to display string or boolean data
 To complie, run:
 
 ```
-yarn install
-yarn build
+npm install
+grunt
 ```
 
 #### Roadmap
