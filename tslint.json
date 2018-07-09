@@ -1,32 +1,20 @@
 {
   "rules": {
-    "no-string-throw": true,
-    "no-unused-expression": true,
-		"no-unused-variable": false,
-    "no-use-before-declare": false,
-    "no-duplicate-variable": true,
-    "curly": true,
     "class-name": true,
-    "semicolon": [true, "always", "ignore-bound-class-methods"],
-    "triple-equals": [true, "allow-null-check"],
     "comment-format": [false, "check-space"],
+    "curly": true,
     "eofline": true,
     "forin": false,
-    "indent": [true, "spaces", 2],
+    "indent": [true, "spaces"],
     "label-position": true,
     "max-line-length": [true, 140],
     "member-access": false,
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-construct": true,
     "no-debugger": true,
+    "no-duplicate-variable": true,
     "no-empty": false,
     "no-eval": true,
     "no-inferrable-types": true,
@@ -34,28 +22,26 @@
     "no-string-literal": false,
     "no-switch-case-fall-through": false,
     "no-trailing-whitespace": true,
+    "no-unused-expression": false,
+    "no-unused-variable": false,
+    "no-use-before-declare": true,
     "no-var-keyword": false,
     "object-literal-sort-keys": false,
-    "one-line": [true,
-      "check-open-brace",
-      "check-catch",
-      "check-else"
-    ],
+    "one-line": [true, "check-open-brace", "check-catch", "check-else"],
     "radix": false,
-    "typedef-whitespace": [true, {
-      "call-signature": "nospace",
-      "index-signature": "nospace",
-      "parameter": "nospace",
-      "property-declaration": "nospace",
-      "variable-declaration": "nospace"
-    }],
+    "semicolon": true,
+    "triple-equals": [true, "allow-null-check"],
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      }
+    ],
     "variable-name": [true, "ban-keywords"],
-    "whitespace": [true,
-      "check-branch",
-      "check-decl",
-      "check-type",
-      "check-preblock"
-    ]
+    "whitespace": [true, "check-branch", "check-decl", "check-type"]
   }
 }
-

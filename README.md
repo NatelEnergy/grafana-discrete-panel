@@ -18,8 +18,8 @@ choice to display string or boolean data
 To complie, run:
 
 ```
-npm install
-grunt
+yarn install
+yarn build
 ```
 
 #### Roadmap
