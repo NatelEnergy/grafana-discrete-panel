@@ -14,11 +14,11 @@
     "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
+    "noImplicitThis": false,
     "noImplicitUseStrict": true,
     "noImplicitAny": false,
     "noUnusedLocals": true,
-    "strictNullChecks": true
+    "strictNullChecks": false
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "exclude": ["node_modules"]

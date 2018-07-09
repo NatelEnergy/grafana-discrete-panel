@@ -2,7 +2,6 @@
 
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
 
-import _ from 'lodash';
 import moment from 'moment';
 import $ from 'jquery';
 

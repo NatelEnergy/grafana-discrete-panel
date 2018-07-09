@@ -1,10 +1,7 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
-import config from 'app/core/config';
-import angular from 'angular';
-
 import {CanvasPanelCtrl} from './canvas-metric';
-import {DistinctPoints, LegendValue} from './distinct-points';
+import {DistinctPoints} from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -306,8 +303,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if ('time' !== metric.columns[0].type) {
           throw new Error('Expected a time column from the table format');
         }
-
-        let last = null;
         for (let i = 1; i < metric.columns.length; i++) {
           let res = new DistinctPoints(metric.columns[i].text);
           for (let j = 0; j < metric.rows.length; j++) {
@@ -651,11 +646,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this._renderDimensions = {};
 
     const rect = (this._renderDimensions.rect = this.wrap.getBoundingClientRect());
-    const rows = (this._renderDimensions.rows = this.data.length);
+    //const rows = (this._renderDimensions.rows = this.data.length);
     const rowHeight = (this._renderDimensions.rowHeight = this.panel.rowHeight);
-    const rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
-    const timeHeight = this.panel.showTimeAxis ? 14 + this.panel.textSizeTime : 0;
-    const height = (this._renderDimensions.height = rowsHeight + timeHeight);
+    // const rowsHeight = (this._renderDimensions.rowsHeight = rowHeight * rows);
+    // const timeHeight = this.panel.showTimeAxis ? 14 + this.panel.textSizeTime : 0;
+    //const height = (this._renderDimensions.height = rowsHeight + timeHeight);
     const width = (this._renderDimensions.width = rect.width);
 
     let top = 0;
@@ -666,7 +661,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       let positions = [];
 
       if (this.isTimeline) {
-        let lastBS = 0;
         let point = metric.changes[0];
         for (let i = 0; i < metric.changes.length; i++) {
           point = metric.changes[i];
@@ -949,9 +943,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     const ctx = this.context;
-    const rows = this.data.length;
-    const rowHeight = this.panel.rowHeight;
-    const height = this._renderDimensions.height;
+    // const rows = this.data.length;
+    // const rowHeight = this.panel.rowHeight;
+    // const height = this._renderDimensions.height;
     const width = this._renderDimensions.width;
     const top = this._renderDimensions.rowsHeight;
 
@@ -1013,7 +1007,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     let ctx = this.context;
     let rows = this.data.length;
-    let rowHeight = this.panel.rowHeight;
+    //let rowHeight = this.panel.rowHeight;
     let height = this._renderDimensions.height;
 
     ctx.beginPath();
@@ -1043,9 +1037,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
 
     const ctx = this.context;
-    const rows = this.data.length;
+    //const rows = this.data.length;
     const rowHeight = this.panel.rowHeight;
-    const height = this._renderDimensions.height;
+    //const height = this._renderDimensions.height;
     const width = this._renderDimensions.width;
     const top = this._renderDimensions.rowsHeight;
 
@@ -1062,7 +1056,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     let min = _.isUndefined(this.range.from) ? null : this.range.from.valueOf();
     let max = _.isUndefined(this.range.to) ? null : this.range.to.valueOf();
-    let xPos = headerColumnIndent;
+    //let xPos = headerColumnIndent;
 
     _.forEach(this.annotations, anno => {
       ctx.setLineDash([3, 3]);
