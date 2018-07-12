@@ -22,8 +22,8 @@ choice to display string or boolean data
 To complie, run:
 
 ```
-npm install
-grunt
+yarn install
+yarn build
 ```
 
 #### Roadmap
@@ -37,6 +37,7 @@ grunt
 ##### v0.0.9 (not released)
 
 * Remove `dist` from master
+* Use webpack build
 
 ##### v0.0.8
 
