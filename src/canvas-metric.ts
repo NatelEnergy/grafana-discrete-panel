@@ -278,7 +278,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
         // Calculate the mouse position when it came from somewhere else
         if (!isThis) {
-          if (!event.pos.x) {
+          if (!event.pos.x || !this.range) {
             // NOTE, this happens when a panel has no data
             // console.log('Invalid hover point', event);
             return;
