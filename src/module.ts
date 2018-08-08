@@ -119,6 +119,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _renderDimensions: any = {};
   _selectionMatrix: Array<Array<String>> = [];
 
+  /** @ngInject */
   constructor($scope, $injector, public annotationsSrv) {
     super($scope, $injector);
 
