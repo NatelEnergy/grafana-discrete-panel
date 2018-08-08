@@ -288,7 +288,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           let ts = event.pos.x;
           let rect = this.canvas.getBoundingClientRect();
           let elapsed = this.range.to - this.range.from;
-          let x = (ts - this.range.from) / elapsed * rect.width;
+          let x = ((ts - this.range.from) / elapsed) * rect.width;
 
           this.mouse.position = {
             x: x,

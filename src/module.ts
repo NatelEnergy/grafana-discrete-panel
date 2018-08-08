@@ -568,7 +568,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
               if (a.isRegion) {
                 return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
               }
-              const anno_x = (a.time - min) / (max - min) * width;
+              const anno_x = ((a.time - min) / (max - min)) * width;
               const mouse_x = evt.evt.offsetX;
               return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
             });
@@ -668,7 +668,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           point = metric.changes[i];
           if (point.start <= this.range.to) {
             let xt = Math.max(point.start - this.range.from, 0);
-            let x = xt / elapsed * width;
+            let x = (xt / elapsed) * width;
             positions.push(x);
           }
         }
@@ -680,7 +680,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         for (let i = 0; i < metric.legendInfo.length; i++) {
           point = metric.legendInfo[i];
           let xt = Math.max(start - this.range.from, 0);
-          let x = xt / elapsed * width;
+          let x = (xt / elapsed) * width;
           positions.push(x);
           start += point.ms;
         }
@@ -967,9 +967,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let estNumTicks = width / minPxInterval;
     let estTimeInterval = (max - min) / estNumTicks;
     let timeResolution = this.getTimeResolution(estTimeInterval);
-    let pixelStep = timeResolution / (max - min) * width;
+    let pixelStep = (timeResolution / (max - min)) * width;
     let nextPointInTime = this.roundDate(min, timeResolution) + timeResolution;
-    let xPos = headerColumnIndent + (nextPointInTime - min) / (max - min) * width;
+    let xPos = headerColumnIndent + ((nextPointInTime - min) / (max - min)) * width;
 
     let timeFormat = this.time_format(max - min, timeResolution / 1000);
     let displayOffset = 0;
@@ -1102,8 +1102,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         );
 
         //draw horizontal line at bottom
-        let xPosStart = headerColumnIndent + (anno.time - min) / (max - min) * width;
-        let xPosEnd = headerColumnIndent + (anno.timeEnd - min) / (max - min) * width;
+        let xPosStart = headerColumnIndent + ((anno.time - min) / (max - min)) * width;
+        let xPosEnd = headerColumnIndent + ((anno.timeEnd - min) / (max - min)) * width;
 
         // draw ticks
         ctx.beginPath();
@@ -1128,7 +1128,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   _drawVertical(ctx, timeVal, min, max, headerColumnIndent, top, width, isAlert) {
-    let xPos = headerColumnIndent + (timeVal - min) / (max - min) * width;
+    let xPos = headerColumnIndent + ((timeVal - min) / (max - min)) * width;
 
     // draw ticks
     ctx.lineWidth = 1;
