@@ -18,6 +18,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   context: any;
   _devicePixelRatio: number;
 
+  /** @ngInject */
   constructor($scope, $injector) {
     super($scope, $injector);
 
