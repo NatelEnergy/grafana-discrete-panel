@@ -20,6 +20,6 @@ jobs:
           command: 'yarn build'
       - run:
           name: zip dist
-          command: 'zip -r9 grafana-discrete-panel-dev.zip dist/*'
+          command: 'cd dist && zip -r9 ../grafana-discrete-panel-dev.zip *'
       - store_artifacts:
           path: grafana-discrete-panel-dev.zip
