@@ -9,6 +9,7 @@
     "test": "jest --config jest.config.js",
     "release": "node release.js",
     "precommit": "pretty-quick --staged",
+    "lint": "tslint -c tslint.json --project tsconfig.json",
     "pretty": "prettier --write src/**/*.ts"
   },
   "author": "ryantxu",

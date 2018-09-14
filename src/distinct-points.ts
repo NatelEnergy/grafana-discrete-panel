@@ -3,7 +3,7 @@ import _ from 'lodash';
 export class PointInfo {
   val: string;
   start: number; // timestamp
-  ms: number = 0; // elapsed time
+  ms = 0; // elapsed time
 
   constructor(val: string, start: number) {
     this.val = val;
@@ -13,9 +13,9 @@ export class PointInfo {
 
 export class LegendValue {
   val: string;
-  ms: number = 0; // elapsed time
-  count: number = 0;
-  per: number = 0;
+  ms = 0; // elapsed time
+  count = 0;
+  per = 0;
 
   constructor(val: string) {
     this.val = val;
@@ -23,8 +23,8 @@ export class LegendValue {
 }
 
 export class DistinctPoints {
-  changes: Array<PointInfo> = [];
-  legendInfo: Array<LegendValue> = [];
+  changes: PointInfo[] = [];
+  legendInfo: LegendValue[] = [];
   last: PointInfo = null;
   asc = false;
   transitionCount = 0;
@@ -85,7 +85,7 @@ export class DistinctPoints {
 
     // Add a point beyond the controls
     if (this.last.start < ctrl.range.to) {
-      let until = ctrl.range.to + 1;
+      const until = ctrl.range.to + 1;
       // let now = Date.now();
       // if(this.last.start < now && ctrl.range.to > now) {
       //   until = now;
@@ -100,10 +100,10 @@ export class DistinctPoints {
     }
 
     this.transitionCount = 0;
-    let distinct = new Map<string, LegendValue>();
+    const distinct = new Map<string, LegendValue>();
     let last: PointInfo = this.changes[0];
     for (let i = 1; i < this.changes.length; i++) {
-      let pt = this.changes[i];
+      const pt = this.changes[i];
 
       let s = last.start;
       let e = pt.start;
@@ -120,7 +120,7 @@ export class DistinctPoints {
       last.ms = e - s;
       if (last.ms > 0) {
         if (distinct.has(last.val)) {
-          let v = distinct.get(last.val);
+          const v = distinct.get(last.val);
           v.ms += last.ms;
           v.count++;
         } else {
@@ -130,7 +130,7 @@ export class DistinctPoints {
       last = pt;
     }
 
-    let elapsed = ctrl.range.to - ctrl.range.from;
+    const elapsed = ctrl.range.to - ctrl.range.from;
     this.elapsed = elapsed;
 
     distinct.forEach((value: LegendValue, key: any) => {
@@ -149,16 +149,16 @@ export class DistinctPoints {
       return data[0];
     }
 
-    let merged: DistinctPoints = new DistinctPoints('merged');
+    const merged: DistinctPoints = new DistinctPoints('merged');
     let elapsed = 0;
-    let distinct = new Map<string, LegendValue>();
+    const distinct = new Map<string, LegendValue>();
     _.forEach(data, (m: DistinctPoints) => {
       merged.transitionCount += m.transitionCount;
       elapsed += m.elapsed;
 
       _.forEach(m.legendInfo, (leg: LegendValue) => {
         if (distinct.has(leg.val)) {
-          let v = distinct.get(leg.val);
+          const v = distinct.get(leg.val);
           v.ms += leg.ms;
           v.count += leg.count;
           // per gets recalculated at the end

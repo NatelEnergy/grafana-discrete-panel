@@ -57,16 +57,16 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }
     console.log('canvas render', this.mouse);
 
-    let rect = this.wrap.getBoundingClientRect();
+    const rect = this.wrap.getBoundingClientRect();
 
-    let height = Math.max(this.height, 100);
-    let width = rect.width;
+    const height = Math.max(this.height, 100);
+    const width = rect.width;
     this.canvas.width = width;
     this.canvas.height = height;
 
-    let centerV = height / 2;
+    const centerV = height / 2;
 
-    let ctx = this.context;
+    const ctx = this.context;
     ctx.lineWidth = 1;
     ctx.textBaseline = 'middle';
 
@@ -84,8 +84,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     if (this.mouse.position != null) {
       if (this.mouse.down != null) {
-        let xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
-        let xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
+        const xmin = Math.min(this.mouse.position.x, this.mouse.down.x);
+        const xmax = Math.max(this.mouse.position.x, this.mouse.down.x);
 
         // Fill canvas using 'destination-out' and alpha at 0.05
         ctx.globalCompositeOperation = 'destination-out';
@@ -121,11 +121,11 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   getMousePosition(evt) {
-    let elapsed = this.range.to - this.range.from;
-    let rect = this.canvas.getBoundingClientRect();
-    let x = evt.offsetX; // - rect.left;
-    let ts = this.range.from + elapsed * (x / parseFloat(rect.width));
-    let y = evt.clientY - rect.top;
+    const elapsed = this.range.to - this.range.from;
+    const rect = this.canvas.getBoundingClientRect();
+    const x = evt.offsetX; // - rect.left;
+    const ts = this.range.from + elapsed * (x / parseFloat(rect.width));
+    const y = evt.clientY - rect.top;
 
     return {
       x: x,
@@ -168,7 +168,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         }
 
         this.mouse.position = this.getMousePosition(evt);
-        let info = {
+        const info = {
           pos: {
             pageX: evt.pageX,
             pageY: evt.pageY,
@@ -228,16 +228,16 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'mouseup',
       evt => {
         this.$tooltip.detach();
-        let up = this.getMousePosition(evt);
+        const up = this.getMousePosition(evt);
         if (this.mouse.down != null) {
           if (up.x === this.mouse.down.x && up.y === this.mouse.down.y) {
             this.mouse.position = null;
             this.mouse.down = null;
             this.onMouseClicked(up, evt);
           } else {
-            let min = Math.min(this.mouse.down.ts, up.ts);
-            let max = Math.max(this.mouse.down.ts, up.ts);
-            let range = {from: moment.utc(min), to: moment.utc(max)};
+            const min = Math.min(this.mouse.down.ts, up.ts);
+            const max = Math.max(this.mouse.down.ts, up.ts);
+            const range = {from: moment.utc(min), to: moment.utc(max)};
             this.mouse.position = up;
             this.onMouseSelectedRange(range, evt);
           }
@@ -267,7 +267,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'graph-hover',
       event => {
         // ignore other graph hover events if shared tooltip is disabled
-        let isThis = event.panel.id === this.panel.id;
+        const isThis = event.panel.id === this.panel.id;
         if (!this.dashboard.sharedTooltipModeEnabled() && !isThis) {
           return;
         }
@@ -285,10 +285,10 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
             return;
           }
 
-          let ts = event.pos.x;
-          let rect = this.canvas.getBoundingClientRect();
-          let elapsed = this.range.to - this.range.from;
-          let x = ((ts - this.range.from) / elapsed) * rect.width;
+          const ts = event.pos.x;
+          const rect = this.canvas.getBoundingClientRect();
+          const elapsed = this.range.to - this.range.from;
+          const x = ((ts - this.range.from) / elapsed) * rect.width;
 
           this.mouse.position = {
             x: x,
@@ -331,8 +331,8 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   //---------------------------------
 
   time_format(range: number, secPerTick: number): string {
-    let oneDay = 86400000;
-    let oneYear = 31536000000;
+    const oneDay = 86400000;
+    const oneYear = 31536000000;
 
     if (secPerTick <= 45) {
       return '%H:%M:%S';
@@ -350,7 +350,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   getTimeResolution(estTimeInterval: number): number {
-    let timeIntInSecs = estTimeInterval / 1000;
+    const timeIntInSecs = estTimeInterval / 1000;
 
     if (timeIntInSecs <= 30) {
       return 30 * 1000;
@@ -436,10 +436,10 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       return d.strftime(fmt);
     }
 
-    let r = [];
+    const r = [];
     let escape = false;
-    let hours = d.getHours();
-    let isAM = hours < 12;
+    const hours = d.getHours();
+    const isAM = hours < 12;
     let hours12;
 
     if (hours > 12) {
