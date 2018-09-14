@@ -28,69 +28,70 @@ yarn build
 
 #### Roadmap
 
-* TODO: full annotation support
-* TODO: better documentation
-* release v1.0
+- TODO: full annotation support
+- TODO: better documentation
+- release v1.0
 
 #### Changelog
 
 ##### v0.0.9 (not released)
 
-* Remove `dist` from master
-* Use webpack build
+- Remove `dist` from master
+- Use webpack build
+- FIX: Use background color to clear the background
 
 ##### v0.0.8
 
-* Support Snapshots (thanks @londonanthonyoleary)
-* Direct link rendered image now works.
-* Support UTC date display
-* Fix display issue with 5.1
-* Merge distinct values in legend unless showing the name
-* Basic Annotation Support
-* Fix mapping numeric data to text
+- Support Snapshots (thanks @londonanthonyoleary)
+- Direct link rendered image now works.
+- Support UTC date display
+- Fix display issue with 5.1
+- Merge distinct values in legend unless showing the name
+- Basic Annotation Support
+- Fix mapping numeric data to text
 
 ##### v0.0.7
 
-* Switch to typescript
-* Override applyPanelTimeOverrides rather than issueQueries to extend time
-* Support numeric unit conversion
-* New rendering pipeline (thanks @jonyrock)
-* Don't detect duplicate colors from metrics
-* Formatting with prettier.js
-* Only hide hover text when it collides
-* Show time axis (copied from novatec-grafana-discrete-panel)
-* Improved text collision behavior
+- Switch to typescript
+- Override applyPanelTimeOverrides rather than issueQueries to extend time
+- Support numeric unit conversion
+- New rendering pipeline (thanks @jonyrock)
+- Don't detect duplicate colors from metrics
+- Formatting with prettier.js
+- Only hide hover text when it collides
+- Show time axis (copied from novatec-grafana-discrete-panel)
+- Improved text collision behavior
 
 ##### v0.0.6
 
-* Fix for grafana 4.5 (thanks @alin-amana)
+- Fix for grafana 4.5 (thanks @alin-amana)
 
 ##### v0.0.5
 
-* Support results from the table format
-* Support results in ascending or decending order
-* Configure legend percentage decimal points
-* Legend can show transition count and distinct value count
-* Clamp percentage stats within the query time window
-* Changed the grafana dependency version to 4.x.x, since 3.x.x was not really supported
-* Fixed issues with tooltip hover position
-* Option to expand 'from' query so the inital state can avoid 'null'
+- Support results from the table format
+- Support results in ascending or decending order
+- Configure legend percentage decimal points
+- Legend can show transition count and distinct value count
+- Clamp percentage stats within the query time window
+- Changed the grafana dependency version to 4.x.x, since 3.x.x was not really supported
+- Fixed issues with tooltip hover position
+- Option to expand 'from' query so the inital state can avoid 'null'
 
 ##### v0.0.4
 
-* Support shared tooltips (not just crosshair)
+- Support shared tooltips (not just crosshair)
 
 ##### v0.0.3
 
-* Configure more colors (retzkek)
-* Fix tooltips (retzkek)
-* Configure Text Size
-* Support shared crosshair
+- Configure more colors (retzkek)
+- Fix tooltips (retzkek)
+- Configure Text Size
+- Support shared crosshair
 
 ##### v0.0.2
 
-* Use the panel time shift.
+- Use the panel time shift.
 
 ##### v0.0.1
 
-* First working version
+- First working version

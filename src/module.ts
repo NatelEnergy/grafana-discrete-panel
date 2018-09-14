@@ -788,6 +788,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _renderRects() {
     const matrix = this._renderDimensions.matrix;
     const ctx = this.context;
+
+    // Clear the background
+    ctx.fillStyle = this.panel.backgroundColor;
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
     _.forEach(this.data, (metric, i) => {
       const rowObj = matrix[i];
       for (let j = 0; j < rowObj.positions.length; j++) {
