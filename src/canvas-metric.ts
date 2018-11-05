@@ -432,7 +432,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'Dec',
     ];
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    if (typeof d.strftime == 'function') {
+    if (typeof d.strftime === 'function') {
       return d.strftime(fmt);
     }
 
@@ -444,7 +444,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     if (hours > 12) {
       hours12 = hours - 12;
-    } else if (hours == 0) {
+    } else if (hours === 0) {
       hours12 = 12;
     } else {
       hours12 = hours;
@@ -509,7 +509,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         r.push(c);
         escape = false;
       } else {
-        if (c == '%') {
+        if (c === '%') {
           escape = true;
         } else {
           r.push(c);
@@ -523,6 +523,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   leftPad(n, pad) {
     n = '' + n;
     pad = '' + (pad == null ? '0' : pad);
-    return n.length == 1 ? pad + n : n;
+    return n.length === 1 ? pad + n : n;
   }
 }

@@ -117,7 +117,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   _colorsPaleteCash: any = null;
   _renderDimensions: any = {};
-  _selectionMatrix: String[][] = [];
+  _selectionMatrix: string[][] = [];
 
   /** @ngInject */
   constructor($scope, $injector, public annotationsSrv) {
@@ -568,9 +568,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
               if (a.isRegion) {
                 return evt.pos.x > a.time && evt.pos.x < a.timeEnd;
               }
-              const anno_x = ((a.time - min) / (max - min)) * width;
-              const mouse_x = evt.evt.offsetX;
-              return anno_x > mouse_x - 5 && anno_x < mouse_x + 5;
+              const annoX = ((a.time - min) / (max - min)) * width;
+              const mouseX = evt.evt.offsetX;
+              return annoX > mouseX - 5 && annoX < mouseX + 5;
             });
             if (anno) {
               console.log('TODO, hover <annotation-tooltip>', anno);
@@ -612,7 +612,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onMouseClicked(where, event) {
-    if (event.metaKey == true || event.ctrlKey == true) {
+    if (event.metaKey === true || event.ctrlKey === true) {
       console.log('TODO? Create Annotation?', where, event);
       return;
     }
@@ -626,7 +626,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   onMouseSelectedRange(range, event) {
-    if (event.metaKey == true || event.ctrlKey == true) {
+    if (event.metaKey === true || event.ctrlKey === true) {
       console.log('TODO? Create range annotation?', range, event);
       return;
     }
@@ -978,7 +978,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     const timeFormat = this.time_format(max - min, timeResolution / 1000);
     let displayOffset = 0;
-    if (this.dashboard.timezone == 'utc') {
+    if (this.dashboard.timezone === 'utc') {
       displayOffset = new Date().getTimezoneOffset() * 60000;
     }
 
@@ -1120,7 +1120,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.stroke();
         //end horizontal
         //do transparency
-        if (isAlert == false) {
+        if (isAlert === false) {
           ctx.save();
           ctx.fillStyle = '#7FE9FF';
           ctx.globalAlpha = 0.2;
@@ -1149,7 +1149,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     ctx.fill();
 
     // draw alert label
-    if (isAlert == true) {
+    if (isAlert === true) {
       const dateStr = '\u25B2';
       const xOffset = ctx.measureText(dateStr).width / 2;
       ctx.fillText(dateStr, xPos - xOffset, top + 10);

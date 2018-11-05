@@ -145,7 +145,7 @@ export class DistinctPoints {
   }
 
   static combineLegend(data: DistinctPoints[], ctrl: any): DistinctPoints {
-    if (data.length == 1) {
+    if (data.length === 1) {
       return data[0];
     }
 
