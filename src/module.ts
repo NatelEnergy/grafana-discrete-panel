@@ -74,6 +74,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   static templateUrl = 'partials/module.html';
   static scrollable = true;
 
+
   defaults = {
     display: 'timeline', // or 'stacked'
     rowHeight: 50,
@@ -101,6 +102,45 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     expandFromQueryS: 0,
     legendSortBy: '-ms',
     units: 'short',
+    timeOptions: [
+        {
+            name: 'Years',
+            value: 'years',
+        },
+        {
+            name: 'Months',
+            value: 'months',
+        },
+        {
+            name: 'Weeks',
+            value: 'weeks',
+        },
+        {
+            name: 'Days',
+            value: 'days',
+        },
+        {
+            name: 'Hours',
+            value: 'hours',
+        },
+        {
+            name: 'Minutes',
+            value: 'minutes',
+        },
+        {
+            name: 'Seconds',
+            value: 'seconds',
+        },
+        {
+            name: 'Milliseconds',
+            value: 'milliseconds',
+        },
+    ],
+    timePrecision: {
+        name: 'Minutes',
+        value: 'minutes',
+    },
+    useTimePrecision: false
   };
 
   annotations: any = [];
@@ -203,7 +243,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     if (info.count > 1) {
       body += info.count + ' times<br/>for<br/>';
     }
-    body += moment.duration(info.ms).humanize();
+
+    body += this.formatDuration(moment.duration(info.ms));
+
     if (info.count > 1) {
       body += '<br/>total';
     }
@@ -443,6 +485,39 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
+  formatDuration(duration){
+    if (!this.panel.useTimePrecision) {
+        return duration.humanize()
+    }
+
+    let dir: any = {}
+    let hasValue = false
+    let limit = false
+
+    for(const o of this.panel.timeOptions) {
+      dir[o.value] = parseInt(duration.as(o.value))
+      hasValue = dir[o.value] || hasValue
+      duration.subtract(moment.duration(dir[o.value], o.value))
+      limit = this.panel.timePrecision.value == o.value || limit
+
+      // always show a value in case it is less than the configured
+      // precision
+      if (limit && hasValue) {
+        break
+      }
+    }
+
+    let rs = Object.keys(dir)
+      .reduce((carry, key) => {
+        let value = dir[key]
+        if(!value) return carry
+        key = value < 2 ? key.replace(/s$/, '') : key
+        return `${carry} ${value} ${key},`
+      }, '')
+
+    return rs.substr(0, rs.length-1)
+  }
+
   getLegendDisplay(info, metric) {
     let disp = info.val;
     if (
@@ -453,7 +528,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       disp += ' (';
       let hassomething = false;
       if (this.panel.showLegendTime) {
-        disp += moment.duration(info.ms).humanize();
+        disp += this.formatDuration(moment.duration(info.ms))
         hassomething = true;
       }
 
@@ -510,7 +585,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     body += this.dashboard.formatDate(moment(from)) + '<br/>';
     body += 'to<br/>';
     body += this.dashboard.formatDate(moment(to)) + '<br/><br/>';
-    body += moment.duration(time).humanize() + '<br/>';
+    body += this.formatDuration(moment.duration(time))  + '<br/>';
     body += '</center>';
 
     let pageX = 0;
