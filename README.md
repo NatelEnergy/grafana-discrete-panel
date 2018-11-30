@@ -39,6 +39,7 @@ yarn build
 - Remove `dist` from master
 - Use webpack build
 - FIX: Use background color to clear the background
+- Configurable duration resolution option (thanks @clink-aaron)
 
 ##### v0.0.8
 
