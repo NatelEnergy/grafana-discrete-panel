@@ -497,15 +497,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       return duration.humanize();
     }
 
-    let dir: any = {};
+    const dir: any = {};
     let hasValue = false;
     let limit = false;
 
     for (const o of this.panel.timeOptions) {
-      dir[o.value] = parseInt(duration.as(o.value));
+      dir[o.value] = parseInt(duration.as(o.value), 10);
       hasValue = dir[o.value] || hasValue;
       duration.subtract(moment.duration(dir[o.value], o.value));
-      limit = this.panel.timePrecision.value == o.value || limit;
+      limit = this.panel.timePrecision.value === o.value || limit;
 
       // always show a value in case it is less than the configured
       // precision
@@ -514,9 +514,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
     }
 
-    let rs = Object.keys(dir).reduce((carry, key) => {
-      let value = dir[key];
-      if (!value) return carry;
+    const rs = Object.keys(dir).reduce((carry, key) => {
+      const value = dir[key];
+      if (!value) {
+        return carry;
+      }
       key = value < 2 ? key.replace(/s$/, '') : key;
       return `${carry} ${value} ${key},`;
     }, '');
@@ -778,7 +780,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   _updateSelectionMatrix() {
     const selectionPredicates = {
-      all: function() {
+      all: () => {
         return true;
       },
       crosshairHover: function(i, j) {
