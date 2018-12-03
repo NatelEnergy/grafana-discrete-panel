@@ -74,7 +74,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   static templateUrl = 'partials/module.html';
   static scrollable = true;
 
-
   defaults = {
     display: 'timeline', // or 'stacked'
     rowHeight: 50,
@@ -103,44 +102,44 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     legendSortBy: '-ms',
     units: 'short',
     timeOptions: [
-        {
-            name: 'Years',
-            value: 'years',
-        },
-        {
-            name: 'Months',
-            value: 'months',
-        },
-        {
-            name: 'Weeks',
-            value: 'weeks',
-        },
-        {
-            name: 'Days',
-            value: 'days',
-        },
-        {
-            name: 'Hours',
-            value: 'hours',
-        },
-        {
-            name: 'Minutes',
-            value: 'minutes',
-        },
-        {
-            name: 'Seconds',
-            value: 'seconds',
-        },
-        {
-            name: 'Milliseconds',
-            value: 'milliseconds',
-        },
-    ],
-    timePrecision: {
+      {
+        name: 'Years',
+        value: 'years',
+      },
+      {
+        name: 'Months',
+        value: 'months',
+      },
+      {
+        name: 'Weeks',
+        value: 'weeks',
+      },
+      {
+        name: 'Days',
+        value: 'days',
+      },
+      {
+        name: 'Hours',
+        value: 'hours',
+      },
+      {
         name: 'Minutes',
         value: 'minutes',
+      },
+      {
+        name: 'Seconds',
+        value: 'seconds',
+      },
+      {
+        name: 'Milliseconds',
+        value: 'milliseconds',
+      },
+    ],
+    timePrecision: {
+      name: 'Minutes',
+      value: 'minutes',
     },
-    useTimePrecision: false
+    useTimePrecision: false,
   };
 
   annotations: any = [];
@@ -158,6 +157,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _colorsPaleteCash: any = null;
   _renderDimensions: any = {};
   _selectionMatrix: string[][] = [];
+  _initalized = false; // in 5.4.0 onPanelInitialized not called?
 
   /** @ngInject */
   constructor($scope, $injector, public annotationsSrv) {
@@ -169,7 +169,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('render', this.onRender.bind(this));
-    this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
 
     this.events.on('data-received', this.onDataReceived.bind(this));
@@ -180,6 +179,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onPanelInitialized() {
     this.updateColorInfo();
     this.onConfigChanged();
+    this._initalized = true;
   }
 
   onDataSnapshotLoad(snapshotData) {
@@ -221,6 +221,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onRender() {
     if (this.data == null || !this.context) {
       return;
+    }
+    if (!this._initalized) {
+      this.onPanelInitialized();
     }
 
     this._updateRenderDimensions();
@@ -339,6 +342,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
+    if (!this._initalized) {
+      console.log('onDataReceived');
+      this.onPanelInitialized();
+    }
 
     const data: DistinctPoints[] = [];
     _.forEach(dataList, metric => {
@@ -485,37 +492,36 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
-  formatDuration(duration){
+  formatDuration(duration) {
     if (!this.panel.useTimePrecision) {
-        return duration.humanize()
+      return duration.humanize();
     }
 
-    let dir: any = {}
-    let hasValue = false
-    let limit = false
+    let dir: any = {};
+    let hasValue = false;
+    let limit = false;
 
-    for(const o of this.panel.timeOptions) {
-      dir[o.value] = parseInt(duration.as(o.value))
-      hasValue = dir[o.value] || hasValue
-      duration.subtract(moment.duration(dir[o.value], o.value))
-      limit = this.panel.timePrecision.value == o.value || limit
+    for (const o of this.panel.timeOptions) {
+      dir[o.value] = parseInt(duration.as(o.value));
+      hasValue = dir[o.value] || hasValue;
+      duration.subtract(moment.duration(dir[o.value], o.value));
+      limit = this.panel.timePrecision.value == o.value || limit;
 
       // always show a value in case it is less than the configured
       // precision
       if (limit && hasValue) {
-        break
+        break;
       }
     }
 
-    let rs = Object.keys(dir)
-      .reduce((carry, key) => {
-        let value = dir[key]
-        if(!value) return carry
-        key = value < 2 ? key.replace(/s$/, '') : key
-        return `${carry} ${value} ${key},`
-      }, '')
+    let rs = Object.keys(dir).reduce((carry, key) => {
+      let value = dir[key];
+      if (!value) return carry;
+      key = value < 2 ? key.replace(/s$/, '') : key;
+      return `${carry} ${value} ${key},`;
+    }, '');
 
-    return rs.substr(0, rs.length-1)
+    return rs.substr(0, rs.length - 1);
   }
 
   getLegendDisplay(info, metric) {
@@ -528,7 +534,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       disp += ' (';
       let hassomething = false;
       if (this.panel.showLegendTime) {
-        disp += this.formatDuration(moment.duration(info.ms))
+        disp += this.formatDuration(moment.duration(info.ms));
         hassomething = true;
       }
 
@@ -585,7 +591,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     body += this.dashboard.formatDate(moment(from)) + '<br/>';
     body += 'to<br/>';
     body += this.dashboard.formatDate(moment(to)) + '<br/><br/>';
-    body += this.formatDuration(moment.duration(time))  + '<br/>';
+    body += this.formatDuration(moment.duration(time)) + '<br/>';
     body += '</center>';
 
     let pageX = 0;

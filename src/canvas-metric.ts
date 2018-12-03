@@ -29,7 +29,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     };
     this.$tooltip = $('<div class="graph-tooltip">');
 
-    this.events.on('panel-initialized', this.onPanelInitalized.bind(this));
+    this.events.on('panel-initialized', this.onPanelInitialized.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
     this.events.on('render', this.onRender.bind(this));
 
@@ -39,7 +39,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
     }
   }
 
-  onPanelInitalized() {
+  onPanelInitialized() {
     //console.log("onPanelInitalized()");
     this.render();
   }
