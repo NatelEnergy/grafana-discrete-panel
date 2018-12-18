@@ -157,7 +157,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _colorsPaleteCash: any = null;
   _renderDimensions: any = {};
   _selectionMatrix: string[][] = [];
-  _initalized = false; // in 5.4.0 onPanelInitialized not called?
 
   /** @ngInject */
   constructor($scope, $injector, public annotationsSrv) {
@@ -179,7 +178,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onPanelInitialized() {
     this.updateColorInfo();
     this.onConfigChanged();
-    this._initalized = true;
   }
 
   onDataSnapshotLoad(snapshotData) {
@@ -221,9 +219,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onRender() {
     if (this.data == null || !this.context) {
       return;
-    }
-    if (!this._initalized) {
-      this.onPanelInitialized();
     }
 
     this._updateRenderDimensions();
@@ -342,10 +337,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
-    if (!this._initalized) {
-      console.log('onDataReceived');
-      this.onPanelInitialized();
-    }
 
     const data: DistinctPoints[] = [];
     _.forEach(dataList, metric => {
