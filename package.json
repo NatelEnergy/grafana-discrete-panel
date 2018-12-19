@@ -1,6 +1,6 @@
 {
   "name": "natel-discrete-panel",
-  "version": "0.0.9-dev",
+  "version": "1.0.0-dev",
   "description": "Discrete Events in Grafana",
   "scripts": {
     "build": "webpack --config webpack.config.prod.js",
