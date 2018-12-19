@@ -1,22 +1,24 @@
 {
-  "github": {
-    "release": true,
-    "assets": ["dist/*.zip"]
-  },
-
-  "dist": {
-    "scripts": {
-      "beforeStage": "echo ${version}; ls"
-    },
-    "git": {
-      "addUntrackedFiles": true
-    }
-  },
   "scripts": {
     "beforeStage": "yarn build; cd dist; zip -r natel-discrete-panel-${version}.zip *",
     "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
   "npm": {
     "publish": false
+  },
+  "git": {
+    "requireCleanWorkingDir": false
+  },
+  "dist": {
+    "repo": "git@github.com:NatelEnergy/grafana-discrete-panel#dist",
+    "baseDir": "dist",
+    "files": ["**/*"],
+    "github": {
+      "release": true,
+      "assets": ["dist/*.zip"]
+    },
+    "npm": {
+      "publish": false
+    }
   }
 }
