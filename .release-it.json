@@ -3,8 +3,14 @@
     "release": true,
     "assets": ["dist/*.zip"]
   },
-  "git": {
-    "addUntrackedFiles": true
+
+  "dist": {
+    "scripts": {
+      "beforeStage": "echo ${version}; ls"
+    },
+    "git": {
+      "addUntrackedFiles": true
+    }
   },
   "scripts": {
     "beforeStage": "yarn build; cd dist; zip -r natel-discrete-panel-${version}.zip *",
