@@ -919,6 +919,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       const labelPositionLastValue = centerY;
       const labelPositionValue = centerY;
 
+      let minTextSpot = 0;
+      let maxTextSpot = this._renderDimensions.width;
+      if (this.panel.writeMetricNames) {
+        ctx.fillStyle = this.panel.metricNameColor;
+        ctx.textAlign = 'left';
+        ctx.fillText(metric.name, offset, labelPositionMetricName);
+        minTextSpot = offset + ctx.measureText(metric.name).width + 2;
+      }
+
       let hoverTextStart = -1;
       let hoverTextEnd = -1;
 
@@ -926,10 +935,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         for (let j = 0; j < positions.length; j++) {
           if (positions[j] <= this.mouse.position.x) {
             if (j >= positions.length - 1 || positions[j + 1] >= this.mouse.position.x) {
-              const val = this._getVal(i, j);
+              let val = this._getVal(i, j);
               ctx.fillStyle = this.panel.valueTextColor;
               ctx.textAlign = 'left';
               hoverTextStart = positions[j] + offset;
+              if (hoverTextStart < minTextSpot) {
+                hoverTextStart = minTextSpot + 2;
+                val = ': ' + val;
+              }
+
               ctx.fillText(val, hoverTextStart, labelPositionValue);
               const txtinfo = ctx.measureText(val);
               hoverTextEnd = hoverTextStart + txtinfo.width + 4;
@@ -939,17 +953,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         }
       }
 
-      let minTextSpot = 0;
-      let maxTextSpot = this._renderDimensions.width;
-      if (this.panel.writeMetricNames) {
-        ctx.fillStyle = this.panel.metricNameColor;
-        ctx.textAlign = 'left';
-        const txtinfo = ctx.measureText(metric.name);
-        if (hoverTextStart < 0 || hoverTextStart > txtinfo.width) {
-          ctx.fillText(metric.name, offset, labelPositionMetricName);
-          minTextSpot = offset + ctx.measureText(metric.name).width + 2;
-        }
-      }
       if (this.panel.writeLastValue) {
         const val = this._getVal(i, positions.length - 1);
         ctx.fillStyle = this.panel.valueTextColor;

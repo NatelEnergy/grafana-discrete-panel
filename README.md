@@ -26,6 +26,16 @@ yarn install
 yarn build
 ```
 
+## Releasing
+
+This plugin uses [release-it](https://github.com/webpro/release-it) to release to GitHub.
+
+```
+env GITHUB_TOKEN=your_token yarn release-it patch
+```
+
+G
+
 #### Roadmap
 
 - TODO: full annotation support
@@ -40,6 +50,8 @@ yarn build
 - Use webpack build
 - FIX: Use background color to clear the background
 - Configurable duration resolution option (thanks @clink-aaron)
+- deploy using release-it
+- Don't hide series names on hover
 
 ##### v0.0.8
 
