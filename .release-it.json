@@ -5,7 +5,7 @@
   },
   "git": {
     "tagName": "v${version}",
-    "requireCleanWorkingDir": false
+    "requireCleanWorkingDir": true
   },
   "scripts": {
     "afterBump": "yarn build; git add --verbose --force dist/;",

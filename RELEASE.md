@@ -11,3 +11,16 @@ git tag -a v0.0.2 6d963171005734b0392525854576bd21c5ca1661 -m "Release v0.0.2";
 git tag -a v0.0.1 d729bd3b0cc71e4de1aab934065c72931fd4487e -m "Release v0.0.1";
 git push --tags
 ```
+
+Remove all old releases:
+
+```
+#Delete local tags.
+git tag -d $(git tag -l)
+#Fetch remote tags.
+git fetch
+#Delete remote tags.
+git push origin --delete $(git tag -l) # Pushing once should be faster than multiple times
+#Delete local tags.
+git tag -d $(git tag -l)
+```
