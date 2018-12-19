@@ -44,7 +44,7 @@ G
 
 #### Changelog
 
-##### v0.0.9
+##### v0.0.10
 
 - Remove `dist` from master
 - Use webpack build

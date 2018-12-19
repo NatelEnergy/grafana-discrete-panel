@@ -3,6 +3,10 @@
     "release": true,
     "assets": ["dist/*.zip"]
   },
+  "git": {
+    "tagName": "v${version}",
+    "requireCleanWorkingDir": false
+  },
   "scripts": {
     "afterBump": "yarn build; git add --verbose --force dist/;",
     "beforeStage": "cd dist; zip -r natel-discrete-panel-${version}.zip *",
