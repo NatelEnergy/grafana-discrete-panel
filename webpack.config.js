@@ -55,7 +55,7 @@ module.exports = {
     new ReplaceInFileWebpackPlugin([
       {
         dir: 'dist',
-        files: ['plugin.json'],
+        files: ['plugin.json', 'README.md'],
         rules: [
           {
             search: '%VERSION%',
