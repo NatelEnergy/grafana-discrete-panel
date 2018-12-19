@@ -3,6 +3,9 @@
     "release": true,
     "assets": ["dist/*.zip"]
   },
+  "git": {
+    "addUntrackedFiles": true
+  },
   "scripts": {
     "beforeStage": "yarn build; cd dist; zip -r natel-discrete-panel-${version}.zip *",
     "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
