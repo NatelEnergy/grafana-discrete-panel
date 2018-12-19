@@ -4,8 +4,8 @@
     "assets": ["dist/*.zip"]
   },
   "scripts": {
-    "afterBump": "yarn build; git add --verbose --force dist/; cd dist; zip -r natel-discrete-panel-${version}.zip *",
-    "beforeStage": "echo STAGE ${name} v${version}",
+    "afterBump": "yarn build; git add --verbose --force dist/;",
+    "beforeStage": "cd dist; zip -r natel-discrete-panel-${version}.zip *",
     "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
   "npm": {
