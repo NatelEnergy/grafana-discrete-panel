@@ -62,16 +62,5 @@
     "uglifyjs-webpack-plugin": "^2.0.1",
     "webpack": "^4.9.1",
     "webpack-cli": "^3.1"
-  },
-  "release-it": {
-    "github": {
-      "release": true,
-      "assets": [
-        "dist/*.zip"
-      ]
-    },
-    "scripts": {
-      "beforeStage": "yarn build; cd dist; zip -r natel-discrete-panel-${version}.zip *"
-    }
   }
 }
