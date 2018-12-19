@@ -15,7 +15,7 @@
     "files": ["**/*"],
     "github": {
       "release": true,
-      "assets": ["dist/*.zip"]
+      "beforeStageCommand": "yarn build;"
     },
     "npm": {
       "publish": false
