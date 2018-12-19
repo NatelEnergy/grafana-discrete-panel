@@ -26,7 +26,7 @@ yarn install
 yarn build
 ```
 
-## Releasing
+### Releasing
 
 This plugin uses [release-it](https://github.com/webpro/release-it) to release to GitHub.
 
@@ -34,9 +34,7 @@ This plugin uses [release-it](https://github.com/webpro/release-it) to release t
 env GITHUB_TOKEN=your_token yarn release-it patch
 ```
 
-G
-
-#### Roadmap
+### Roadmap
 
 - TODO: full annotation support
 - TODO: better documentation
@@ -44,7 +42,7 @@ G
 
 #### Changelog
 
-##### v0.0.10
+##### v0.0.9
 
 - Remove `dist` from master
 - Use webpack build
