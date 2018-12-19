@@ -4,7 +4,6 @@
     "assets": ["dist/*.zip"]
   },
   "scripts": {
-    "beforeStart": "yarn test",
     "beforeStage": "yarn build; cd dist; zip -r natel-discrete-panel-${version}.zip *",
     "afterRelease": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
