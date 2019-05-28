@@ -338,28 +338,43 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
 
+    console.log('dataList: ', dataList);
+
     const data: DistinctPoints[] = [];
-    _.forEach(dataList, metric => {
-      if ('table' === metric.type) {
-        if ('time' !== metric.columns[0].type) {
-          throw new Error('Expected a time column from the table format');
-        }
-        for (let i = 1; i < metric.columns.length; i++) {
-          const res = new DistinctPoints(metric.columns[i].text);
-          for (let j = 0; j < metric.rows.length; j++) {
-            const row = metric.rows[j];
-            res.add(row[0], this.formatValue(row[i]));
-          }
-          res.finish(this);
-          data.push(res);
-        }
-      } else {
+    _.forEach(dataList, (metric: any) => {
+      if (metric.datapoints) {
         const res = new DistinctPoints(metric.target);
         _.forEach(metric.datapoints, point => {
           res.add(point[1], this.formatValue(point[0]));
         });
         res.finish(this);
         data.push(res);
+      } else if (metric.columns) {
+        let timeIndex = -1;
+        for (let i = 0; i < metric.columns.length; i++) {
+          if (metric.columns[i].type === 'time') {
+            timeIndex = i;
+            break;
+          }
+        }
+        if (timeIndex < 0) {
+          throw new Error('Expected a time column from the table format');
+        }
+
+        for (let i = 0; i < metric.columns.length; i++) {
+          if (i === timeIndex) {
+            continue;
+          }
+          const res = new DistinctPoints(metric.columns[i].text);
+          for (let j = 0; j < metric.rows.length; j++) {
+            const row = metric.rows[j];
+            res.add(row[timeIndex], this.formatValue(row[i]));
+          }
+          res.finish(this);
+          data.push(res);
+        }
+      } else {
+        console.log('SKIP:', metric);
       }
     });
     this.data = data;
