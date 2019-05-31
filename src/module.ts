@@ -358,10 +358,18 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let range: any = {};
     let rawRange: any = {};
 
+    let incompatibleFormat = false;
+
     targets.map((t: any) => {
       t.rawQuery = false;
-      t.select.map((s: any) => { s.push({ params: [], type: "last" }) });
+      if(t.select) {
+        t.select.map((s: any) => { s.push({ params: [], type: "last" }) });
+      } else {
+        incompatibleFormat = true
+      }
     })
+
+    if(incompatibleFormat) return
 
     range.to = _.cloneDeep(this.range.from);
     rawRange.to = _.cloneDeep(this.range.from)
@@ -421,29 +429,16 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   async onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
 
-    const data: DistinctPoints[] = [];
+    console.log('dataList: ', dataList);
+
     const initialPoints = await this.getInitialDistinctPoints()
     if (dataList.length == 0 && initialPoints != undefined && initialPoints.data.length > 0) {
       dataList = initialPoints.data
     }
-    _.forEach(dataList, (metric, index) => {
-      if ('table' === metric.type) {
-        if ('time' !== metric.columns[0].type) {
-          throw new Error('Expected a time column from the table format');
-        }
-        for (let i = 1; i < metric.columns.length; i++) {
-          const res = new DistinctPoints(metric.columns[i].text);
-          if (initialPoints != undefined && initialPoints.data[index] != undefined) {
-            res.add(this.range.from.unix() * 1000, this.formatValue(initialPoints.data[index].rows[0][i]))
-          }
-          for (let j = 0; j < metric.rows.length; j++) {
-            const row = metric.rows[j];
-            res.add(row[0], this.formatValue(row[i]));
-          }
-          res.finish(this);
-          data.push(res);
-        }
-      } else {
+
+    const data: DistinctPoints[] = [];
+    _.forEach(dataList, (metric: any, index) => {
+      if (metric.datapoints) {
         const res = new DistinctPoints(metric.target);
         if (initialPoints != undefined && initialPoints.data[index] != undefined) {
           res.add(this.range.from.unix() * 1000, this.formatValue(initialPoints.data[index].datapoints[0][0]))
@@ -453,6 +448,35 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         });
         res.finish(this);
         data.push(res);
+      } else if (metric.columns) {
+        let timeIndex = -1;
+        for (let i = 0; i < metric.columns.length; i++) {
+          if (metric.columns[i].type === 'time' || metric.columns[i].text === 'Time') {
+            timeIndex = i;
+            break;
+          }
+        }
+        if (timeIndex < 0) {
+          throw new Error('Expected a time column from the table format');
+        }
+
+        for (let i = 0; i < metric.columns.length; i++) {
+          if (i === timeIndex) {
+            continue;
+          }
+          const res = new DistinctPoints(metric.columns[i].text);
+          if (initialPoints != undefined && initialPoints.data[index] != undefined) {
+            res.add(this.range.from.unix() * 1000, this.formatValue(initialPoints.data[index].rows[0][i]))
+          }
+          for (let j = 0; j < metric.rows.length; j++) {
+            const row = metric.rows[j];
+            res.add(row[timeIndex], this.formatValue(row[i]));
+          }
+          res.finish(this);
+          data.push(res);
+        }
+      } else {
+        console.log('SKIP:', metric);
       }
     });
     this.data = data;
