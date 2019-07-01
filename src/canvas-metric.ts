@@ -1,9 +1,9 @@
-import {MetricsPanelCtrl} from 'app/plugins/sdk';
+import {MetricsPanelCtrl} from 'grafana/app/plugins/sdk';
 
 import moment from 'moment';
 import $ from 'jquery';
 
-import appEvents from 'app/core/app_events';
+import appEvents from 'grafana/app/core/app_events';
 
 // Expects a template with:
 // <div class="canvas-spot"></div>
@@ -434,7 +434,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       return d.strftime(fmt);
     }
 
-    const r = [];
+    const r: string[] = [];
     let escape = false;
     const hours = d.getHours();
     const isAM = hours < 12;
