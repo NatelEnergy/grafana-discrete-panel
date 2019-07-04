@@ -336,8 +336,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
 
-    console.log('dataList: ', dataList);
-
     const data: DistinctPoints[] = [];
     _.forEach(dataList, (metric: any) => {
       if (metric.datapoints) {

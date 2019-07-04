@@ -5,7 +5,7 @@ jobs:
       # specify the version you desire here
       - image: circleci/node:10
 
-    working_directory: ~/repo
+    working_directory: ~/plugin
 
     steps:
       - checkout
@@ -26,12 +26,9 @@ jobs:
           key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
-      - persist_to_workspace:
-          root: .
-          paths:
-            - artifacts
-            - dist
       - store_artifacts:
           path: artifacts
+      - store_artifacts:
+          path: coverage
       - store_artifacts:
           path: dist
