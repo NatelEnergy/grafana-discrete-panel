@@ -25,7 +25,7 @@ export class LegendValue {
 export class DistinctPoints {
   changes: PointInfo[] = [];
   legendInfo: LegendValue[] = [];
-  last: PointInfo = null;
+  last: PointInfo|null = null;
   asc = false;
   transitionCount = 0;
   distinctValuesCount = 0;
@@ -83,6 +83,10 @@ export class DistinctPoints {
       _.reverse(this.changes);
     }
 
+    if (!this.last) {
+      return;
+    }
+
     // Add a point beyond the controls
     if (this.last.start < ctrl.range.to) {
       const until = ctrl.range.to + 1;
@@ -120,7 +124,7 @@ export class DistinctPoints {
       last.ms = e - s;
       if (last.ms > 0) {
         if (distinct.has(last.val)) {
-          const v = distinct.get(last.val);
+          const v = distinct.get(last.val)!;
           v.ms += last.ms;
           v.count++;
         } else {
@@ -158,7 +162,7 @@ export class DistinctPoints {
 
       _.forEach(m.legendInfo, (leg: LegendValue) => {
         if (distinct.has(leg.val)) {
-          const v = distinct.get(leg.val);
+          const v = distinct.get(leg.val)!;
           v.ms += leg.ms;
           v.count += leg.count;
           // per gets recalculated at the end

@@ -1,14 +1,12 @@
-///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-
 import {CanvasPanelCtrl} from './canvas-metric';
-import {DistinctPoints} from './distinct-points';
+import {DistinctPoints, LegendValue} from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
-import kbn from 'app/core/utils/kbn';
+import kbn from 'grafana/app/core/utils/kbn';
 
-import appEvents from 'app/core/app_events';
+import appEvents from 'grafana/app/core/app_events';
 
 const grafanaColors = [
   '#7EB26D',
@@ -153,8 +151,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   };
 
   annotations: any = [];
-  data: DistinctPoints[] = null;
-  legend: DistinctPoints[] = null;
+  data: DistinctPoints[] = [];
+  legend: DistinctPoints[] = [];
 
   externalPT = false;
   isTimeline = true;
@@ -428,14 +426,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   async onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
-
-    console.log('dataList: ', dataList);
-
+    
     const initialPoints = await this.getInitialDistinctPoints()
     if (dataList.length == 0 && initialPoints != undefined && initialPoints.data.length > 0) {
       dataList = initialPoints.data
     }
-
+    
     const data: DistinctPoints[] = [];
     _.forEach(dataList, (metric: any, index) => {
       if (metric.datapoints) {
@@ -730,7 +726,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onGraphHover(evt, showTT, isExternal) {
     this.externalPT = false;
     if (this.data && this.data.length) {
-      let hover = null;
+      let hover: any = null;
       let j = Math.floor(this.mouse.position.y / this.panel.rowHeight);
       if (j < 0) {
         j = 0;
@@ -846,12 +842,20 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const width = (this._renderDimensions.width = rect.width);
     this._renderDimensions.height = height;
 
+    // First render?
+    if (!this.range) {
+      this.range = {
+        to: 2000,
+        from: 1000,
+      };
+    }
+
     let top = 0;
     const elapsed = this.range.to - this.range.from;
 
     this._renderDimensions.matrix = [];
     _.forEach(this.data, metric => {
-      const positions = [];
+      const positions: any[] = [];
 
       if (this.isTimeline) {
         let point = metric.changes[0];
@@ -866,7 +870,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       }
 
       if (this.isStacked) {
-        let point = null;
+        let point: LegendValue;
         let start = this.range.from;
         for (let i = 0; i < metric.legendInfo.length; i++) {
           point = metric.legendInfo[i];
@@ -946,7 +950,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const predicate = selectionPredicates[pn].bind(this);
     this._selectionMatrix = [];
     for (let i = 0; i < this._renderDimensions.matrix.length; i++) {
-      const rs = [];
+      const rs: any[] = [];
       const r = this._renderDimensions.matrix[i];
       for (let j = 0; j < r.positions.length; j++) {
         rs.push(predicate(i, j));
@@ -966,7 +970,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   _getVal(metricIndex, rectIndex) {
-    let point = undefined;
+    let point: any;
     if (this.isTimeline) {
       point = this.data[metricIndex].changes[rectIndex];
     }
