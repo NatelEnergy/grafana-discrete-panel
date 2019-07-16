@@ -1,5 +1,5 @@
-import {CanvasPanelCtrl} from './canvas-metric';
-import {DistinctPoints, LegendValue} from './distinct-points';
+import { CanvasPanelCtrl } from './canvas-metric';
+import { DistinctPoints, LegendValue } from './distinct-points';
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -75,9 +75,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   defaults = {
     display: 'timeline', // or 'stacked'
     rowHeight: 50,
-    valueMaps: [{value: 'null', op: '=', text: 'N/A'}],
-    rangeMaps: [{from: 'null', to: 'null', text: 'N/A'}],
-    colorMaps: [{text: 'N/A', color: '#CCC'}],
+    valueMaps: [{ value: 'null', op: '=', text: 'N/A' }],
+    rangeMaps: [{ from: 'null', to: 'null', text: 'N/A' }],
+    colorMaps: [{ text: 'N/A', color: '#CCC' }],
     metricNameColor: '#000000',
     valueTextColor: '#000000',
     timeTextColor: '#d8d9da',
@@ -190,26 +190,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   onInitEditMode() {
     this.unitFormats = kbn.getUnitFormats();
 
-    this.addEditorTab(
-      'Options',
-      'public/plugins/natel-discrete-panel/partials/editor.options.html',
-      1
-    );
-    this.addEditorTab(
-      'Legend',
-      'public/plugins/natel-discrete-panel/partials/editor.legend.html',
-      3
-    );
-    this.addEditorTab(
-      'Colors',
-      'public/plugins/natel-discrete-panel/partials/editor.colors.html',
-      4
-    );
-    this.addEditorTab(
-      'Mappings',
-      'public/plugins/natel-discrete-panel/partials/editor.mappings.html',
-      5
-    );
+    this.addEditorTab('Options', 'public/plugins/natel-discrete-panel/partials/editor.options.html', 1);
+    this.addEditorTab('Legend', 'public/plugins/natel-discrete-panel/partials/editor.legend.html', 3);
+    this.addEditorTab('Colors', 'public/plugins/natel-discrete-panel/partials/editor.colors.html', 4);
+    this.addEditorTab('Mappings', 'public/plugins/natel-discrete-panel/partials/editor.mappings.html', 5);
     this.editorTabIndex = 1;
     this.refresh();
   }
@@ -403,12 +387,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   updateLegendMetrics(notify?: boolean) {
-    if (
-      !this.data ||
-      !this.panel.showLegend ||
-      this.panel.showLegendNames ||
-      this.data.length <= 1
-    ) {
+    if (!this.data || !this.panel.showLegend || this.panel.showLegendNames || this.data.length <= 1) {
       this.legend = this.data;
     } else {
       this.legend = [DistinctPoints.combineLegend(this.data, this)];
@@ -445,7 +424,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if (metric.legendInfo) {
           _.forEach(metric.legendInfo, info => {
             if (!_.has(this.colorMap, info.val)) {
-              const v = {text: info.val, color: this.getColor(info.val)};
+              const v = { text: info.val, color: this.getColor(info.val) };
               this.panel.colorMaps.push(v);
               this.colorMap[info.val] = v;
             }
@@ -453,7 +432,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         }
       });
     } else {
-      this.panel.colorMaps.push({text: '???', color: this.randomColor()});
+      this.panel.colorMaps.push({ text: '???', color: this.randomColor() });
     }
     this.updateColorInfo();
   }
@@ -465,7 +444,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addValueMap() {
-    this.panel.valueMaps.push({value: '', op: '=', text: ''});
+    this.panel.valueMaps.push({ value: '', op: '=', text: '' });
   }
 
   removeRangeMap(rangeMap) {
@@ -475,7 +454,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   addRangeMap() {
-    this.panel.rangeMaps.push({from: '', to: '', text: ''});
+    this.panel.rangeMaps.push({ from: '', to: '', text: '' });
   }
 
   onConfigChanged(update = false) {
@@ -530,11 +509,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   getLegendDisplay(info, metric) {
     let disp = info.val;
-    if (
-      this.panel.showLegendPercent ||
-      this.panel.showLegendCounts ||
-      this.panel.showLegendTime
-    ) {
+    if (this.panel.showLegendPercent || this.panel.showLegendCounts || this.panel.showLegendTime) {
       disp += ' (';
       let hassomething = false;
       if (this.panel.showLegendTime) {
@@ -660,9 +635,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
             if (anno) {
               console.log('TODO, hover <annotation-tooltip>', anno);
               // See: https://github.com/grafana/grafana/blob/master/public/app/plugins/panel/graph/jquery.flot.events.js#L10
-              this.$tooltip
-                .html(anno.text)
-                .place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
+              this.$tooltip.html(anno.text).place_tt(evt.evt.pageX + 20, evt.evt.pageY + 5);
               return;
             }
           }
@@ -704,7 +677,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     const pt = this.hoverPoint;
     if (pt && pt.start) {
-      const range = {from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms)};
+      const range = { from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms) };
       this.timeSrv.setTime(range);
       this.clear();
     }
@@ -797,20 +770,14 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if (j + 1 === this.data[i].changes.length) {
           return this.data[i].changes[j].start <= this.mouse.position.ts;
         }
-        return (
-          this.data[i].changes[j].start <= this.mouse.position.ts &&
-          this.mouse.position.ts < this.data[i].changes[j + 1].start
-        );
+        return this.data[i].changes[j].start <= this.mouse.position.ts && this.mouse.position.ts < this.data[i].changes[j + 1].start;
       },
       mouseX: function(i, j) {
         const row = this._renderDimensions.matrix[i];
         if (j + 1 === row.positions.length) {
           return row.positions[j] <= this.mouse.position.x;
         }
-        return (
-          row.positions[j] <= this.mouse.position.x &&
-          this.mouse.position.x < row.positions[j + 1]
-        );
+        return row.positions[j] <= this.mouse.position.x && this.mouse.position.x < row.positions[j + 1];
       },
       metric: function(i) {
         return this.data[i] === this._selectedMetric;
@@ -899,12 +866,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if (!this._selectionMatrix[i][j]) {
           ctx.globalAlpha = 0.3;
         }
-        ctx.fillRect(
-          currentX,
-          matrix[i].y,
-          nextX - currentX,
-          this._renderDimensions.rowHeight
-        );
+        ctx.fillRect(currentX, matrix[i].y, nextX - currentX, this._renderDimensions.rowHeight);
         ctx.globalAlpha = globalAlphaTemp;
       }
 
@@ -928,7 +890,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     const offset = 2;
     const rowHeight = this._renderDimensions.rowHeight;
     _.forEach(this.data, (metric, i) => {
-      const {y, positions} = this._renderDimensions.matrix[i];
+      const { y, positions } = this._renderDimensions.matrix[i];
 
       const centerY = y + rowHeight / 2;
       // let labelPositionMetricName = y + rectHeight - this.panel.textSize / 2;
@@ -979,11 +941,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         const txtinfo = ctx.measureText(val);
         const xval = this._renderDimensions.width - offset - txtinfo.width;
         if (xval > hoverTextEnd) {
-          ctx.fillText(
-            val,
-            this._renderDimensions.width - offset,
-            labelPositionLastValue
-          );
+          ctx.fillText(val, this._renderDimensions.width - offset, labelPositionLastValue);
           maxTextSpot = this._renderDimensions.width - ctx.measureText(val).width - 10;
         }
       }
@@ -1178,29 +1136,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         ctx.strokeStyle = '#EA0F3B';
       }
 
-      this._drawVertical(
-        ctx,
-        anno.time,
-        min,
-        max,
-        headerColumnIndent,
-        top,
-        width,
-        isAlert
-      );
+      this._drawVertical(ctx, anno.time, min, max, headerColumnIndent, top, width, isAlert);
 
       //do the TO rangeMap
       if (anno.isRegion) {
-        this._drawVertical(
-          ctx,
-          anno.timeEnd,
-          min,
-          max,
-          headerColumnIndent,
-          top,
-          width,
-          isAlert
-        );
+        this._drawVertical(ctx, anno.timeEnd, min, max, headerColumnIndent, top, width, isAlert);
 
         //draw horizontal line at bottom
         const xPosStart = headerColumnIndent + ((anno.time - min) / (max - min)) * width;
@@ -1253,4 +1193,4 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 }
 
-export {DiscretePanelCtrl as PanelCtrl};
+export { DiscretePanelCtrl as PanelCtrl };
