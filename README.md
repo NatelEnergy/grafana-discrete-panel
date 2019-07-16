@@ -44,7 +44,8 @@ env GITHUB_TOKEN=your_token yarn release-it patch
 
 ##### v%VERSION% (not yet released)
 
-- Contributions welcome!
+- Building with `@grafana/toolkit`
+
 
 ##### v0.0.9
 
