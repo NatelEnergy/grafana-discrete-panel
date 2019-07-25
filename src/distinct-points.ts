@@ -25,7 +25,7 @@ export class LegendValue {
 export class DistinctPoints {
   changes: PointInfo[] = [];
   legendInfo: LegendValue[] = [];
-  last: PointInfo|null = null;
+  last: PointInfo | null = null;
   asc = false;
   transitionCount = 0;
   distinctValuesCount = 0;
@@ -128,7 +128,7 @@ export class DistinctPoints {
           v.ms += last.ms;
           v.count++;
         } else {
-          distinct.set(last.val, {val: last.val, ms: last.ms, count: 1, per: 0});
+          distinct.set(last.val, { val: last.val, ms: last.ms, count: 1, per: 0 });
         }
       }
       last = pt;
@@ -167,7 +167,7 @@ export class DistinctPoints {
           v.count += leg.count;
           // per gets recalculated at the end
         } else {
-          distinct.set(leg.val, {val: leg.val, ms: leg.ms, count: leg.count, per: 0});
+          distinct.set(leg.val, { val: leg.val, ms: leg.ms, count: leg.count, per: 0 });
         }
       });
     });

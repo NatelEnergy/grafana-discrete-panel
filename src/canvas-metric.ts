@@ -1,4 +1,4 @@
-import {MetricsPanelCtrl} from 'grafana/app/plugins/sdk';
+import { MetricsPanelCtrl } from 'grafana/app/plugins/sdk';
 
 import moment from 'moment';
 import $ from 'jquery';
@@ -235,7 +235,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           } else {
             const min = Math.min(this.mouse.down.ts, up.ts);
             const max = Math.max(this.mouse.down.ts, up.ts);
-            const range = {from: moment.utc(min), to: moment.utc(max)};
+            const range = { from: moment.utc(min), to: moment.utc(max) };
             this.mouse.position = up;
             this.onMouseSelectedRange(range, evt);
           }
@@ -298,11 +298,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           //console.log( "Calculate mouseInfo", event, this.mouse.position);
         }
 
-        this.onGraphHover(
-          event,
-          isThis || !this.dashboard.sharedCrosshairModeOnly(),
-          !isThis
-        );
+        this.onGraphHover(event, isThis || !this.dashboard.sharedCrosshairModeOnly(), !isThis);
       },
       scope
     );
@@ -415,20 +411,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   formatDate(d, fmt) {
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     if (typeof d.strftime === 'function') {
       return d.strftime(fmt);

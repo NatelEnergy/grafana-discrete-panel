@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "@grafana/toolkit": "next",
-    "grafana-sdk-mocks": "github:ryantxu/grafana-sdk-mocks",
     "@types/grafana": "github:CorpGlory/types-grafana.git"
   }
 }
