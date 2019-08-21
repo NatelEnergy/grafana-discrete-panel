@@ -68,6 +68,16 @@ const grafanaColors = [
 ]; // copied from public/app/core/utils/colors.ts because of changes in grafana 4.6.0
 //(https://github.com/grafana/grafana/blob/master/PLUGIN_DEV.md)
 
+const spans = {
+  s: { display: 'seconds' },
+  m: { display: 'minutes' },
+  h: { display: 'hours' },
+  d: { display: 'days' },
+  w: { display: 'weeks' },
+  M: { display: 'months' },
+  y: { display: 'years' },
+};
+
 class DiscretePanelCtrl extends CanvasPanelCtrl {
   static templateUrl = 'partials/module.html';
   static scrollable = true;
@@ -306,24 +316,113 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     return color;
   }
 
-  // Override the
-  applyPanelTimeOverrides() {
-    super.applyPanelTimeOverrides();
-
-    if (this.panel.expandFromQueryS && this.panel.expandFromQueryS > 0) {
-      const from = this.range.from.subtract(this.panel.expandFromQueryS, 's');
-      this.range.from = from;
-      this.range.raw.from = from;
+  async getInitialDistinctPoints() {
+    if (!this.panel.expandFromQuery) {
+      return
     }
+    const parts = /^(\d+)(\w)/.exec(this.panel.expandFromQuery);
+    if (!parts) {
+      return
+    }
+    const expandTime = {
+      unit: parts[2],
+      span: spans[parts[2]],
+      amount: parseInt(parts[1], 10)
+    }
+    // make shallow copy of scoped vars,
+    // and add built in variables interval and interval_ms
+    const scopedVars = Object.assign({}, this.panel.scopedVars, {
+      __interval: { text: this.interval, value: this.interval },
+      __interval_ms: { text: this.intervalMs, value: this.intervalMs },
+    });
+
+    let targets: [] = _.cloneDeep(this.panel.targets);
+    let range: any = {};
+    let rawRange: any = {};
+
+    let incompatibleFormat = false;
+
+    targets.map((t: any) => {
+      t.rawQuery = false;
+      if(t.select) {
+        t.select.map((s: any) => { s.push({ params: [], type: "last" }) });
+      } else {
+        incompatibleFormat = true
+      }
+    })
+
+    if(incompatibleFormat) return
+
+    range.to = _.cloneDeep(this.range.from);
+    rawRange.to = _.cloneDeep(this.range.from)
+    const from = _.cloneDeep(this.range.from).subtract(expandTime.amount, expandTime.span.display);
+    range.from = from;
+    rawRange.from = from;
+
+    const metricsQuery = {
+      timezone: this.dashboard.getTimezone(),
+      panelId: this.panel.id,
+      dashboardId: this.dashboard.id,
+      range: range,
+      rangeRaw: rawRange,
+      interval: this.interval,
+      intervalMs: this.intervalMs,
+      targets: targets,
+      maxDataPoints: this.resolution,
+      scopedVars: scopedVars,
+      cacheTimeout: this.panel.cacheTimeout,
+    };
+
+    let result : any;
+    try {
+      result = await this.datasource.query(metricsQuery)
+    } catch (err) {
+        // if cancelled  keep loading set to true
+        if (err.cancelled) {
+          console.log('Panel request cancelled', err);
+          return;
+        }
+
+        this.loading = false;
+        this.error = err.message || 'Request Error';
+        this.inspector = { error: err };
+
+        if (err.data) {
+          if (err.data.message) {
+            this.error = err.data.message;
+          }
+          if (err.data.error) {
+            this.error = err.data.error;
+          }
+        }
+
+        this.events.emit('data-error', err);
+        console.log('Panel data error:', err);
+    }
+
+    if (!result || !result.data) {
+      console.log('Data source query result invalid, missing data field:', result);
+      result = { data: [] };
+    }
+
+    return result
   }
 
-  onDataReceived(dataList) {
+  async onDataReceived(dataList) {
     $(this.canvas).css('cursor', 'pointer');
-
+    
+    const initialPoints = await this.getInitialDistinctPoints()
+    if (dataList.length == 0 && initialPoints != undefined && initialPoints.data.length > 0) {
+      dataList = initialPoints.data
+    }
+    
     const data: DistinctPoints[] = [];
-    _.forEach(dataList, (metric: any) => {
+    _.forEach(dataList, (metric: any, index) => {
       if (metric.datapoints) {
         const res = new DistinctPoints(metric.target);
+        if (initialPoints != undefined && initialPoints.data[index] != undefined) {
+          res.add(this.range.from.unix() * 1000, this.formatValue(initialPoints.data[index].datapoints[0][0]))
+        }
         _.forEach(metric.datapoints, point => {
           res.add(point[1], this.formatValue(point[0]));
         });
@@ -332,7 +431,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       } else if (metric.columns) {
         let timeIndex = -1;
         for (let i = 0; i < metric.columns.length; i++) {
-          if (metric.columns[i].type === 'time') {
+          if (metric.columns[i].type === 'time' || metric.columns[i].text === 'Time') {
             timeIndex = i;
             break;
           }
@@ -346,6 +445,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
             continue;
           }
           const res = new DistinctPoints(metric.columns[i].text);
+          if (initialPoints != undefined && initialPoints.data[index] != undefined) {
+            res.add(this.range.from.unix() * 1000, this.formatValue(initialPoints.data[index].rows[0][i]))
+          }
           for (let j = 0; j < metric.rows.length; j++) {
             const row = metric.rows[j];
             res.add(row[timeIndex], this.formatValue(row[i]));

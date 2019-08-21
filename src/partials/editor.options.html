@@ -130,13 +130,12 @@
         >
       </label>
       <input
-        type="number"
-        ng-model="ctrl.panel.expandFromQueryS"
+        type="text"
+        placeholder="1h"
+        empty-to-null ng-model="ctrl.panel.expandFromQuery" valid-time-span
         class="gf-form-input max-width-5"
-        ng-blur="ctrl.onConfigChanged()"
-        min="0"
+        ng-change="ctrl.onConfigChanged(true)" ng-model-onblur
       />
-      &nbsp; Seconds
     </div>
   </div>
 </div>
