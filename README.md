@@ -45,6 +45,7 @@ env GITHUB_TOKEN=your_token yarn release-it patch
 ##### v%VERSION% (not yet released)
 
 - Building with `@grafana/toolkit`
+- Supports DataFrame directly for 6.4+
 
 
 ##### v0.0.9

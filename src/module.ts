@@ -1,5 +1,9 @@
 import { CanvasPanelCtrl } from './canvas-metric';
 import { DistinctPoints, LegendValue } from './distinct-points';
+import { isArray } from 'lodash';
+
+import { DataFrame, guessFieldTypes, toDataFrame, getTimeField } from '@grafana/data';
+import { DataQueryResponseData, LegacyResponseData } from '@grafana/ui';
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -168,18 +172,16 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.events.on('render', this.onRender.bind(this));
     this.events.on('refresh', this.onRefresh.bind(this));
 
-    this.events.on('data-received', this.onDataReceived.bind(this));
-    this.events.on('data-snapshot-load', this.onDataSnapshotLoad.bind(this));
+    // 6.4+ use DataFrames
+    (this as any).useDataFrames = true;
+    this.events.on('data-frames-received', this.onDataFramesReceived.bind(this));
+    this.events.on('data-snapshot-load', this.onSnapshotLoad.bind(this));
     this.events.on('data-error', this.onDataError.bind(this));
   }
 
   onPanelInitialized() {
     this.updateColorInfo();
     this.onConfigChanged();
-  }
-
-  onDataSnapshotLoad(snapshotData) {
-    this.onDataReceived(snapshotData);
   }
 
   onDataError(err) {
@@ -317,44 +319,29 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
   }
 
-  onDataReceived(dataList) {
+  // This should only be called from the snapshot callback
+  onSnapshotLoad(dataList: LegacyResponseData[]) {
+    this.onDataFramesReceived(getProcessedDataFrames(dataList));
+  }
+
+  // Directly support DataFrame
+  onDataFramesReceived(frames: DataFrame[]) {
     $(this.canvas).css('cursor', 'pointer');
 
     const data: DistinctPoints[] = [];
-    _.forEach(dataList, (metric: any) => {
-      if (metric.datapoints) {
-        const res = new DistinctPoints(metric.target);
-        _.forEach(metric.datapoints, point => {
-          res.add(point[1], this.formatValue(point[0]));
+    frames.forEach(frame => {
+      const time = getTimeField(frame).timeField;
+      if (time) {
+        frame.fields.forEach(field => {
+          if (field !== time) {
+            const res = new DistinctPoints(field.config.title || field.name);
+            for (let i = 0; i < time.values.length; i++) {
+              res.add(time.values.get(i), this.formatValue(field.values.get(i)));
+            }
+            res.finish(this);
+            data.push(res);
+          }
         });
-        res.finish(this);
-        data.push(res);
-      } else if (metric.columns) {
-        let timeIndex = -1;
-        for (let i = 0; i < metric.columns.length; i++) {
-          if (metric.columns[i].type === 'time') {
-            timeIndex = i;
-            break;
-          }
-        }
-        if (timeIndex < 0) {
-          throw new Error('Expected a time column from the table format');
-        }
-
-        for (let i = 0; i < metric.columns.length; i++) {
-          if (i === timeIndex) {
-            continue;
-          }
-          const res = new DistinctPoints(metric.columns[i].text);
-          for (let j = 0; j < metric.rows.length; j++) {
-            const row = metric.rows[j];
-            res.add(row[timeIndex], this.formatValue(row[i]));
-          }
-          res.finish(this);
-          data.push(res);
-        }
-      } else {
-        console.log('SKIP:', metric);
       }
     });
     this.data = data;
@@ -1191,6 +1178,32 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       ctx.fillText(dateStr, xPos - xOffset, top + 10);
     }
   }
+}
+
+/**
+ * All panels will be passed tables that have our best guess at colum type set
+ *
+ * This is also used by PanelChrome for snapshot support
+ */
+export function getProcessedDataFrames(results?: DataQueryResponseData[]): DataFrame[] {
+  if (!results || !isArray(results)) {
+    return [];
+  }
+
+  const dataFrames: DataFrame[] = [];
+
+  for (const result of results) {
+    const dataFrame = guessFieldTypes(toDataFrame(result));
+
+    // clear out any cached calcs
+    for (const field of dataFrame.fields) {
+      field.calcs = undefined;
+    }
+
+    dataFrames.push(dataFrame);
+  }
+
+  return dataFrames;
 }
 
 export { DiscretePanelCtrl as PanelCtrl };
