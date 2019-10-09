@@ -712,6 +712,11 @@
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.4.0.tgz#b67268ca3aa4ad3a24ea4e7080dccf4976740311"
   integrity sha512-7qUfRG9rtZdUq7nxsz3h45juXwKADWFAclqxo7o/RaPiemskZI8pEzx3kDp7D/WxJ5s52T92bvYLIvyA4P5OnA==
 
+"@grafana/data@6.4.2":
+  version "6.4.2"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.4.2.tgz#1ce4687757c609a6b12b39b04cd37e20e08fee8f"
+  integrity sha512-Vb8IBl1VtX+jAMOzVb6s1klPWpMwWSdrPrG0CSoI62F/Hs5Cun3nOWVjDEkfPnvMMycEuD1nMBePK/gM3W53Iw==
+
 "@grafana/slate-react@0.22.9-grafana":
   version "0.22.9-grafana"
   resolved "https://registry.yarnpkg.com/@grafana/slate-react/-/slate-react-0.22.9-grafana.tgz#07f35f0ffc018f616b9f82fa6e5ba65fae75c6a0"
@@ -813,6 +818,36 @@
   integrity sha512-4wyqXTj08RR2s3Cq3HWyE0CfQ7k+hNUKvVJHIeKbic/T2j7vssZ6qDnX6RHdE2lKHz4kzZuclpIOr/m2XGVuTQ==
   dependencies:
     "@grafana/data" "6.4.0"
+    "@grafana/slate-react" "0.22.9-grafana"
+    "@torkelo/react-select" "2.1.1"
+    "@types/react-color" "2.17.0"
+    classnames "2.2.6"
+    d3 "5.9.1"
+    immutable "3.8.2"
+    jquery "3.4.1"
+    lodash "4.17.15"
+    moment "2.24.0"
+    papaparse "4.6.3"
+    rc-time-picker "^3.7.2"
+    react "16.8.6"
+    react-calendar "2.18.1"
+    react-color "2.17.0"
+    react-custom-scrollbars "4.2.1"
+    react-dom "16.8.6"
+    react-highlight-words "0.11.0"
+    react-popper "1.3.3"
+    react-storybook-addon-props-combinations "1.1.0"
+    react-transition-group "2.6.1"
+    react-virtualized "9.21.0"
+    slate "0.47.8"
+    tinycolor2 "1.4.1"
+
+"@grafana/ui@latest":
+  version "6.4.2"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.4.2.tgz#bd1550798e4e959edf7e72efce9fe12beedd7adb"
+  integrity sha512-O1Ux23D1mmRNsWlmrMkIsqOX/FaBIQ6n1jVySvFdf7Bsy51DHjf7m76RXs++LcBjKgJOJeCDZeRyNV67rYVHzw==
+  dependencies:
+    "@grafana/data" "6.4.2"
     "@grafana/slate-react" "0.22.9-grafana"
     "@torkelo/react-select" "2.1.1"
     "@types/react-color" "2.17.0"
