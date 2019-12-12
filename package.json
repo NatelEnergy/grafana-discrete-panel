@@ -20,15 +20,13 @@
     "type": "git",
     "url": "https://github.com/NatelEnergy/grafana-discrete-panel.git"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@grafana/toolkit": "next",
+    "@grafana/data": "next",
+    "@grafana/ui": "next",
+    "@types/grafana": "github:CorpGlory/types-grafana.git",
     "jquery": "^3.2.1",
     "lodash": "^4.17.10",
     "moment": "^2.22.1"
-  },
-  "devDependencies": {
-    "@grafana/toolkit": "latest",
-    "@grafana/data": "latest",
-    "@grafana/ui": "latest",
-    "@types/grafana": "github:CorpGlory/types-grafana.git"
   }
 }
