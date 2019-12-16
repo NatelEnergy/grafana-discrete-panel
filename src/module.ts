@@ -2,8 +2,7 @@ import { CanvasPanelCtrl } from './canvas-metric';
 import { DistinctPoints, LegendValue } from './distinct-points';
 import { isArray } from 'lodash';
 
-import { DataFrame, guessFieldTypes, toDataFrame, getTimeField } from '@grafana/data';
-import { DataQueryResponseData, LegacyResponseData } from '@grafana/ui';
+import { DataQueryResponseData, LegacyResponseData, DataFrame, guessFieldTypes, toDataFrame, getTimeField } from '@grafana/data';
 
 import _ from 'lodash';
 import $ from 'jquery';
