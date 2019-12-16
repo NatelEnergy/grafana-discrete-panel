@@ -26,13 +26,6 @@ yarn install
 yarn build
 ```
 
-### Releasing
-
-This plugin uses [release-it](https://github.com/webpro/release-it) to release to GitHub.
-
-```
-env GITHUB_TOKEN=your_token yarn release-it patch
-```
 
 ### Roadmap
 
