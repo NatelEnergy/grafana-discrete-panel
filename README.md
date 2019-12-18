@@ -33,8 +33,8 @@ yarn build
 - TODO: better documentation
 - release v1.0
 
-#### Changelog
 
+#### Changelog
 
 ##### v%VERSION% (not yet released)
 
