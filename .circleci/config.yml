@@ -25,32 +25,6 @@ jobs:
         root: .
         paths:
         - ci
-  build_docs:
-    docker:
-    - image: circleci/node:10
-    working_directory: ~/plugin
-    steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install yarn
-        command: |
-          sudo npm install -g yarn --quiet
-          yarn install --pure-lockfile
-          mkdir ci # Avoid error if not exists
-    - run:
-        name: Build Docs
-        command: npx grafana-toolkit plugin:ci-docs
-    - save_cache:
-        paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci
   package:
     docker:
     - image: circleci/node:10
@@ -169,11 +143,9 @@ workflows:
   plugin_workflow:
     jobs:
     - build_plugin
-    - build_docs
     - package:
         requires:
         - build_plugin
-        - build_docs
     - test_6_2_5:
         requires:
         - package
