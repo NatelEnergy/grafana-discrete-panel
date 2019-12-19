@@ -5,7 +5,8 @@
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
-    "dev": "grafana-toolkit plugin:dev"
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "ryantxu",
   "license": "MIT",
