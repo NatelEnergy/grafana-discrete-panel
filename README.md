@@ -7,7 +7,6 @@
 This panel shows discrete values in a horizontal graph. This lets show state transitions clearly. It is a good
 choice to display string or boolean data
 
-
 ### Screenshots
 
 ![example](https://raw.githubusercontent.com/NatelEnergy/grafana-discrete-panel/master/src/img/screenshot-multiple.png)
