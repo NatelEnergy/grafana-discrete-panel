@@ -24,3 +24,4 @@ git push origin --delete $(git tag -l) # Pushing once should be faster than mult
 #Delete local tags.
 git tag -d $(git tag -l)
 ```
+
