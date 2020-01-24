@@ -25,3 +25,4 @@ git push origin --delete $(git tag -l) # Pushing once should be faster than mult
 git tag -d $(git tag -l)
 ```
 
+
