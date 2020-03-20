@@ -6,10 +6,12 @@ import { DataQueryResponseData, LegacyResponseData, DataFrame, guessFieldTypes, 
 
 import _ from 'lodash';
 import $ from 'jquery';
-import moment from 'moment';
 import kbn from 'grafana/app/core/utils/kbn';
 
 import appEvents from 'grafana/app/core/app_events';
+
+/* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
+import moment from 'moment';
 
 const grafanaColors = [
   '#7EB26D',

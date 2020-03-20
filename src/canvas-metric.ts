@@ -1,6 +1,8 @@
 import { MetricsPanelCtrl } from 'grafana/app/plugins/sdk';
 
+/* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
 import moment from 'moment';
+
 import $ from 'jquery';
 
 import appEvents from 'grafana/app/core/app_events';

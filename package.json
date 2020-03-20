@@ -5,7 +5,8 @@
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
-    "dev": "grafana-toolkit plugin:dev"
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "ryantxu",
   "license": "MIT",
@@ -21,9 +22,9 @@
     "url": "https://github.com/NatelEnergy/grafana-discrete-panel.git"
   },
   "devDependencies": {
-    "@grafana/toolkit": "next",
-    "@grafana/data": "next",
-    "@grafana/ui": "next",
+    "@grafana/toolkit": "6.6.2",
+    "@grafana/data": "6.6.2",
+    "@grafana/ui": "6.6.2",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
     "jquery": "^3.2.1",
     "lodash": "^4.17.10",
