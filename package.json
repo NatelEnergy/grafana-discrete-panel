@@ -26,7 +26,7 @@
     "@grafana/data": "6.6.2",
     "@grafana/ui": "6.6.2",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
-    "jquery": "^3.2.1",
+    "jquery": "^3.5.0",
     "lodash": "^4.17.10",
     "moment": "^2.22.1"
   }
