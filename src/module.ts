@@ -1020,7 +1020,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     const timeFormat = this.time_format(max - min, timeResolution / 1000);
     let displayOffset = 0;
-    if (this.dashboard.isTimezoneUtc()) {
+    if (this.dashboard.getTimezone() === 'utc') {
       displayOffset = new Date().getTimezoneOffset() * 60000;
     }
 
