@@ -2,7 +2,14 @@ import { CanvasPanelCtrl } from './canvas-metric';
 import { DistinctPoints, LegendValue } from './distinct-points';
 import { isArray } from 'lodash';
 
-import { DataQueryResponseData, LegacyResponseData, DataFrame, guessFieldTypes, toDataFrame, getTimeField } from '@grafana/data';
+import {
+  DataQueryResponseData,
+  LegacyResponseData,
+  DataFrame,
+  guessFieldTypes,
+  toDataFrame,
+  getTimeField,
+} from '@grafana/data';
 
 import _ from 'lodash';
 import $ from 'jquery';
@@ -758,7 +765,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         if (j + 1 === this.data[i].changes.length) {
           return this.data[i].changes[j].start <= this.mouse.position.ts;
         }
-        return this.data[i].changes[j].start <= this.mouse.position.ts && this.mouse.position.ts < this.data[i].changes[j + 1].start;
+        return (
+          this.data[i].changes[j].start <= this.mouse.position.ts &&
+          this.mouse.position.ts < this.data[i].changes[j + 1].start
+        );
       },
       mouseX: function(i, j) {
         const row = this._renderDimensions.matrix[i];

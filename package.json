@@ -1,6 +1,6 @@
 {
   "name": "natel-discrete-panel",
-  "version": "0.0.10-dev",
+  "version": "0.0.10",
   "description": "Discrete Events in Grafana",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
@@ -22,7 +22,7 @@
     "url": "https://github.com/NatelEnergy/grafana-discrete-panel.git"
   },
   "devDependencies": {
-    "@grafana/toolkit": "6.6.2",
+    "@grafana/toolkit": "latest",
     "@grafana/data": "6.6.2",
     "@grafana/ui": "6.6.2",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
