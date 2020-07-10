@@ -23,9 +23,10 @@
   },
   "devDependencies": {
     "@grafana/toolkit": "latest",
-    "@grafana/data": "6.6.2",
-    "@grafana/ui": "6.6.2",
+    "@grafana/data": "latest",
+    "@grafana/ui": "latest",
     "@types/grafana": "github:CorpGlory/types-grafana.git",
+    "@types/lodash": "4.14.149",
     "jquery": "^3.2.1",
     "lodash": "^4.17.10",
     "moment": "^2.22.1"
