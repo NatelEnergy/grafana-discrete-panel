@@ -9,6 +9,10 @@ import {
   guessFieldTypes,
   toDataFrame,
   getTimeField,
+  getFieldDisplayName,
+  Field,
+  ArrayVector,
+  FieldType,
 } from '@grafana/data';
 
 import _ from 'lodash';
@@ -168,6 +172,13 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   _renderDimensions: any = {};
   _selectionMatrix: string[][] = [];
 
+  fieldNamer = (field: Field, frame?: DataFrame, allFrames?: DataFrame[]): string => {
+    if (field.config.displayName) {
+      return field.config.displayName;
+    }
+    return field.name;
+  };
+
   /** @ngInject */
   constructor($scope, $injector, public annotationsSrv) {
     super($scope, $injector);
@@ -185,6 +196,15 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.events.on('data-frames-received', this.onDataFramesReceived.bind(this));
     this.events.on('data-snapshot-load', this.onSnapshotLoad.bind(this));
     this.events.on('data-error', this.onDataError.bind(this));
+    // Try to load the 7+ naming strategy
+    try {
+      const a = getFieldDisplayName({ name: 'a', config: {}, type: FieldType.number, values: new ArrayVector([]) });
+      if (a === 'a') {
+        this.fieldNamer = getFieldDisplayName;
+      }
+    } catch (err) {
+      console.warn('Using 6x style field names', err);
+    }
   }
 
   onPanelInitialized() {
@@ -342,7 +362,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       if (time) {
         frame.fields.forEach(field => {
           if (field !== time) {
-            const res = new DistinctPoints(field.config.title || field.name);
+            const res = new DistinctPoints(this.fieldNamer(field, frame, frames));
             for (let i = 0; i < time.values.length; i++) {
               res.add(time.values.get(i), this.formatValue(field.values.get(i)));
             }
@@ -1208,7 +1228,9 @@ export function getProcessedDataFrames(results?: DataQueryResponseData[]): DataF
 
     // clear out any cached calcs
     for (const field of dataFrame.fields) {
-      field.calcs = undefined;
+      const f = field as any;
+      f.calcs = undefined;
+      f.state = undefined;
     }
 
     dataFrames.push(dataFrame);
