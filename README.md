@@ -44,14 +44,9 @@ env GITHUB_TOKEN=your_token yarn release-it patch
 #### Changelog
 
 
-##### v0.1.1
-
-- Fix naming issue with 7+
-
-
 ##### v0.1.0
 
-- works with Grafana 7
+- works with Grafana 7 (naming fixed)
 - Building with `@grafana/toolkit`
 - Supports DataFrame directly for 6.4+
 
