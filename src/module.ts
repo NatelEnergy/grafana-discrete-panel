@@ -617,7 +617,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   getCorrectTime(ts: number) {
     const from = moment(this.range.from).valueOf();
-    return (ts < from ? from : ts);
+    return ts < from ? from : ts;
   }
 
   onGraphHover(evt, showTT, isExternal) {
