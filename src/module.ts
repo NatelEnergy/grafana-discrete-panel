@@ -154,6 +154,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       value: 'minutes',
     },
     useTimePrecision: false,
+    use12HourClock: false,
   };
 
   annotations: any = [];
@@ -578,13 +579,16 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       time = to - from;
       val = 'Zoom To:';
     }
-
+    let timeformat = '';
+    if (this.panel.use12HourClock) {
+      timeformat = 'YYYY-MM-DD h:mm:ss a';
+    }
     let body = '<div class="graph-tooltip-time">' + val + '</div>';
 
     body += '<center>';
-    body += this.dashboard.formatDate(moment(from)) + '<br/>';
+    body += this.dashboard.formatDate(moment(from), timeformat) + '<br/>';
     body += 'to<br/>';
-    body += this.dashboard.formatDate(moment(to)) + '<br/><br/>';
+    body += this.dashboard.formatDate(moment(to), timeformat) + '<br/><br/>';
     body += this.formatDuration(moment.duration(time)) + '<br/>';
     body += '</center>';
 
