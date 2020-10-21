@@ -611,6 +611,11 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     this.$tooltip.html(body).place_tt(pageX + 20, pageY + 5);
   }
 
+  getCorrectTime(ts: number) {
+    const from = moment(this.range.from).valueOf();
+    return (ts < from ? from : ts);
+  }
+
   onGraphHover(evt, showTT, isExternal) {
     this.externalPT = false;
     if (this.data && this.data.length) {
@@ -631,6 +636,9 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
           }
           hover = this.data[j].changes[i];
         }
+
+        hover.start = this.getCorrectTime(hover.start);
+
         this.hoverPoint = hover;
 
         if (this.annotations && !isExternal && this._renderDimensions) {
