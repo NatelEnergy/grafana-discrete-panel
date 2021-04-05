@@ -78,5 +78,15 @@
 
         </div>
     </div>
+    <!-- Regex-->
+	  <div class="section gf-form-group">
+		  <h5 class="section-heading">Regex</h5>
+		  <div class="gf-form">
+		    <label class="gf-form-label width-8">Regex Pattern
+			  <tip>Optional, The values in the specified column are filtered and displayed according to this regex. Ex: String: Url|broadcom.com|mirror|location-1 regex: /Url\|(.*?)\|/ Output: broadcom.com</tip>
+		    </label>
+		    <input type="text" class="gf-form-input" ng-model="ctrl.panel.regexPattern" ng-blur="ctrl.render()" placeholder="regex">
+		  </div>
+	  </div>
 
 </div>

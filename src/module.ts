@@ -13,6 +13,7 @@ import {
   Field,
   ArrayVector,
   FieldType,
+  stringToJsRegex
 } from '@grafana/data';
 
 import _ from 'lodash';
@@ -234,6 +235,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       return;
     }
 
+    this._applyRegexPattern();
     this._updateRenderDimensions();
     this._updateSelectionMatrix();
     this._updateCanvasSize();
@@ -597,13 +599,12 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     if (isExternal) {
       const rect = this.canvas.getBoundingClientRect();
       pageY = rect.top + evt.pos.panelRelY * rect.height;
-      if (pageY < 0 || pageY > $(window).innerHeight()) {
+      if (pageY < 0 || pageY > window.innerHeight) {
         // Skip Hidden tooltip
         this.$tooltip.detach();
         return;
       }
-      pageY += $(window).scrollTop();
-
+      pageY += $(window).scrollTop() || 0;
       const elapsed = this.range.to - this.range.from;
       const pX = (evt.pos.x - this.range.from) / elapsed;
       pageX = rect.left + pX * rect.width;
@@ -726,6 +727,39 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     $(this.canvas).css('cursor', 'wait');
     appEvents.emit('graph-hover-clear');
     this.render();
+  }
+  _applyRegexPattern() {
+    let seriesList: any = this.data;
+    if (seriesList && seriesList.length > 0) {
+      for (let i = 0; i < seriesList.length; i++) {
+        if (!seriesList[i].seriesName) {
+          seriesList[i].seriesName = seriesList[i].name
+        }
+        if (this.panel.regexPattern !== '' && this.panel.regexPattern !== undefined) {
+          const regexVal = stringToJsRegex(this.panel.regexPattern);
+          if (seriesList[i].seriesName && regexVal.test(seriesList[i].seriesName.toString())) {
+            const temp = regexVal.exec(seriesList[i].seriesName.toString());
+            if (!temp) {
+              continue;
+            }
+            let extractedtxt = '';
+            if (temp.length > 1) {
+              temp.slice(1).forEach((value, i) => {
+                if (value) {
+                  extractedtxt += extractedtxt.length > 0 ? ' ' + value.toString() : value.toString();
+                }
+              });
+              seriesList[i].name = extractedtxt;
+            }
+          } else {
+            seriesList[i].name = seriesList[i].seriesName;
+          }
+        } else {
+          seriesList[i].name = seriesList[i].seriesName;
+        }
+      }
+      this.data = seriesList;
+    }
   }
 
   _updateRenderDimensions() {
