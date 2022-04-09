@@ -26,7 +26,7 @@
     "@types/lodash": "latest",
     "jquery": "^3.2.1",
     "lodash": "^4.17.10",
-    "moment": "^2.22.1",
+    "moment": "^2.29.2",
     "@grafana/data": "latest",
     "@grafana/toolkit": "latest",
     "@grafana/ui": "latest"
