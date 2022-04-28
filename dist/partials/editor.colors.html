@@ -1,10 +1,10 @@
 
 <div class="editor-row">
-    <h5 class="page-heading">Text Colors</h5>
+    <h5 class="page-heading">{{'natel-discrete-panel.textColors' | translate}}</h5>
     <div class="gf-form-group">
         <div class="gf-form">
             <span class="gf-form-label width-10">
-                Metric Names
+              {{'natel-discrete-panel.metricNames' | translate}}
             </span>
             <input type="text" placeholder="text" ng-model="ctrl.panel.metricNameColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
             <span class="gf-form-label">
@@ -14,7 +14,7 @@
 
         <div class="gf-form">
             <span class="gf-form-label width-10">
-                Value Text
+              {{'natel-discrete-panel.valueText' | translate}}
             </span>
             <input type="text" placeholder="text" ng-model="ctrl.panel.valueTextColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
             <span class="gf-form-label">
@@ -24,7 +24,7 @@
 
         <div class="gf-form">
             <span class="gf-form-label width-10">
-                Time Text
+              {{'natel-discrete-panel.timeText' | translate}}
             </span>
             <input type="text" placeholder="text" ng-model="ctrl.panel.timeTextColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
             <span class="gf-form-label">
@@ -35,7 +35,7 @@
 
         <div class="gf-form">
             <span class="gf-form-label width-10">
-                Background
+              {{'public.background' | translate}}
             </span>
             <input type="text" placeholder="text" ng-model="ctrl.panel.backgroundColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
             <span class="gf-form-label">
@@ -45,7 +45,7 @@
 
         <div class="gf-form">
             <span class="gf-form-label width-10">
-                Lines
+              {{'natel-discrete-panel.lines' | translate}}
             </span>
             <input type="text" placeholder="text" ng-model="ctrl.panel.lineColor" class="gf-form-input width-13" ng-blur="ctrl.updateColorInfo()">
             <span class="gf-form-label">
@@ -57,7 +57,7 @@
 
 
 <div class="editor-row">
-  <h5 class="page-heading">Color Mappings</h5>
+  <h5 class="page-heading">{{'natel-discrete-panel.colorMappings' | translate}}</h5>
   <div class="gf-form-group">
     <div class="gf-form" ng-repeat="map in ctrl.panel.colorMaps">
       <span class="gf-form-label">
@@ -76,11 +76,11 @@
     <div class="gf-form-button-row">
       <button class="btn btn-inverse" ng-click="ctrl.addColorMap();">
         <i class="fa fa-plus"></i>
-        Add a Color mapping
+        {{'natel-discrete-panel.addaColorMapping' | translate}}
       </button>
       <button class="btn btn-inverse" ng-click="ctrl.addColorMap('curent');">
         <i class="fa fa-plus"></i>
-        Add Current Values
+        {{'natel-discrete-panel.addCurrentValues' | translate}}
       </button>
     </div>
   </div>

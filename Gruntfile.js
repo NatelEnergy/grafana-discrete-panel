@@ -42,8 +42,22 @@ module.exports = function(grunt) {
       dist_statics: {
         expand: true,
         flatten: true,
-        src: ['src/plugin.json', 'LICENSE', 'README.md'],
+        src: ['src/*.json', 'LICENSE', 'README.md'],
         dest: 'dist/'
+      },
+      app_core_utils: {
+        expand: true,
+        flatten: true,
+        cwd: 'reference',
+        src: ['fontsize.ts','operationURL.ts'],
+        dest: 'node_modules/grafana-sdk-mocks/app/core/utils/'
+      },
+      app_headers: {
+        expand: true,
+        flatten: true,
+        cwd: 'reference',
+        src: ['commod.d.ts'],
+        dest: 'node_modules/grafana-sdk-mocks/app/headers/'
       }
     },
 
@@ -96,6 +110,8 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [
     'clean',
     'copy:dist_js',
+    'copy:app_core_utils',
+    'copy:app_headers',
     'typescript:build',
     'copy:dist_html',
     'copy:dist_css',

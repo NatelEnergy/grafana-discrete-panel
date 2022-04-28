@@ -4,39 +4,53 @@
 
 
     <div class="section gf-form-group">
-        <h5 class="section-heading">Legend</h5>
+        <h5 class="section-heading">{{'public.legend' | translate}}</h5>
           <gf-form-switch class="gf-form"
-            label="Show Legend"
+            label="{{'heatmap.showLegend' | translate}}"
             label-class="gf-form-label width-14"
             checked="ctrl.panel.showLegend"
             on-change="ctrl.onConfigChanged()"></gf-form-switch>
           <gf-form-switch class="gf-form"
-            label="Show Metric Names"
+            label="{{'natel-discrete-panel.showMetricNames' | translate}}"
             label-class="gf-form-label width-14"
             checked="ctrl.panel.showLegendNames"
             on-change="ctrl.onConfigChanged()"></gf-form-switch>
           <gf-form-switch class="gf-form"
-            label="Transition Count"
+            label="{{'natel-discrete-panel.transitionCount' | translate}}"
             label-class="gf-form-label width-14"
             checked="ctrl.panel.showTransitionCount"
             on-change="ctrl.onConfigChanged()"></gf-form-switch>
           <gf-form-switch class="gf-form"
-            label="Distinct Values Count"
+            label="{{'natel-discrete-panel.distinctValuesCount' | translate}}"
             label-class="gf-form-label width-14"
             checked="ctrl.panel.showDistinctCount"
             on-change="ctrl.onConfigChanged()"></gf-form-switch>
+          <!-- <gf-form-switch class="gf-form" label-class="width-14" label="Adjustable Font Size" tooltip="Font size adjust with window size"
+          checked="ctrl.panel.adjFontSize" on-change="ctrl.render()"></gf-form-switch> -->
+          <!-- <div class="gf-form max-width-17" ng-if="!ctrl.panel.adjFontSize">
+              <label class="gf-form-label width-9">Legend Font size</label>
+              <div class="gf-form-select-wrapper max-width-16">
+                <select class="gf-form-input" ng-model="ctrl.panel.FontSize" ng-options="f for f in ctrl.fontSizes" ng-change="ctrl.render()"></select>
+              </div>
+          </div> -->
+          <div class="gf-form max-width-17">
+              <label class="gf-form-label width-10">{{'natel-discrete-panel.legendFontsize' | translate}}<i class="gicon gicon-i18n"></i></label>
+              <div class="gf-form-select-wrapper max-width-16">
+                <select class="gf-form-input" ng-model="ctrl.panel.FontSize" ng-options="f.text as f.text for f in ctrl.fontCalc" ng-change="ctrl.handleLegnedFontSizeChange();ctrl.render()"></select>
+              </div>
+          </div> 
     </div>
 
     <div class="section gf-form-group">
-        <h5 class="section-heading">Values</h5>
+        <h5 class="section-heading">{{'public.values' | translate}}</h5>
               <gf-form-switch class="gf-form"
-                label="Show"
+                label="{{'public.show' | translate}}"
                 label-class="gf-form-label width-14"
                 checked="ctrl.panel.showLegendValues"
                 on-change="ctrl.onConfigChanged()"></gf-form-switch>
 
               <div class="gf-form">
-                <label class="gf-form-label width-7">Sort By</label>
+                <label class="gf-form-label width-7">{{'natel-discrete-panel.sortBy' | translate}}</label>
                 <div class="gf-form-select-wrapper max-width-14">
                   <select class="gf-form-input" ng-model="ctrl.panel.legendSortBy" ng-change="ctrl.onConfigChanged()">
                     <option value="-ms">Time (desc)</option>
@@ -48,31 +62,31 @@
               </div>
 
             <div class="gf-form">
-              <label class="gf-form-label width-14">Limit</label>
+              <label class="gf-form-label width-14">{{'public.limit' | translate}}</label>
               <input type="number" ng-model="ctrl.panel.legendMaxValues" class="gf-form-input max-width-5" ng-blur="ctrl.render()" min="1" max="100" placeholder="all"/>
             </div>
 
 
               <gf-form-switch class="gf-form"
-                label="Show Time"
+                label="{{'natel-discrete-panel.showTime' | translate}}"
                 label-class="gf-form-label width-14"
                 checked="ctrl.panel.showLegendTime"
                 on-change="ctrl.onConfigChanged()"></gf-form-switch>
 
               <gf-form-switch class="gf-form"
-                label="Show Counts"
+                label="{{'natel-discrete-panel.showCounts' | translate}}"
                 label-class="gf-form-label width-14"
                 checked="ctrl.panel.showLegendCounts"
                 on-change="ctrl.onConfigChanged()"></gf-form-switch>
 
               <gf-form-switch class="gf-form"
-                label="Show Percent"
+                label="{{'natel-discrete-panel.showPercent' | translate}}"
                 label-class="gf-form-label width-14"
                 checked="ctrl.panel.showLegendPercent"
                 on-change="ctrl.onConfigChanged()"></gf-form-switch>
 
             <div class="gf-form" ng-show="ctrl.panel.showLegendPercent">
-              <label class="gf-form-label width-14">Percent Decimals</label>
+              <label class="gf-form-label width-14">{{'natel-discrete-panel.percentDecimals' | translate}}</label>
               <input type="number" ng-model="ctrl.panel.legendPercentDecimals" class="gf-form-input max-width-5" ng-blur="ctrl.render()" placeholder="auto" min="0" max="10" />
             </div>
 

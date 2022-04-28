@@ -7,6 +7,7 @@ import moment from 'moment';
 import $ from 'jquery';
 
 import appEvents from 'app/core/app_events';
+import {initAttrI18n} from './i18n';
 
 // Expects a template with:
 // <div class="canvas-spot"></div>
@@ -21,7 +22,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
   constructor($scope, $injector) {
     super($scope, $injector);
-
     this.data = null;
     this.mouse = {
       position: null,
@@ -150,6 +150,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   }
 
   link(scope, elem, attrs, ctrl) {
+    ctrl.initDefaultI18n();
     this.wrap = elem.find('.canvas-spot')[0];
     this.canvas = document.createElement('canvas');
     this.wrap.appendChild(this.canvas);
@@ -298,7 +299,6 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           };
           //console.log( "Calculate mouseInfo", event, this.mouse.position);
         }
-
         this.onGraphHover(
           event,
           isThis || !this.dashboard.sharedCrosshairModeOnly(),
@@ -318,16 +318,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       },
       scope
     );
-
-    // scope.$on('$destroy', () => {
-    //   this.$tooltip.destroy();
-    //   elem.off();
-    //   elem.remove();
-    // });
   }
-
-  // Utility Functions for time axis
-  //---------------------------------
 
   time_format(range: number, secPerTick: number): string {
     let oneDay = 86400000;
@@ -431,7 +422,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
       'Dec',
     ];
     let dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    if (typeof d.strftime == 'function') {
+    if (typeof d.strftime === 'function') {
       return d.strftime(fmt);
     }
 
@@ -465,7 +456,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     if (hours > 12) {
       hours12 = hours - 12;
-    } else if (hours == 0) {
+    } else if (hours === 0) {
       hours12 = 12;
     } else {
       hours12 = hours;
@@ -530,7 +521,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
         r.push(c);
         escape = false;
       } else {
-        if (c == '%') {
+        if (c === '%') {
           escape = true;
         } else {
           r.push(c);
@@ -544,6 +535,20 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
   leftPad(n, pad) {
     n = '' + n;
     pad = '' + (pad == null ? '0' : pad);
-    return n.length == 1 ? pad + n : n;
+    return n.length === 1 ? pad + n : n;
+  }
+
+  initDefaultI18n() {
+    const lang = this.dashboard.panelLanguage;
+    if (lang) {
+      for (const valueMap of this.panel.valueMaps) {
+        initAttrI18n(valueMap, 'text', lang);
+      }
+      for (const rangeMap of this.panel.rangeMaps) {
+        initAttrI18n(rangeMap, 'text', lang);
+      }
+      initAttrI18n(this.panel, 'FontSize', lang);
+      initAttrI18n(this.panel, 'FontSizeValue', lang);
+    }
   }
 }
