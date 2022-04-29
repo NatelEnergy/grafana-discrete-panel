@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         expand: true,
         flatten: true,
         cwd: 'reference',
-        src: ['commod.d.ts'],
+        src: ['common.d.ts'],
         dest: 'node_modules/grafana-sdk-mocks/app/headers/'
       }
     },

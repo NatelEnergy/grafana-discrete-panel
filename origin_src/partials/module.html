@@ -1,8 +1,8 @@
 
-<div class="canvas-spot" style="width:100%;height:auto;"></div>
-<div class="discrete-Theme"></div>
+<div class="canvas-spot" style="width:100%;"></div>
 
-<div ng-show="ctrl.panel.showLegend" ng-style="{fontSize:ctrl.getFontSize(ctrl.panel.FontSize)}">
+
+<div ng-show="ctrl.panel.showLegend">
     <div ng-repeat="metric in ctrl.data">
         <span ng-show="ctrl.panel.showLegendNames">{{ metric.name }}: </span>
         <div ng-show="ctrl.panel.showLegendValues"
