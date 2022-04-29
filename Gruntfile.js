@@ -16,49 +16,49 @@ module.exports = function(grunt) {
         expand: true,
         cwd: 'src',
         src: ['**/*.ts', '**/*.d.ts'],
-        dest: 'dist'
+        dest: 'dist',
       },
       dist_html: {
         expand: true,
         flatten: true,
         cwd: 'src/partials',
         src: ['*.html'],
-        dest: 'dist/partials/'
+        dest: 'dist/partials/',
       },
       dist_css: {
         expand: true,
         flatten: true,
         cwd: 'src/css',
         src: ['*.css'],
-        dest: 'dist/css/'
+        dest: 'dist/css/',
       },
       dist_img: {
         expand: true,
         flatten: true,
         cwd: 'src/img',
         src: ['*.*'],
-        dest: 'dist/img/'
+        dest: 'dist/img/',
       },
       dist_statics: {
         expand: true,
         flatten: true,
         src: ['src/*.json', 'LICENSE', 'README.md'],
-        dest: 'dist/'
+        dest: 'dist/',
       },
       app_core_utils: {
         expand: true,
         flatten: true,
         cwd: 'reference',
-        src: ['fontsize.ts','operationURL.ts'],
-        dest: 'node_modules/grafana-sdk-mocks/app/core/utils/'
+        src: ['fontsize.ts', 'operationURL.ts'],
+        dest: 'node_modules/grafana-sdk-mocks/app/core/utils/',
       },
       app_headers: {
         expand: true,
         flatten: true,
         cwd: 'reference',
-        src: ['commod.d.ts'],
-        dest: 'node_modules/grafana-sdk-mocks/app/headers/'
-      }
+        src: ['common.d.ts'],
+        dest: 'node_modules/grafana-sdk-mocks/app/headers/',
+      },
     },
 
     typescript: {
@@ -74,37 +74,49 @@ module.exports = function(grunt) {
           experimentalDecorators: true,
           sourceMap: true,
           noImplicitAny: false,
-        }
-      }
+        },
+      },
     },
 
     'string-replace': {
       dist: {
-        files: [{
-          cwd: 'src',
-          expand: true,
-          src: ["**/plugin.json"],
-          dest: 'dist'
-        }],
+        files: [
+          {
+            cwd: 'src',
+            expand: true,
+            src: ['**/plugin.json'],
+            dest: 'dist',
+          },
+        ],
         options: {
-          replacements: [{
-            pattern: '%VERSION%',
-            replacement: pkgJson.version
-          },{
-            pattern: '%TODAY%',
-            replacement: '<%= grunt.template.today("yyyy-mm-dd") %>'
-          }]
-        }
-      }
+          replacements: [
+            {
+              pattern: '%VERSION%',
+              replacement: pkgJson.version,
+            },
+            {
+              pattern: '%TODAY%',
+              replacement: '<%= grunt.template.today("yyyy-mm-dd") %>',
+            },
+          ],
+        },
+      },
     },
 
     watch: {
-      files: ['src/**/*.ts', 'src/**/*.html', 'src/**/*.css', 'src/img/*.*', 'src/plugin.json', 'README.md'],
+      files: [
+        'src/**/*.ts',
+        'src/**/*.html',
+        'src/**/*.css',
+        'src/img/*.*',
+        'src/plugin.json',
+        'README.md',
+      ],
       tasks: ['default'],
       options: {
         debounceDelay: 250,
       },
-    }
+    },
   });
 
   grunt.registerTask('default', [
@@ -117,6 +129,6 @@ module.exports = function(grunt) {
     'copy:dist_css',
     'copy:dist_img',
     'copy:dist_statics',
-    'string-replace'
+    'string-replace',
   ]);
 };
