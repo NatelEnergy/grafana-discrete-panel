@@ -1,5 +1,8 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
 
+//shaun add 2022/4/29
+import { PanelProps } from '../node_modules/@grafana/data';
+
 import config from 'app/core/config';
 
 import {CanvasPanelCtrl} from './canvas-metric';

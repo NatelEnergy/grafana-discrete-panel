@@ -6,7 +6,7 @@
   "info": {
     "description": "Discrete Events grafana",
     "author": {
-      "name": "Advantech"
+      "name": "Natel Energy"
     },
     "keywords": ["discrete", "events", "strings"],
     "logos": {
@@ -33,10 +33,9 @@
       {"name": "Options", "path": "img/screenshot-options-1.png"},
       {"name": "Legend", "path": "img/screenshot-options-2.png"}
     ],
-    "version": "1.1.1",
-    "updated": "2022-1-14"
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
   },
-  "version": "1.1.0",
 
   "dependencies": {
     "grafanaVersion": "4.x.x",
