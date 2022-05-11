@@ -1,8 +1,4 @@
 ///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
-
-//shaun add 2022/4/29
-import { PanelProps } from '../node_modules/@grafana/data';
-
 import config from 'app/core/config';
 
 import {CanvasPanelCtrl} from './canvas-metric';
@@ -248,6 +244,30 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     }
     this.timeSrv = $scope.ctrl.timeSrv;
   }
+  // Shaun add 20220506 replace val with Dashboard Variables
+  replaceCodes(val) {
+    const templateSrv = this.templateSrv;
+    const mapcode = {
+      group: '',
+      Value: '',
+      Text: '',
+    };
+    console.log(this.data[0].name);
+    let gp = this.data[0].name.replace(/\d/g, '');
+    // console.log(templateSrv.index['code']);
+    if (templateSrv.index['code']) {
+      for (let j = 0; j < templateSrv.index['code'].options.length; j++) {
+        [mapcode.group, mapcode.Value, mapcode.Text] = templateSrv.index['code'].options[
+          j
+        ].text.split('|');
+        console.log(gp + val, mapcode.group + mapcode.Value);
+        if (gp + val === mapcode.group + mapcode.Value) {
+          val = mapcode.Text;
+        }
+      }
+    }
+    return val;
+  }
 
   onDataSnapshotLoad(snapshotData) {
     this.onDataReceived(snapshotData);
@@ -360,7 +380,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         colorValue: '',
         colorText: '',
       };
-      let map = this.panel.valueMaps[i];
+
+      var map = this.panel.valueMaps[i];
       // special null case
       if (map.value === 'null') {
         if (isNull) {
@@ -602,6 +623,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
   getLegendDisplay(info, metric) {
     let disp = info.val;
+    // Shaun add 20220506 replace disp with Dashboard Variables
+    disp = this.replaceCodes(disp);
     if (
       this.panel.showLegendPercent ||
       this.panel.showLegendCounts ||
@@ -653,6 +676,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let to = point.start + point.ms;
     let time = point.ms;
     let val = point.val;
+    // Shaun add 20220506 replace val with Dashboard Variables
+    val = this.replaceCodes(val);
 
     if (this.mouse.down != null) {
       from = Math.min(this.mouse.down.ts, this.mouse.position.ts);
@@ -1000,7 +1025,8 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         for (let j = 0; j < positions.length; j++) {
           if (positions[j] <= this.mouse.position.x) {
             if (j >= positions.length - 1 || positions[j + 1] >= this.mouse.position.x) {
-              let val = this._getVal(i, j);
+              //Shaun modify 20220506 replace val with Dashboard Variables
+              let val = this.replaceCodes(this._getVal(i, j));
               ctx.fillStyle = this.panel.valueTextColor;
               ctx.textAlign = 'left';
               hoverTextStart = positions[j] + offset;

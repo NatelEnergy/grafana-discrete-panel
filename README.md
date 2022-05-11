@@ -31,6 +31,12 @@ yarn pretty
 
 #### Changelog
 
+##### rebuild v0.0.7 with Advantech v1.1.1 source code
+
+* Add replaceCodes function that can use system variable $code with panel values and colors mapping.
+* The $code format like: groupname|$No.|status, for example: FX|$1|started.
+* The function will check legendInfo-without-number with groupname.
+
 ##### v0.0.8 (not released yet)
 
 * TODO... annotations

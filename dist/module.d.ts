@@ -63,6 +63,7 @@ declare class DiscretePanelCtrl extends CanvasPanelCtrl {
     noPoints: boolean;
     timeSrv: any;
     constructor($scope: any, $injector: any);
+    replaceCodes(val: any): any;
     onDataSnapshotLoad(snapshotData: any): void;
     onPanelInitialized(): void;
     onDataError(err: any): void;
