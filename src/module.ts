@@ -22,7 +22,14 @@ import kbn from 'grafana/app/core/utils/kbn';
 import appEvents from 'grafana/app/core/app_events';
 
 /* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
-import moment from 'moment';
+//import moment from 'moment';
+import dayjs, { extend } from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import utc from 'dayjs/plugin/utc';
+extend(duration);
+extend(relativeTime);
+extend(utc);
 
 const grafanaColors = [
   '#7EB26D',
@@ -255,7 +262,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       body += info.count + ' times<br/>for<br/>';
     }
 
-    body += this.formatDuration(moment.duration(info.ms));
+    body += this.formatDuration(dayjs.duration(info.ms));
 
     if (info.count > 1) {
       body += '<br/>total';
@@ -499,9 +506,39 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let limit = false;
 
     for (const o of this.panel.timeOptions) {
-      dir[o.value] = parseInt(duration.as(o.value), 10);
+      switch(o.value) {
+        case "years":
+          dir[o.value] = duration.years();
+          break;
+        case "months":
+          dir[o.value] = duration.months();
+          break;
+        case "weeks":
+          dir[o.value] = duration.weeks();
+          break;
+        case "days":
+          dir[o.value] = duration.days();
+          break;
+        case "hours":
+          dir[o.value] = duration.hours();
+          break;
+        case "minutes":
+          dir[o.value] = duration.minutes();
+          break;
+        case "seconds":
+          dir[o.value] = duration.seconds();
+          break;
+        case "milliseconds":
+          dir[o.value] = duration.milliseconds();
+          break;
+        default:
+          dir[o.value] = 0;
+          break;
+      }
+      //dir[o.value] = 0;
+      //dir[o.value] = parseInt(duration['$d'][o.value], 10);
       hasValue = dir[o.value] || hasValue;
-      duration.subtract(moment.duration(dir[o.value], o.value));
+      duration.subtract(dayjs.duration(dir[o.value], o.value));
       limit = this.panel.timePrecision.value === o.value || limit;
 
       // always show a value in case it is less than the configured
@@ -510,7 +547,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         break;
       }
     }
-
+    
     const rs = Object.keys(dir).reduce((carry, key) => {
       const value = dir[key];
       if (!value) {
@@ -519,7 +556,6 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       key = value < 2 ? key.replace(/s$/, '') : key;
       return `${carry} ${value} ${key},`;
     }, '');
-
     return rs.substr(0, rs.length - 1);
   }
 
@@ -529,7 +565,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       disp += ' (';
       let hassomething = false;
       if (this.panel.showLegendTime) {
-        disp += this.formatDuration(moment.duration(info.ms));
+        disp += this.formatDuration(dayjs.duration(info.ms));
         hassomething = true;
       }
 
@@ -586,10 +622,10 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
     let body = '<div class="graph-tooltip-time">' + val + '</div>';
 
     body += '<center>';
-    body += this.dashboard.formatDate(moment(from), timeformat) + '<br/>';
+    body += this.dashboard.formatDate(dayjs(from), timeformat) + '<br/>';
     body += 'to<br/>';
-    body += this.dashboard.formatDate(moment(to), timeformat) + '<br/><br/>';
-    body += this.formatDuration(moment.duration(time)) + '<br/>';
+    body += this.dashboard.formatDate(dayjs(to), timeformat) + '<br/><br/>';
+    body += this.formatDuration(dayjs.duration(time)) + '<br/>';
     body += '</center>';
 
     let pageX = 0;
@@ -616,7 +652,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
   }
 
   getCorrectTime(ts: number) {
-    const from = moment(this.range.from).valueOf();
+    const from = dayjs(this.range.from).valueOf();
     return ts < from ? from : ts;
   }
 
@@ -704,7 +740,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     const pt = this.hoverPoint;
     if (pt && pt.start) {
-      const range = { from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms) };
+      const range = { from: dayjs.utc(pt.start), to: dayjs.utc(pt.start + pt.ms) };
       this.timeSrv.setTime(range);
       this.clear();
     }
