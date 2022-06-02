@@ -1,7 +1,7 @@
 import { MetricsPanelCtrl } from 'grafana/app/plugins/sdk';
 
 /* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
-//import moment from 'moment';
+import moment from 'moment';
 import dayjs, { extend } from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -244,7 +244,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
           } else {
             const min = Math.min(this.mouse.down.ts, up.ts);
             const max = Math.max(this.mouse.down.ts, up.ts);
-            const range = { from: dayjs.utc(min), to: dayjs.utc(max) };
+            const range = { from: moment.utc(min), to: moment.utc(max) };
             this.mouse.position = up;
             this.onMouseSelectedRange(range, evt);
           }

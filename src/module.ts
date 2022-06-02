@@ -22,7 +22,7 @@ import kbn from 'grafana/app/core/utils/kbn';
 import appEvents from 'grafana/app/core/app_events';
 
 /* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
-//import moment from 'moment';
+import moment from 'moment';
 import dayjs, { extend } from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -740,7 +740,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
 
     const pt = this.hoverPoint;
     if (pt && pt.start) {
-      const range = { from: dayjs.utc(pt.start), to: dayjs.utc(pt.start + pt.ms) };
+      const range = { from: moment.utc(pt.start), to: moment.utc(pt.start + pt.ms) };
       this.timeSrv.setTime(range);
       this.clear();
     }
