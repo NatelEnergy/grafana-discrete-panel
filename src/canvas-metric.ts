@@ -2,6 +2,13 @@ import { MetricsPanelCtrl } from 'grafana/app/plugins/sdk';
 
 /* eslint-disable id-blacklist, no-restricted-imports, @typescript-eslint/ban-types */
 import moment from 'moment';
+import dayjs, { extend } from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import utc from 'dayjs/plugin/utc';
+extend(duration);
+extend(relativeTime);
+extend(utc);
 
 import $ from 'jquery';
 
@@ -72,7 +79,7 @@ export class CanvasPanelCtrl extends MetricsPanelCtrl {
 
     let time = '';
     if (this.mouse.position != null) {
-      time = this.dashboard.formatDate(moment(this.mouse.position.ts));
+      time = this.dashboard.formatDate(dayjs(this.mouse.position.ts));
     }
 
     ctx.fillStyle = '#999999';
