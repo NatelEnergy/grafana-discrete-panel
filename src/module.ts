@@ -252,7 +252,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       Value: '',
       Text: '',
     };
-    console.log(this.data[0].name);
+    // console.log(this.data[0].name);
     let gp = this.data[0].name.replace(/\d/g, '');
     // console.log(templateSrv.index['code']);
     if (templateSrv.index['code']) {
