@@ -253,14 +253,14 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
       Text: '',
     };
     // console.log(this.data[0].name);
-    let gp = this.data[0].name.replace(/\d/g, '');
+    let gp = this.data[0].name.replace(/\d/g, ''); // get group name
     // console.log(templateSrv.index['code']);
     if (templateSrv.index['code']) {
       for (let j = 0; j < templateSrv.index['code'].options.length; j++) {
         [mapcode.group, mapcode.Value, mapcode.Text] = templateSrv.index['code'].options[
           j
         ].text.split('|');
-        console.log(gp + val, mapcode.group + mapcode.Value);
+        // console.log(gp + val, mapcode.group + mapcode.Value);
         if (gp + val === mapcode.group + mapcode.Value) {
           val = mapcode.Text;
         }
