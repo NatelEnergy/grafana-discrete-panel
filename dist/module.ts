@@ -260,7 +260,7 @@ class DiscretePanelCtrl extends CanvasPanelCtrl {
         [mapcode.group, mapcode.Value, mapcode.Text] = templateSrv.index['code'].options[
           j
         ].text.split('|');
-        console.log(gp + val, mapcode.group + mapcode.Value);
+        // console.log(gp + val, mapcode.group + mapcode.Value);
         if (gp + val === mapcode.group + mapcode.Value) {
           val = mapcode.Text;
         }
