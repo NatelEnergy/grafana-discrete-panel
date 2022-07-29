@@ -267,7 +267,7 @@ System.register(['./canvas-metric', './distinct-points', 'lodash', 'jquery', 'mo
                         Text: '',
                     };
                     // console.log(this.data[0].name);
-                    var gp = this.data[0].name.replace(/\d/g, '');
+                    var gp = this.data[0].name.replace(/\d/g, ''); // get group name
                     // console.log(templateSrv.index['code']);
                     if (templateSrv.index['code']) {
                         for (var j = 0; j < templateSrv.index['code'].options.length; j++) {
